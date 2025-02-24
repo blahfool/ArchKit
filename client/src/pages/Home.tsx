@@ -14,7 +14,25 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative">
-      {/* Blueprint grid background */}
+      {/* Brick gradient background */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            linear-gradient(45deg, 
+              rgba(229, 231, 235, 0.05) 25%, 
+              transparent 25%,
+              transparent 75%,
+              rgba(229, 231, 235, 0.05) 75%,
+              rgba(229, 231, 235, 0.05)
+            )
+          `,
+          backgroundSize: '60px 60px',
+          opacity: 0.4
+        }}
+      />
+
+      {/* Blueprint grid overlay */}
       <div 
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
