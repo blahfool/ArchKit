@@ -2,12 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background: 220 50% 98%;
+  --foreground: 222.2 84% 4.9%;
+  background: linear-gradient(135deg, hsl(215 100% 96%), hsl(235 100% 97%), hsl(255 100% 98%));
+  min-height: 100vh;
+}
+
 @layer base {
   * {
     @apply border-border;
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
   }
 }
