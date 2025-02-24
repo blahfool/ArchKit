@@ -12,16 +12,15 @@ export default function About() {
           <div className="prose prose-sm dark:prose-invert">
             <h2 className="text-2xl font-semibold mb-4">The Developer</h2>
             <p>
-              Hi! I'm Rani, the developer behind ArchKit. As someone passionate about both
-              architecture and programming, I created this tool to help architecture
-              students prepare for their licensure exams and daily studies.
+              Hi! I'm Rani, the developer behind ArchKit. I created this tool to help
+              architecture students have an easier time with their studies and exam
+              preparation.
             </p>
 
             <div className="my-8 p-4 bg-primary/5 rounded-lg">
               <p className="italic text-muted-foreground">
-                Special thanks to Pey, my {"<3"}, for being the inspiration and
-                support throughout this project. Your architectural insights were
-                invaluable!
+                Dedicating this project to Pey, my {"<3"}. Wishing you all the success
+                in your architectural journey!
               </p>
               <Heart className="text-red-500 mt-2 mx-auto h-6 w-6" />
             </div>
