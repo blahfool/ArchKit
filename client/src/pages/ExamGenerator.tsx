@@ -39,7 +39,7 @@ export default function ExamGenerator() {
     setShowResults(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const graded = questions.map(q => ({
       ...q,
       isCorrect: q.userAnswer?.toLowerCase().trim() === 
@@ -47,6 +47,13 @@ export default function ExamGenerator() {
     }));
     setQuestions(graded);
     setShowResults(true);
+
+    const score = graded.filter(q => q.isCorrect).length;
+    await fetch('/api/quiz-scores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ score, total: questions.length })
+    });
   };
 
   const score = questions.filter(q => q.isCorrect).length;

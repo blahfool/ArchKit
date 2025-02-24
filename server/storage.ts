@@ -37,7 +37,41 @@ export class SQLiteStorage implements IStorage {
         description TEXT NOT NULL,
         variables TEXT NOT NULL
       );
+
+      CREATE TABLE IF NOT EXISTS quiz_scores (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        score INTEGER NOT NULL,
+        total INTEGER NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS study_time (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        duration INTEGER NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
     `);
+  }
+
+  async addQuizScore(score: number, total: number): Promise<void> {
+    this.db.prepare(
+      "INSERT INTO quiz_scores (score, total) VALUES (?, ?)"
+    ).run(score, total);
+  }
+
+  async getQuizScores(): Promise<any[]> {
+    return this.db.prepare("SELECT * FROM quiz_scores ORDER BY timestamp DESC LIMIT 10").all();
+  }
+
+  async addStudyTime(duration: number): Promise<void> {
+    this.db.prepare(
+      "INSERT INTO study_time (duration) VALUES (?)"
+    ).run(duration);
+  }
+
+  async getTotalStudyTime(): Promise<number> {
+    const result = this.db.prepare("SELECT SUM(duration) as total FROM study_time").get();
+    return result.total || 0;
   }
 
   async getAllTerms(): Promise<Term[]> {
