@@ -1,3 +1,4 @@
+import Database from "better-sqlite3";
 import {
   type Term,
   type InsertTerm,
@@ -12,40 +13,66 @@ export interface IStorage {
   createFormula(formula: InsertFormula): Promise<Formula>;
 }
 
-export class MemStorage implements IStorage {
-  private terms: Map<number, Term>;
-  private formulas: Map<number, Formula>;
-  private termId: number;
-  private formulaId: number;
+export class SQLiteStorage implements IStorage {
+  private db: Database.Database;
 
   constructor() {
-    this.terms = new Map();
-    this.formulas = new Map();
-    this.termId = 1;
-    this.formulaId = 1;
+    this.db = new Database("archkit.db");
+    this.initDatabase();
+  }
+
+  private initDatabase() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS terms (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        term TEXT NOT NULL,
+        definition TEXT NOT NULL,
+        category VARCHAR(50) NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS formulas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        formula TEXT NOT NULL,
+        description TEXT NOT NULL,
+        variables TEXT NOT NULL
+      );
+    `);
   }
 
   async getAllTerms(): Promise<Term[]> {
-    return Array.from(this.terms.values());
+    return this.db.prepare("SELECT * FROM terms").all() as Term[];
   }
 
   async getAllFormulas(): Promise<Formula[]> {
-    return Array.from(this.formulas.values());
+    return this.db.prepare("SELECT * FROM formulas").all() as Formula[];
   }
 
   async createTerm(insertTerm: InsertTerm): Promise<Term> {
-    const id = this.termId++;
-    const term: Term = { ...insertTerm, id };
-    this.terms.set(id, term);
-    return term;
+    const result = this.db
+      .prepare(
+        "INSERT INTO terms (term, definition, category) VALUES (?, ?, ?) RETURNING *"
+      )
+      .get(insertTerm.term, insertTerm.definition, insertTerm.category) as Term;
+
+    return result;
   }
 
   async createFormula(insertFormula: InsertFormula): Promise<Formula> {
-    const id = this.formulaId++;
-    const formula: Formula = { ...insertFormula, id };
-    this.formulas.set(id, formula);
-    return formula;
+    const result = this.db
+      .prepare(
+        "INSERT INTO formulas (name, formula, description, variables) VALUES (?, ?, ?, ?) RETURNING *"
+      )
+      .get(
+        insertFormula.name,
+        insertFormula.formula,
+        insertFormula.description,
+        insertFormula.variables
+      ) as Formula;
+
+    return result;
   }
 }
 
-export const storage = new MemStorage();
+// Initialize storage with SQLite implementation
+export const storage = new SQLiteStorage();
