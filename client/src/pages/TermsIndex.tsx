@@ -20,21 +20,27 @@ export default function TermsIndex() {
   );
 
   return (
-    <div className="min-h-screen p-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">Architecture Terms</h1>
+    <div className="min-h-screen p-3 sm:p-4 md:p-6">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 md:mb-8 text-center">
+        Architecture Terms
+      </h1>
 
       <div className="max-w-2xl mx-auto">
         <Input
-          className="mb-6"
+          className="mb-4 sm:mb-6"
           placeholder="Search terms..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
         <Tabs defaultValue={categories[0]}>
-          <TabsList className="w-full flex-wrap h-auto">
+          <TabsList className="w-full flex-wrap h-auto mb-4">
             {categories.map(category => (
-              <TabsTrigger key={category} value={category}>
+              <TabsTrigger 
+                key={category} 
+                value={category}
+                className="text-xs sm:text-sm py-1.5 px-2 sm:px-3"
+              >
                 {category}
               </TabsTrigger>
             ))}
@@ -42,14 +48,16 @@ export default function TermsIndex() {
 
           {categories.map(category => (
             <TabsContent key={category} value={category}>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {filteredTerms
                   ?.filter(term => term.category === category)
                   .map(term => (
                     <Card key={term.id}>
-                      <CardContent className="pt-6">
-                        <h3 className="text-lg font-semibold">{term.term}</h3>
-                        <p className="mt-2 text-muted-foreground">
+                      <CardContent className="p-3 sm:p-4 md:p-6">
+                        <h3 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2">
+                          {term.term}
+                        </h3>
+                        <p className="text-sm sm:text-base text-muted-foreground">
                           {term.definition}
                         </p>
                       </CardContent>

@@ -19,7 +19,7 @@ export default function Calculator() {
 
   const calculateResult = () => {
     if (!selectedFormula) return;
-    
+
     try {
       const scope = variables;
       const result = evaluate(selectedFormula.formula, scope);
@@ -37,10 +37,24 @@ export default function Calculator() {
   };
 
   return (
-    <div className="min-h-screen p-4 flex flex-col items-center">
-      <h1 className="text-3xl font-bold mb-8">Architectural Calculator</h1>
+    <div className="min-h-screen p-4 flex flex-col items-center relative">
+      {/* Blueprint grid background */}
+      <div 
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, var(--primary) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--primary) 1px, transparent 1px)
+          `,
+          backgroundSize: '20px 20px'
+        }}
+      />
 
-      <Card className="w-full max-w-md">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 tracking-tight">
+        Architectural Calculator
+      </h1>
+
+      <Card className="w-full max-w-md bg-background/60 backdrop-blur border-primary/20">
         <CardContent className="pt-6">
           <Select
             onValueChange={(value) => {
@@ -50,7 +64,7 @@ export default function Calculator() {
               setResult(null);
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger className="mb-4">
               <SelectValue placeholder="Select a formula" />
             </SelectTrigger>
             <SelectContent>
@@ -65,27 +79,30 @@ export default function Calculator() {
           {selectedFormula && (
             <div className="mt-4 space-y-4">
               <p className="text-sm text-muted-foreground">{selectedFormula.description}</p>
-              
-              {selectedFormula.variables.split(",").map((variable) => (
-                <div key={variable} className="space-y-2">
-                  <label className="text-sm font-medium">{variable.trim()}</label>
-                  <Input
-                    type="number"
-                    placeholder={`Enter ${variable.trim()}`}
-                    onChange={(e) => handleVariableChange(variable.trim(), e.target.value)}
-                  />
-                </div>
-              ))}
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {selectedFormula.variables.split(",").map((variable) => (
+                  <div key={variable} className="space-y-2">
+                    <label className="text-sm font-medium">{variable.trim()}</label>
+                    <Input
+                      type="number"
+                      placeholder={`Enter ${variable.trim()}`}
+                      onChange={(e) => handleVariableChange(variable.trim(), e.target.value)}
+                      className="transition-all hover:border-primary/50 focus:border-primary"
+                    />
+                  </div>
+                ))}
+              </div>
 
               <Button 
-                className="w-full" 
+                className="w-full transition-all hover:shadow-md" 
                 onClick={calculateResult}
               >
                 Calculate
               </Button>
 
               {result !== null && (
-                <div className="mt-4 p-4 bg-primary/10 rounded-lg">
+                <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
                   <p className="text-center font-medium">
                     Result: {result.toFixed(2)}
                   </p>
@@ -95,7 +112,7 @@ export default function Calculator() {
           )}
         </CardContent>
       </Card>
-      
+
       <BackButton />
     </div>
   );
