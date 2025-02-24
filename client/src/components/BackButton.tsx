@@ -7,12 +7,12 @@ export default function BackButton() {
 
   return (
     <Button
-      variant="ghost"
+      variant="secondary"
       onClick={() => setLocation("/")}
-      className="fixed bottom-4 left-4"
+      className="fixed bottom-6 left-6 shadow-lg bg-background/80 backdrop-blur-sm"
     >
       <ArrowLeft className="h-4 w-4 mr-2" />
-      Back
+      Back to Home
     </Button>
   );
 }
