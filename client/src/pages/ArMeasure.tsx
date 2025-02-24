@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import BackButton from "@/components/BackButton";
-import { Camera, Ruler, Maximize2, Move, Reset } from "lucide-react";
+import { Camera, Ruler, Maximize2, Move, RotateCcw } from "lucide-react";
 
 export default function ArMeasure() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -167,7 +167,7 @@ export default function ArMeasure() {
               variant="outline"
               onClick={handleReset}
             >
-              <Reset className="h-4 w-4" />
+              <RotateCcw className="h-4 w-4" />
             </Button>
           </div>
 
