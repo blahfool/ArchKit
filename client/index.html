@@ -26,7 +26,7 @@
     <div id="root"></div>
     <script type="module" src="./src/main.tsx"></script>
     <script>
-      // Register Service Worker with better error handling and offline support
+      // PWA installation and offline support
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', async () => {
           try {
@@ -50,16 +50,29 @@
               });
             });
 
-            // Add offline capability notification
-            window.addEventListener('online', () => {
-              console.log('Application is online');
+            // Track online/offline status
+            const updateOnlineStatus = () => {
+              const status = navigator.onLine ? 'online' : 'offline';
+              console.log(`Application is ${status}`);
+              document.body.dataset.connectionStatus = status;
+            };
+
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            updateOnlineStatus(); // Initial check
+
+            // Track installation status
+            window.addEventListener('beforeinstallprompt', (e) => {
+              // Prevent Chrome 67 and earlier from automatically showing the prompt
+              e.preventDefault();
+              // Store the event for later use
+              console.log('PWA is installable');
             });
 
-            window.addEventListener('offline', () => {
-              console.log('Application is offline - continuing with cached content');
+            window.addEventListener('appinstalled', () => {
+              console.log('PWA was installed');
             });
 
-            // Log successful registration
             console.log('ServiceWorker registration successful');
           } catch (err) {
             console.error('ServiceWorker registration failed: ', err);
