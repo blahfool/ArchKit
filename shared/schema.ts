@@ -143,6 +143,126 @@ export const fallbackTerms = [
     term: "Form Follows Function",
     definition: "Design principle where building shape is primarily determined by its intended purpose and functional requirements.",
     category: "Design Principles"
+  },
+  {
+    term: "HVAC System",
+    definition: "Heating, Ventilation, and Air Conditioning system that controls indoor environmental conditions for occupant comfort and air quality.",
+    category: "Building Systems"
+  },
+  {
+    term: "Post-Tensioning",
+    definition: "Construction method where steel cables in concrete are tensioned after the concrete has hardened to provide additional structural strength.",
+    category: "Construction"
+  },
+  {
+    term: "Professional Liability Insurance",
+    definition: "Insurance coverage protecting architects against claims of negligence or failure to perform professional duties.",
+    category: "Professional Practice"
+  },
+  {
+    term: "Means of Egress",
+    definition: "Continuous and unobstructed path of exit travel from any point in a building to a public way, including exit access, exit, and exit discharge.",
+    category: "Building Codes"
+  },
+  {
+    term: "Moment Frame",
+    definition: "Structural system where beams and columns are rigidly connected to resist lateral forces through bending of frame elements.",
+    category: "Structural Systems"
+  },
+  {
+    term: "Value Engineering",
+    definition: "Systematic method to improve value by analyzing function versus cost while maintaining performance requirements.",
+    category: "Project Management"
+  },
+  {
+    term: "Building Envelope",
+    definition: "Physical separator between interior and exterior environments, including walls, roof, and foundation, crucial for energy efficiency.",
+    category: "Building Systems"
+  },
+  {
+    term: "Fire-Resistance Rating",
+    definition: "Time period that a building element can withstand standard fire test conditions while maintaining structural integrity.",
+    category: "Building Codes"
+  },
+  {
+    term: "ADA Compliance",
+    definition: "Meeting requirements of the Americans with Disabilities Act for accessible design in buildings and facilities.",
+    category: "Regulations"
+  },
+  {
+    term: "Vapor Barrier",
+    definition: "Material that restricts the passage of water vapor through walls, ceilings, and floors to prevent condensation.",
+    category: "Construction"
+  },
+  {
+    term: "Design Development",
+    definition: "Phase of architectural services where preliminary design is refined with detailed drawings and specifications.",
+    category: "Professional Practice"
+  },
+  {
+    term: "Curtain Wall System",
+    definition: "Non-load-bearing exterior wall system attached to the building structure, typically consisting of glass and metal framing.",
+    category: "Building Systems"
+  },
+  {
+    term: "Critical Path Method",
+    definition: "Project management technique identifying activities that directly impact the project completion time.",
+    category: "Project Management"
+  },
+  {
+    term: "Thermal Bridge",
+    definition: "Area of construction with higher heat transfer than surrounding materials, reducing overall thermal efficiency.",
+    category: "Environmental Design"
+  },
+  {
+    term: "Construction Administration",
+    definition: "Architect's role during construction to ensure project is built according to design intent and contract documents.",
+    category: "Professional Practice"
+  },
+  {
+    term: "Structural Grid",
+    definition: "System of reference lines used to organize and coordinate building structure and components.",
+    category: "Construction"
+  },
+  {
+    term: "Daylighting",
+    definition: "Use of natural light to illuminate building interiors, reducing energy consumption and improving occupant well-being.",
+    category: "Environmental Design"
+  },
+  {
+    term: "Specification Writing",
+    definition: "Detailed description of materials, products, and workmanship required for construction projects.",
+    category: "Professional Practice"
+  },
+  {
+    term: "Building Code Analysis",
+    definition: "Evaluation of building design against applicable codes and regulations for compliance.",
+    category: "Regulations"
+  },
+  {
+    term: "Construction Documents",
+    definition: "Drawings, specifications, and other documents prepared by architects for building permit and construction.",
+    category: "Professional Practice"
+  },
+  {
+    term: "Site Analysis",
+    definition: "Evaluation of site conditions including topography, climate, vegetation, and context to inform design decisions.",
+    category: "Design Process"
+  },
+  {
+    term: "Load Calculations",
+    definition: "Determination of structural loads and forces acting on building elements for proper design.",
+    category: "Structural Systems"
+  },
+  {
+    term: "Building Commissioning",
+    definition: "Process of verifying building systems perform according to design intent and owner requirements.",
+    category: "Building Systems"
+  },
+  {
+    term: "Zoning Requirements",
+    definition: "Local regulations controlling land use, building height, setbacks, and density in specific areas.",
+    category: "Urban Planning"
   }
 ];
 
