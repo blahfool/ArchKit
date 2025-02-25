@@ -19,6 +19,7 @@ import BuildingCodes from "@/pages/BuildingCodes";
 import ProfessionalTools from "@/pages/ProfessionalTools";
 import About from "@/pages/About";
 import NotFound from "@/pages/not-found";
+import AI from "@/pages/AI"; // Added import
 
 // Components
 import ThemeToggle from "@/components/ThemeToggle";
@@ -57,6 +58,7 @@ function Router() {
         <Route path="/codes" component={BuildingCodes} />
         <Route path="/professional" component={ProfessionalTools} />
         <Route path="/about" component={About} />
+        <Route path="/ai" component={AI} /> {/* Added route */}
         <Route component={NotFound} />
       </Switch>
       <OfflineIndicator />

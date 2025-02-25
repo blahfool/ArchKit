@@ -13,7 +13,8 @@ import {
   FileCode, 
   PenSquare,
   ClipboardList,
-  ChevronRight
+  ChevronRight,
+  Sparkles
 } from "lucide-react";
 
 export default function Home() {
@@ -29,6 +30,13 @@ export default function Home() {
   }, []);
 
   const menuItems = [
+    { 
+      icon: Sparkles, 
+      label: "Ask AI", 
+      href: "/ai",
+      description: "AI-powered architectural design assistant",
+      featured: true
+    },
     { 
       icon: Calculator, 
       label: "Calculator", 
@@ -147,18 +155,29 @@ export default function Home() {
             <Link 
               key={item.href} 
               href={item.href}
-              className="group"
+              className={`group ${item.featured ? 'sm:col-span-2 lg:col-span-3' : ''}`}
             >
-              <Card className="h-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]">
-                <CardContent className="p-6 flex flex-col items-center text-center gap-4">
-                  <div className="rounded-full bg-primary/5 p-3 transition-colors group-hover:bg-primary/10">
-                    <item.icon className="h-8 w-8" />
+              <Card className={`h-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] ${
+                item.featured ? 'bg-gradient-to-r from-primary/10 via-primary/5 to-background border-primary/20' : ''
+              }`}>
+                <CardContent className={`p-6 flex flex-col items-center text-center gap-4 ${
+                  item.featured ? 'sm:flex-row sm:text-left sm:justify-between' : ''
+                }`}>
+                  <div className={`rounded-full bg-primary/5 p-3 transition-colors group-hover:bg-primary/10 ${
+                    item.featured ? 'sm:order-2' : ''
+                  }`}>
+                    <item.icon className={`h-8 w-8 ${item.featured ? 'text-primary' : ''}`} />
                   </div>
-                  <div>
-                    <h2 className="text-xl font-semibold mb-2 tracking-wide">{item.label}</h2>
+                  <div className={item.featured ? 'sm:order-1' : ''}>
+                    <h2 className="text-xl font-semibold mb-2 tracking-wide">
+                      {item.label}
+                      {item.featured && <span className="ml-2 text-xs font-normal text-primary-foreground/70">New</span>}
+                    </h2>
                     <p className="text-sm text-muted-foreground">{item.description}</p>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-primary/40 transition-transform group-hover:translate-x-1" />
+                  <ChevronRight className={`h-5 w-5 text-primary/40 transition-transform group-hover:translate-x-1 ${
+                    item.featured ? 'sm:order-3' : ''
+                  }`} />
                 </CardContent>
               </Card>
             </Link>
