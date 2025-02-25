@@ -1,8 +1,8 @@
 import { Term } from "@shared/schema";
 
 interface QuestionTemplate {
-  type: 'multiple-choice' | 'true-false' | 'fill-in-blank' | 'chronological' | 'calculation';
-  generate: (term: Term) => Question;
+  type: 'multiple-choice' | 'true-false' | 'fill-in-blank' | 'chronological' | 'calculation' | 'complex';
+  generate: (term: Term, allTerms: Term[]) => Question;
 }
 
 interface BaseQuestion {
@@ -41,99 +41,135 @@ interface CalculationQuestion extends BaseQuestion {
   correctAnswer: number;
   tolerance: number;
   unit: string;
+  steps: string[];
 }
 
-type Question = MultipleChoiceQuestion | TrueFalseQuestion | FillInBlankQuestion | ChronologicalQuestion | CalculationQuestion;
+interface ComplexQuestion extends BaseQuestion {
+  type: 'complex';
+  parts: {
+    question: string;
+    correctAnswer: string;
+    explanation: string;
+  }[];
+  dependencies: boolean[]; // If part N depends on part N-1
+}
+
+type Question = MultipleChoiceQuestion | TrueFalseQuestion | FillInBlankQuestion | ChronologicalQuestion | CalculationQuestion | ComplexQuestion;
 
 const templates: QuestionTemplate[] = [
   {
     type: 'multiple-choice',
-    generate: (term: Term): MultipleChoiceQuestion => {
-      const otherOptions = [
-        `Not related to ${term.category}`,
-        `Opposite of ${term.term}`,
-        `Alternative to ${term.term}`
-      ];
+    generate: (term: Term, allTerms: Term[]): MultipleChoiceQuestion => {
+      // Find related terms in the same category for more challenging options
+      const relatedTerms = allTerms.filter(t => 
+        t.category === term.category && t.id !== term.id
+      );
+
+      // Create plausible but incorrect options
+      const otherOptions = relatedTerms
+        .slice(0, 3)
+        .map(t => t.definition)
+        .concat([
+          `A combination of ${term.term} and ${relatedTerms[0]?.term || 'another concept'}`,
+          `The opposite application of ${term.term}`,
+        ])
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
 
       return {
         id: Date.now(),
         type: 'multiple-choice',
         category: term.category,
-        question: `Which of the following best describes ${term.term}?`,
+        question: `Which statement most accurately describes ${term.term} and its application in architectural design?`,
         options: [term.definition, ...otherOptions],
         correctAnswer: term.definition,
-        explanation: `${term.term} is correctly defined as: ${term.definition}`
+        explanation: `${term.term} is correctly defined as: ${term.definition}. Understanding this concept is crucial for architectural design decisions.`
       };
     }
-  },
-  {
-    type: 'true-false',
-    generate: (term: Term): TrueFalseQuestion => ({
-      id: Date.now(),
-      type: 'true-false',
-      category: term.category,
-      question: `True or False: ${term.term} refers to ${term.definition}`,
-      correctAnswer: true,
-      explanation: `This statement is true. ${term.term} is defined as: ${term.definition}`
-    })
-  },
-  {
-    type: 'fill-in-blank',
-    generate: (term: Term): FillInBlankQuestion => ({
-      id: Date.now(),
-      type: 'fill-in-blank',
-      category: term.category,
-      question: `_____ is defined as ${term.definition}`,
-      correctKeywords: [term.term.toLowerCase()],
-      explanation: `The correct term is ${term.term}, which is defined as: ${term.definition}`
-    })
   },
   {
     type: 'calculation',
     generate: (term: Term): CalculationQuestion => {
       const calculations = [
         {
-          question: "Calculate the floor area ratio (FAR) for a building with total floor area of 25,000 sq ft on a lot of 10,000 sq ft.",
-          formula: "FAR = Total Floor Area / Lot Area",
-          correctAnswer: 2.5,
+          question: "For a multi-story building project:\n1. Calculate the Floor Area Ratio (FAR) if the total floor area is 45,000 sq ft on a lot of 15,000 sq ft\n2. Determine if this meets zoning requirements of max FAR 2.8\n3. If not compliant, calculate the maximum allowable floor area",
+          formula: "FAR = Total Floor Area / Lot Area\nMax Floor Area = Lot Area × Max FAR",
+          correctAnswer: 3,
           tolerance: 0.1,
-          unit: "ratio"
+          unit: "ratio",
+          steps: [
+            "Calculate FAR: 45,000 / 15,000 = 3.0",
+            "Compare with max FAR: 3.0 > 2.8 (not compliant)",
+            "Calculate max allowed: 15,000 × 2.8 = 42,000 sq ft"
+          ]
         },
         {
-          question: "Calculate the required number of parking spaces for a 30,000 sq ft office building if the requirement is 1 space per 300 sq ft.",
-          formula: "Parking Spaces = Total Floor Area / Area per Space",
-          correctAnswer: 100,
+          question: "For an office building renovation:\n1. Calculate required parking spaces if requirement is 1 space per 250 sq ft\n2. Given a floor area of 28,750 sq ft\n3. Include 15% additional spaces for visitors\n4. Round up to nearest whole number",
+          formula: "Base Spaces = Floor Area / Area per Space\nTotal Spaces = Base Spaces × (1 + Visitor Percentage)",
+          correctAnswer: 133,
           tolerance: 0,
-          unit: "spaces"
+          unit: "spaces",
+          steps: [
+            "Base spaces: 28,750 / 250 = 115",
+            "Add 15% visitor spaces: 115 × 1.15 = 132.25",
+            "Round up: 133 spaces"
+          ]
         },
         {
-          question: "Calculate the U-value of a wall assembly if R-value is 15 ft²·°F·h/BTU.",
-          formula: "U-value = 1 / R-value",
-          correctAnswer: 0.067,
-          tolerance: 0.005,
-          unit: "BTU/(ft²·°F·h)"
-        },
-        {
-          question: "Calculate the minimum width of an emergency egress corridor that needs to accommodate 200 occupants (0.2 inches per occupant).",
-          formula: "Width = Number of Occupants × Width per Occupant",
-          correctAnswer: 40,
-          tolerance: 0,
-          unit: "inches"
+          question: "For a wall assembly design:\n1. Calculate the total R-value given:\n- Exterior air film (R-0.17)\n- 8\" concrete block (R-1.11)\n- 2\" polyiso insulation (R-13)\n- 5/8\" gypsum board (R-0.56)\n- Interior air film (R-0.68)\n2. Then calculate the U-value\n3. Determine if it meets code minimum U-0.064",
+          formula: "Total R-value = Sum of all R-values\nU-value = 1 / R-value",
+          correctAnswer: 15.52,
+          tolerance: 0.1,
+          unit: "R-value",
+          steps: [
+            "Sum R-values: 0.17 + 1.11 + 13 + 0.56 + 0.68 = 15.52",
+            "Calculate U-value: 1/15.52 = 0.0644",
+            "Compare: 0.0644 < 0.064 (meets code)"
+          ]
         }
       ];
 
       const calc = calculations[Math.floor(Math.random() * calculations.length)];
-
       return {
         id: Date.now(),
         type: 'calculation',
         category: 'Building Systems',
-        question: calc.question,
-        formula: calc.formula,
-        correctAnswer: calc.correctAnswer,
-        tolerance: calc.tolerance,
-        unit: calc.unit,
-        explanation: `Using the formula: ${calc.formula}, we can solve this problem. This is a common calculation in architectural practice.`
+        ...calc
+      };
+    }
+  },
+  {
+    type: 'complex',
+    generate: (term: Term, allTerms: Term[]): ComplexQuestion => {
+      // Find related terms for creating complex relationships
+      const relatedTerms = allTerms.filter(t => 
+        t.category === term.category && t.id !== term.id
+      ).slice(0, 2);
+
+      return {
+        id: Date.now(),
+        type: 'complex',
+        category: term.category,
+        question: `Multi-part analysis of ${term.term} in architectural design:`,
+        parts: [
+          {
+            question: `Define ${term.term} and explain its primary function in architectural design.`,
+            correctAnswer: term.definition,
+            explanation: `Understanding ${term.term} is fundamental as it ${term.definition.toLowerCase()}`
+          },
+          {
+            question: `How does ${term.term} interact with ${relatedTerms[0]?.term || 'related systems'} in practice?`,
+            correctAnswer: `The interaction between ${term.term} and ${relatedTerms[0]?.term || 'related systems'} requires careful consideration of both elements' properties and functions.`,
+            explanation: `This relationship is crucial for integrated design solutions.`
+          },
+          {
+            question: `Propose a design solution that optimizes both ${term.term} and ${relatedTerms[1]?.term || 'environmental factors'}.`,
+            correctAnswer: `A comprehensive solution should consider the properties of ${term.term} while accounting for ${relatedTerms[1]?.term || 'environmental factors'}.`,
+            explanation: `This tests ability to synthesize multiple concepts in practical application.`
+          }
+        ],
+        dependencies: [false, true, true],
+        explanation: `This analysis demonstrates the interconnected nature of architectural concepts and their practical applications.`
       };
     }
   }
@@ -151,12 +187,6 @@ export function generateQuestions(terms: Term[], count: number, category: string
   const usedTerms = new Set<number>();
 
   while (questions.length < count && usedTerms.size < availableTerms.length) {
-    if (type === 'calculation') {
-      questions.push(template.generate(availableTerms[0]) as Question);
-      if (questions.length >= count) break;
-      continue;
-    }
-
     let availableIndices = availableTerms
       .map((_, index) => index)
       .filter(index => !usedTerms.has(index));
@@ -167,7 +197,7 @@ export function generateQuestions(terms: Term[], count: number, category: string
     usedTerms.add(randomIndex);
 
     const term = availableTerms[randomIndex];
-    questions.push(template.generate(term) as Question);
+    questions.push(template.generate(term, availableTerms) as Question);
   }
 
   return questions;

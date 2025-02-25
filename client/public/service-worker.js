@@ -1,4 +1,4 @@
-const CACHE_NAME = 'archkit-cache-v2';
+const CACHE_NAME = 'archkit-cache-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -6,107 +6,91 @@ const ASSETS_TO_CACHE = [
   '/src/main.tsx',
   '/src/index.css',
   '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/icons/icon-512x512.png',
+  // Add all routes that need to work offline
+  '/calculator',
+  '/terms',
+  '/ar',
+  '/exam',
+  '/progress',
+  '/ebook',
+  '/portfolio',
+  '/codes',
+  '/professional',
+  '/about'
 ];
-
-// Data caches
-const DATA_CACHE_NAME = 'archkit-data-v2';
-const API_URLS = ['/api/terms', '/api/formulas'];
-
-// Helper function to get full URL including origin
-function getFullUrl(path) {
-  return new URL(path, self.location.origin).href;
-}
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // Cache assets with full URLs
-      return cache.addAll(ASSETS_TO_CACHE.map(getFullUrl));
+      return cache.addAll(ASSETS_TO_CACHE.map(path => new URL(path, self.location.origin).href));
     })
   );
-  // Activate new service worker immediately
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches and take control
+// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    Promise.all([
-      // Clean up old caches
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (cacheName !== CACHE_NAME && cacheName !== DATA_CACHE_NAME) {
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      }),
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => {
       // Take control of all clients immediately
-      clients.claim()
-    ])
+      return clients.claim();
+    })
   );
 });
 
-// Fetch event - serve from cache, fall back to network
+// Fetch event - offline-first strategy
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        if (response) {
+          return response; // Return cached response immediately
+        }
 
-  // Special handling for API requests
-  if (API_URLS.some(apiUrl => url.pathname.includes(apiUrl))) {
-    event.respondWith(
-      caches.open(DATA_CACHE_NAME).then((cache) => {
+        // If not in cache, try network
         return fetch(event.request)
-          .then((response) => {
-            if (response.ok) {
-              cache.put(event.request, response.clone());
+          .then(response => {
+            // Don't cache if not a success response
+            if (!response || response.status !== 200) {
+              return response;
             }
+
+            // Clone the response as it can only be consumed once
+            const responseToCache = response.clone();
+
+            // Add to cache for future offline access
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                cache.put(event.request, responseToCache);
+              });
+
             return response;
           })
           .catch(() => {
-            return cache.match(event.request);
+            // If both cache and network fail, return a fallback
+            return new Response('Offline: Content not available', {
+              status: 503,
+              statusText: 'Service Unavailable',
+              headers: new Headers({
+                'Content-Type': 'text/plain',
+              }),
+            });
           });
-      })
-    );
-    return;
-  }
-
-  // For assessment questions generation - always try network first
-  if (url.pathname.includes('/api/questions/generate')) {
-    event.respondWith(
-      fetch(event.request)
-        .catch(() => {
-          return new Response(
-            JSON.stringify({ error: 'Offline: Cannot generate new questions' }),
-            { headers: { 'Content-Type': 'application/json' } }
-          );
-        })
-    );
-    return;
-  }
-
-  // For all other requests - network first, cache fallback
-  event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        // Cache successful responses
-        if (response.ok && response.type === 'basic') {
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return response;
-      })
-      .catch(() => {
-        return caches.match(event.request);
       })
   );
 });
 
-// Listen for messages from clients
+// Handle messages from clients
 self.addEventListener('message', (event) => {
   if (event.data === 'skipWaiting') {
     self.skipWaiting();

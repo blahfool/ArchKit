@@ -2,11 +2,10 @@ import { Switch, Route, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { queryClient } from "./lib/queryClient";
-import { useEffect, Suspense, lazy } from "react";
-import { syncFromServer } from "./lib/offlineStorage";
+import { Suspense, lazy } from "react";
 import { Logo } from "@/components/Logo";
 import { Loader2 } from "lucide-react";
-import { useStudyTime } from "@/hooks/useStudyTime"; // Added import
+import { useStudyTime } from "@/hooks/useStudyTime";
 
 // Lazy load pages
 const Home = lazy(() => import("@/pages/Home"));
@@ -23,7 +22,6 @@ const About = lazy(() => import("@/pages/About"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 // Components
-import ThemeToggle from "@/components/ThemeToggle";
 import ThemeSelect from "@/components/ThemeSelect";
 import OfflineIndicator from "@/components/OfflineIndicator";
 
@@ -43,14 +41,6 @@ function Router() {
   // Add study time tracking
   useStudyTime();
 
-  useEffect(() => {
-    if (navigator.onLine) {
-      syncFromServer().catch(error => {
-        console.error('Failed to sync from server:', error);
-      });
-    }
-  }, []);
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       {location === "/" && (
@@ -59,7 +49,7 @@ function Router() {
         </div>
       )}
       <div className="fixed top-4 right-4 z-50">
-        <ThemeToggle />
+        <ThemeSelect />
       </div>
       <Suspense fallback={<PageLoader />}>
         <Switch>
