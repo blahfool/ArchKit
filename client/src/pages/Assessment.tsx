@@ -21,13 +21,15 @@ import type { Term } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import BackButton from "@/components/BackButton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@nextui-org/react";
+
 
 interface BaseQuestion {
   id: number;
   category: string;
   question: string;
   explanation: string;
-  type: 'multiple-choice' | 'fill-in-blank' | 'true-false' | 'chronological';
+  type: 'multiple-choice' | 'fill-in-blank' | 'true-false' | 'chronological' | 'calculation';
 }
 
 interface MultipleChoiceQuestion extends BaseQuestion {
@@ -52,7 +54,15 @@ interface ChronologicalQuestion extends BaseQuestion {
   correctOrder: number[];
 }
 
-type Question = MultipleChoiceQuestion | FillInBlankQuestion | TrueFalseQuestion | ChronologicalQuestion;
+interface CalculationQuestion extends BaseQuestion {
+  type: 'calculation';
+  formula: string;
+  correctAnswer: number;
+  tolerance: number; // Percentage of acceptable deviation
+  unit: string;
+}
+
+type Question = MultipleChoiceQuestion | FillInBlankQuestion | TrueFalseQuestion | ChronologicalQuestion | CalculationQuestion;
 
 
 export default function Assessment() {
@@ -67,7 +77,7 @@ export default function Assessment() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { data: apiTerms } = useQuery<Term[]>({ 
+  const { data: apiTerms } = useQuery<Term[]>({
     queryKey: ["/api/terms"]
   });
 
@@ -75,13 +85,14 @@ export default function Assessment() {
     { value: 'multiple-choice', label: 'Multiple Choice' },
     { value: 'fill-in-blank', label: 'Fill in the Blank' },
     { value: 'true-false', label: 'True/False' },
-    { value: 'chronological', label: 'Chronological Order' }
+    { value: 'chronological', label: 'Chronological Order' },
+    { value: 'calculation', label: 'Calculation' }
   ];
 
   const handleStart = async () => {
     setIsLoading(true);
     try {
-      const terms = apiTerms 
+      const terms = apiTerms
         ? [...apiTerms, ...fallbackTerms.map((t, i) => ({ ...t, id: 1000 + i }))]
         : fallbackTerms.map((t, i) => ({ ...t, id: 1000 + i }));
 
@@ -90,7 +101,7 @@ export default function Assessment() {
         const typeQuestions = generateQuestions(
           terms,
           Math.floor(questionCount / selectedTypes.length),
-          "all", 
+          "all",
           type
         );
         generatedQuestions = [...generatedQuestions, ...typeQuestions];
@@ -160,6 +171,10 @@ export default function Assessment() {
         case 'chronological':
           isCorrect = JSON.stringify(answer) === JSON.stringify(q.correctOrder);
           break;
+        case 'calculation':
+          const percentError = Math.abs((answer - q.correctAnswer) / q.correctAnswer * 100);
+          isCorrect = percentError <= q.tolerance;
+          break;
       }
 
       return acc + (isCorrect ? 1 : 0);
@@ -172,6 +187,28 @@ export default function Assessment() {
 
   const renderQuestion = (question: Question) => {
     switch (question.type) {
+      case 'calculation':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="font-mono">{question.formula}</p>
+            </div>
+            <Input
+              type="number"
+              step="0.01"
+              value={answers[currentQuestion] || ''}
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value)) {
+                  setAnswers(prev => ({ ...prev, [currentQuestion]: value }));
+                }
+              }}
+              placeholder={`Enter your answer (${question.unit})`}
+              className="mt-2"
+            />
+          </div>
+        );
+
       case 'multiple-choice':
         return (
           <RadioGroup
@@ -432,6 +469,10 @@ export default function Assessment() {
                         break;
                       case 'chronological':
                         isCorrect = JSON.stringify(answers[index]) === JSON.stringify(q.correctOrder);
+                        break;
+                      case 'calculation':
+                        const percentError = Math.abs((answers[index] - q.correctAnswer) / q.correctAnswer * 100);
+                        isCorrect = percentError <= q.tolerance;
                         break;
                     }
 

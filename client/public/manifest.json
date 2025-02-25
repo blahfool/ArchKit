@@ -1,11 +1,11 @@
 {
-  "name": "ArchKit",
+  "name": "ArchKit - Architecture Student's Toolkit",
   "short_name": "ArchKit",
-  "description": "Architecture Student's Toolkit",
+  "description": "Complete toolkit for architecture students and professionals with study resources, portfolio builder, and assessment tools",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
     {
@@ -22,5 +22,14 @@
     }
   ],
   "prefer_related_applications": false,
-  "offline_enabled": true
+  "offline_enabled": true,
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Home Screen"
+    }
+  ]
 }
