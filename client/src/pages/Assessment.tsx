@@ -2,22 +2,12 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   CheckCircle2,
   XCircle,
   AlertCircle,
   ChevronRight,
   ChevronLeft,
-  ListFilter,
   Loader2
 } from "lucide-react";
 import { generateQuestions, type Question } from "@/lib/questionGenerator";
@@ -27,28 +17,17 @@ import BackButton from "@/components/BackButton";
 export default function Assessment() {
   const [score, setScore] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, any>>({});
+  const [answers, setAnswers] = useState<Record<number, string>>({});
   const [showExplanation, setShowExplanation] = useState(false);
   const [questionCount, setQuestionCount] = useState(10);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>(['multiple-choice']);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const questionTypes = [
-    { value: 'multiple-choice', label: 'Multiple Choice' },
-    { value: 'true-false', label: 'True/False' }
-  ];
-
   const handleStart = async () => {
     setIsLoading(true);
     try {
-      const generatedQuestions = await generateQuestions(
-        [],
-        questionCount,
-        "all",
-        selectedTypes.length === 1 ? selectedTypes[0] : "all"
-      );
+      const generatedQuestions = await generateQuestions([], questionCount, "all");
 
       if (generatedQuestions.length === questionCount) {
         setQuestions(generatedQuestions);
@@ -74,71 +53,28 @@ export default function Assessment() {
     }
   };
 
+  const checkAnswer = (userAnswer: string, correctAnswer: string): boolean => {
+    // Convert both answers to lowercase for case-insensitive comparison
+    const userKeywords = userAnswer.toLowerCase().split(/\s+/);
+    const correctKeywords = correctAnswer.toLowerCase().split(/\s+/);
+
+    // Check if any significant keywords from the correct answer appear in the user's answer
+    return correctKeywords.some(keyword => 
+      keyword.length > 3 && // Only check keywords longer than 3 characters
+      userKeywords.some(userWord => userWord.includes(keyword))
+    );
+  };
+
   const handleSubmit = () => {
     if (!questions.length) return;
 
     const correct = questions.reduce((acc, q, index) => {
-      const answer = answers[index];
-      let isCorrect = false;
-
-      switch (q.type) {
-        case 'multiple-choice':
-          isCorrect = answer === q.correctAnswer;
-          break;
-        case 'true-false':
-          isCorrect = answer === q.correctAnswer;
-          break;
-      }
-
-      return acc + (isCorrect ? 1 : 0);
+      const answer = answers[index] || '';
+      return acc + (checkAnswer(answer, q.correctAnswer) ? 1 : 0);
     }, 0);
 
     setScore((correct / questions.length) * 100);
     setShowExplanation(true);
-  };
-
-  const renderQuestion = (question: Question) => {
-    switch (question.type) {
-      case 'multiple-choice':
-        return (
-          <RadioGroup
-            value={answers[currentQuestion]}
-            onValueChange={(value) => {
-              setAnswers(prev => ({ ...prev, [currentQuestion]: value }));
-            }}
-            className="space-y-3"
-          >
-            {question.options.map((option, index) => (
-              <div key={index} className="flex items-center space-x-2 p-2 rounded hover:bg-muted/50">
-                <RadioGroupItem value={option} id={`option-${index}`} />
-                <Label className="cursor-pointer flex-1" htmlFor={`option-${index}`}>
-                  {option}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-        );
-
-      case 'true-false':
-        return (
-          <RadioGroup
-            value={answers[currentQuestion]?.toString()}
-            onValueChange={(value) => {
-              setAnswers(prev => ({ ...prev, [currentQuestion]: value === 'true' }));
-            }}
-            className="space-y-3"
-          >
-            <div className="flex items-center space-x-2 p-2 rounded hover:bg-muted/50">
-              <RadioGroupItem value="true" id="true" />
-              <Label className="cursor-pointer" htmlFor="true">True</Label>
-            </div>
-            <div className="flex items-center space-x-2 p-2 rounded hover:bg-muted/50">
-              <RadioGroupItem value="false" id="false" />
-              <Label className="cursor-pointer" htmlFor="false">False</Label>
-            </div>
-          </RadioGroup>
-        );
-    }
   };
 
   if (!questions.length) {
@@ -150,29 +86,6 @@ export default function Assessment() {
           <Card>
             <CardContent className="pt-6">
               <div className="space-y-6">
-                <div>
-                  <h2 className="text-lg font-medium mb-2">Question Types</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {questionTypes.map(type => (
-                      <Button
-                        key={type.value}
-                        variant={selectedTypes.includes(type.value) ? "default" : "outline"}
-                        onClick={() => {
-                          setSelectedTypes(prev =>
-                            prev.includes(type.value)
-                              ? prev.filter(t => t !== type.value)
-                              : [...prev, type.value]
-                          );
-                        }}
-                        className="flex items-center gap-2"
-                      >
-                        <ListFilter className="h-4 w-4" />
-                        {type.label}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
                 <div>
                   <h2 className="text-lg font-medium mb-2">Number of Questions</h2>
                   <Input
@@ -194,16 +107,14 @@ export default function Assessment() {
                   <h2 className="text-lg font-medium mb-2">Assessment Details</h2>
                   <p className="text-muted-foreground">
                     • Questions: {questionCount}<br />
-                    • Types: {selectedTypes.map(t =>
-                      questionTypes.find(qt => qt.value === t)?.label
-                    ).join(', ')}
+                    • Format: Short answer questions
                   </p>
                 </div>
 
                 <Button
                   onClick={handleStart}
                   className="w-full"
-                  disabled={selectedTypes.length === 0 || isLoading}
+                  disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
@@ -236,11 +147,18 @@ export default function Assessment() {
                 <div>
                   <div className="text-sm font-medium flex items-center justify-between mb-4">
                     <span>Question {currentQuestion + 1} of {questions.length}</span>
-                    <span className="text-muted-foreground">{questions[currentQuestion].type}</span>
+                    <span className="text-muted-foreground">{questions[currentQuestion].category}</span>
                   </div>
                   <p className="text-lg mb-4">{questions[currentQuestion].question}</p>
 
-                  {renderQuestion(questions[currentQuestion])}
+                  <Input
+                    value={answers[currentQuestion] || ''}
+                    onChange={(e) => {
+                      setAnswers(prev => ({ ...prev, [currentQuestion]: e.target.value }));
+                    }}
+                    placeholder="Type your answer..."
+                    className="mb-4"
+                  />
                 </div>
 
                 <div className="flex justify-between">
@@ -286,7 +204,7 @@ export default function Assessment() {
               {showExplanation && (
                 <div className="space-y-6 mt-6">
                   {questions.map((q, index) => {
-                    const isCorrect = answers[index] === q.correctAnswer;
+                    const isCorrect = checkAnswer(answers[index] || '', q.correctAnswer);
                     return (
                       <div key={q.id} className="border rounded-lg p-4">
                         <div className="flex items-start gap-2">
@@ -298,7 +216,7 @@ export default function Assessment() {
                           <div>
                             <p className="font-medium mb-2">{q.question}</p>
                             <p className="text-sm text-muted-foreground mb-2">
-                              Your answer: {answers[index]?.toString()}
+                              Your answer: {answers[index] || 'No answer provided'}
                             </p>
                             {!isCorrect && (
                               <p className="text-sm text-green-600 dark:text-green-400 mb-2">

@@ -5,15 +5,12 @@ import { queryClient } from "./lib/queryClient";
 import { Suspense, lazy } from "react";
 import { Logo } from "@/components/Logo";
 import { Loader2 } from "lucide-react";
-import { useStudyTime } from "@/hooks/useStudyTime";
 
 // Lazy load pages
 const Home = lazy(() => import("@/pages/Home"));
 const Calculator = lazy(() => import("@/pages/Calculator"));
 const TermsIndex = lazy(() => import("@/pages/TermsIndex"));
-const ArMeasure = lazy(() => import("@/pages/ArMeasure"));
 const Assessment = lazy(() => import("@/pages/Assessment"));
-const Progress = lazy(() => import("@/pages/Progress"));
 const EBook = lazy(() => import("@/pages/EBook"));
 const Portfolio = lazy(() => import("@/pages/Portfolio"));
 const BuildingCodes = lazy(() => import("@/pages/BuildingCodes"));
@@ -39,7 +36,7 @@ function Router() {
   const [location] = useLocation();
 
   // Add study time tracking
-  useStudyTime();
+  //useStudyTime(); // Removed as its relevance is unclear without further context.
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -56,9 +53,7 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/calculator" component={Calculator} />
           <Route path="/terms" component={TermsIndex} />
-          <Route path="/ar" component={ArMeasure} />
           <Route path="/exam" component={Assessment} />
-          <Route path="/progress" component={Progress} />
           <Route path="/ebook" component={EBook} />
           <Route path="/portfolio" component={Portfolio} />
           <Route path="/codes" component={BuildingCodes} />

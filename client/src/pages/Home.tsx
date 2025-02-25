@@ -5,10 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Calculator,
   BookOpen,
-  Ruler,
   Book,
   Info,
-  LineChart,
   Briefcase,
   FileCode,
   PenSquare,
@@ -69,22 +67,10 @@ export default function Home() {
       description: "Comprehensive architectural terminology guide"
     },
     {
-      icon: Ruler,
-      label: "AR Measure",
-      href: "/ar",
-      description: "Augmented reality measurement tools"
-    },
-    {
       icon: ClipboardList,
       label: "Assessment",
       href: "/exam",
       description: "Test your architectural knowledge"
-    },
-    {
-      icon: LineChart,
-      label: "Progress",
-      href: "/progress",
-      description: "Track your learning journey"
     },
     {
       icon: Book,
