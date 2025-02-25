@@ -17,11 +17,13 @@ interface Question {
   isCorrect?: boolean;
 }
 
+type ExamType = 'multiple' | 'text' | 'mixed';
+
 export default function ExamGenerator() {
   const [numQuestions, setNumQuestions] = useState(10);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [showResults, setShowResults] = useState(false);
-  const [questionType, setQuestionType] = useState<'multiple' | 'text'>('text');
+  const [examType, setExamType] = useState<ExamType>('mixed');
 
   const { data: terms } = useQuery<Term[]>({ 
     queryKey: ["/api/terms"]
@@ -41,14 +43,24 @@ export default function ExamGenerator() {
     const shuffled = [...terms].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, numQuestions);
 
-    const newQuestions = selected.map((term, idx) => ({
-      id: idx,
-      term,
-      type: questionType,
-      userAnswer: "",
-      options: questionType === 'multiple' ? generateMultipleChoiceOptions(term, terms) : undefined,
-      isCorrect: false
-    }));
+    const newQuestions = selected.map((term, idx) => {
+      // Determine question type based on examType
+      let questionType: 'multiple' | 'text';
+      if (examType === 'mixed') {
+        questionType = Math.random() > 0.5 ? 'multiple' : 'text';
+      } else {
+        questionType = examType;
+      }
+
+      return {
+        id: idx,
+        term,
+        type: questionType,
+        userAnswer: "",
+        options: questionType === 'multiple' ? generateMultipleChoiceOptions(term, terms) : undefined,
+        isCorrect: false
+      };
+    });
 
     setQuestions(newQuestions);
     setShowResults(false);
@@ -80,8 +92,8 @@ export default function ExamGenerator() {
       <div className="max-w-2xl mx-auto">
         <Card className="mb-6">
           <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="w-full sm:w-auto">
+            <div className="grid gap-6">
+              <div>
                 <Label htmlFor="numQuestions">Number of Questions</Label>
                 <Input
                   id="numQuestions"
@@ -94,27 +106,31 @@ export default function ExamGenerator() {
                 />
               </div>
 
-              <div className="w-full sm:w-auto">
-                <Label>Question Type</Label>
+              <div>
+                <Label>Exam Type</Label>
                 <RadioGroup 
-                  value={questionType}
-                  onValueChange={(value: 'multiple' | 'text') => setQuestionType(value)}
-                  className="flex gap-4 mt-1"
+                  value={examType}
+                  onValueChange={(value: ExamType) => setExamType(value)}
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-1"
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="multiple" id="multiple" />
-                    <Label htmlFor="multiple">Multiple Choice</Label>
+                    <Label htmlFor="multiple">Multiple Choice Only</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="text" id="text" />
-                    <Label htmlFor="text">Text Input</Label>
+                    <Label htmlFor="text">Text Input Only</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="mixed" id="mixed" />
+                    <Label htmlFor="mixed">Mixed Questions</Label>
                   </div>
                 </RadioGroup>
               </div>
 
               <Button 
                 onClick={generateExam}
-                className="w-full sm:w-auto mt-2 sm:mt-6"
+                className="w-full sm:w-auto"
               >
                 Generate Exam
               </Button>

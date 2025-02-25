@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import BackButton from "@/components/BackButton";
 import { Camera, Ruler, Maximize2, Move, RotateCcw, ArrowLeft } from "lucide-react";
 
 export default function ArMeasure() {
@@ -15,15 +14,22 @@ export default function ArMeasure() {
   useEffect(() => {
     const startCamera = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { 
+        const constraints = {
+          video: {
             facingMode: "environment",
             width: { ideal: window.innerWidth },
             height: { ideal: window.innerHeight }
-          } 
-        });
+          }
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
+          // Set canvas size to match video
+          if (canvasRef.current) {
+            canvasRef.current.width = window.innerWidth;
+            canvasRef.current.height = window.innerHeight;
+          }
         }
       } catch (err) {
         console.error("Error accessing camera:", err);
@@ -32,9 +38,19 @@ export default function ArMeasure() {
 
     startCamera();
 
+    // Handle orientation changes
+    const handleResize = () => {
+      if (canvasRef.current && videoRef.current) {
+        canvasRef.current.width = window.innerWidth;
+        canvasRef.current.height = window.innerHeight;
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
     return () => {
       const stream = videoRef.current?.srcObject as MediaStream;
       stream?.getTracks().forEach(track => track.stop());
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -64,45 +80,49 @@ export default function ArMeasure() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Draw point
-    ctx.fillStyle = '#00ff00';
-    ctx.beginPath();
-    ctx.arc(x, y, 5, 0, 2 * Math.PI);
-    ctx.fill();
+    // Clear previous drawings
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw line between points
-    if (points.length > 0) {
-      const prevPoint = points[points.length - 1];
-      ctx.strokeStyle = '#00ff00';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(prevPoint.x, prevPoint.y);
-      ctx.lineTo(x, y);
-      ctx.stroke();
-
-      // Calculate and display distance
-      const dist = calculateDistance(prevPoint, {x, y});
-      setDistance(dist);
-
-      // Draw distance text
+    // Draw all points and lines
+    newPoints.forEach((point, index) => {
+      // Draw point
       ctx.fillStyle = '#00ff00';
-      ctx.font = '20px sans-serif';
-      ctx.fillText(
-        `${dist.toFixed(2)}m`,
-        (prevPoint.x + x) / 2,
-        (prevPoint.y + y) / 2 - 10
-      );
-    }
-
-    // If in area mode and we have enough points, close the shape
-    if (mode === 'area' && newPoints.length > 2) {
-      ctx.setLineDash([5, 5]);
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(newPoints[0].x, newPoints[0].y);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
+      ctx.arc(point.x, point.y, 8, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Draw line to previous point
+      if (index > 0) {
+        const prevPoint = newPoints[index - 1];
+        ctx.strokeStyle = '#00ff00';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(prevPoint.x, prevPoint.y);
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+
+        // Calculate and display distance
+        const dist = calculateDistance(prevPoint, point);
+        setDistance(dist);
+
+        // Draw distance text with background
+        const textX = (prevPoint.x + point.x) / 2;
+        const textY = (prevPoint.y + point.y) / 2 - 20;
+        const text = `${dist.toFixed(2)}m`;
+
+        ctx.font = '24px sans-serif';
+        const textWidth = ctx.measureText(text).width;
+
+        // Draw text background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(textX - textWidth/2 - 5, textY - 20, textWidth + 10, 30);
+
+        // Draw text
+        ctx.fillStyle = '#00ff00';
+        ctx.textAlign = 'center';
+        ctx.fillText(text, textX, textY);
+      }
+    });
   };
 
   const handleCalibrate = () => {
@@ -112,18 +132,35 @@ export default function ArMeasure() {
     if (!ctx || !canvas) return;
 
     // Draw calibration guide
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = '#00ff00';
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - 50, canvas.height / 2);
-    ctx.lineTo(canvas.width / 2 + 50, canvas.height / 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.lineWidth = 3;
+    ctx.setLineDash([10, 10]);
 
-    // Draw calibration text
+    // Draw horizontal line
+    const centerY = canvas.height / 2;
+    ctx.beginPath();
+    ctx.moveTo(canvas.width/2 - 100, centerY);
+    ctx.lineTo(canvas.width/2 + 100, centerY);
+    ctx.stroke();
+
+    // Draw text with background
+    const text = 'Place a reference object (e.g., A4 paper) along this line';
+    ctx.font = '20px sans-serif';
+    const textWidth = ctx.measureText(text).width;
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(
+      canvas.width/2 - textWidth/2 - 10,
+      centerY - 50,
+      textWidth + 20,
+      40
+    );
+
     ctx.fillStyle = '#00ff00';
-    ctx.font = '16px sans-serif';
-    ctx.fillText('Place a reference object (e.g., A4 paper) here', canvas.width / 2 - 100, canvas.height / 2 - 20);
+    ctx.textAlign = 'center';
+    ctx.setLineDash([]);
+    ctx.fillText(text, canvas.width/2, centerY - 20);
   };
 
   const handleReset = () => {
@@ -144,23 +181,46 @@ export default function ArMeasure() {
           ref={videoRef}
           autoPlay
           playsInline
-          className="w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover"
         />
         <canvas
           ref={canvasRef}
           onClick={handleCanvasClick}
-          className="absolute top-0 left-0 w-full h-full cursor-crosshair"
+          className="absolute inset-0 w-full h-full touch-none"
         />
 
-        {/* Measurement UI overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/50 backdrop-blur-sm">
-          <div className="flex gap-2 mb-4">
+        {/* Top controls */}
+        <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
+          <Button
+            variant="secondary"
+            onClick={() => window.history.back()}
+            className="bg-black/50 hover:bg-black/70 backdrop-blur-sm"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+
+          {!calibrated && (
+            <Button 
+              variant="secondary"
+              onClick={handleCalibrate}
+              className="bg-black/50 hover:bg-black/70 backdrop-blur-sm"
+            >
+              <Camera className="h-4 w-4 mr-2" />
+              Calibrate
+            </Button>
+          )}
+        </div>
+
+        {/* Bottom controls */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/50 backdrop-blur-sm space-y-4">
+          <div className="flex gap-2">
             <Button 
               variant={mode === 'distance' ? 'default' : 'outline'}
               onClick={() => setMode('distance')}
               className="flex-1 bg-white/10 hover:bg-white/20"
             >
-              <Ruler className="mr-2 h-4 w-4" />
+              <Ruler className="h-4 w-4 mr-2" />
               Distance
             </Button>
             <Button 
@@ -168,7 +228,7 @@ export default function ArMeasure() {
               onClick={() => setMode('area')}
               className="flex-1 bg-white/10 hover:bg-white/20"
             >
-              <Maximize2 className="mr-2 h-4 w-4" />
+              <Maximize2 className="h-4 w-4 mr-2" />
               Area
             </Button>
           </div>
@@ -179,7 +239,7 @@ export default function ArMeasure() {
               onClick={() => setMeasuring(true)}
               disabled={measuring}
             >
-              <Move className="mr-2 h-4 w-4" />
+              <Move className="h-4 w-4 mr-2" />
               Start Measuring
             </Button>
             <Button
@@ -191,19 +251,14 @@ export default function ArMeasure() {
             </Button>
           </div>
 
-          {!calibrated && (
-            <Button 
-              variant="outline" 
-              className="w-full mt-2 bg-white/10 hover:bg-white/20"
-              onClick={handleCalibrate}
-            >
-              <Camera className="mr-2 h-4 w-4" />
-              Calibrate Camera
-            </Button>
+          {measuring && (
+            <p className="text-center text-white/70 text-sm">
+              Tap points on the screen to measure distances
+            </p>
           )}
 
           {distance && (
-            <div className="mt-4 p-4 bg-white/10 rounded-lg border border-white/20">
+            <div className="p-4 bg-white/10 rounded-lg border border-white/20">
               <p className="text-center text-white font-medium">
                 {mode === 'distance' 
                   ? `Distance: ${distance.toFixed(2)} meters`
@@ -212,25 +267,6 @@ export default function ArMeasure() {
               </p>
             </div>
           )}
-
-          <p className="mt-4 text-sm text-white/70 text-center">
-            {measuring 
-              ? "Tap points on the screen to measure between them" 
-              : "Tap Start Measuring and calibrate the camera for accurate measurements"
-            }
-          </p>
-        </div>
-
-        {/* Back button in top-left corner */}
-        <div className="absolute top-4 left-4">
-          <Button
-            variant="secondary"
-            onClick={() => window.history.back()}
-            className="bg-black/50 hover:bg-black/70 backdrop-blur-sm"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
         </div>
       </div>
     </div>
