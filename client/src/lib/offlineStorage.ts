@@ -260,3 +260,25 @@ export async function getCalibrationData(): Promise<number | null> {
   const data = await getFromStore<{value: number}>('settings', 'arCalibration');
   return data ? data.value : null;
 }
+
+// Add this function after other export functions
+export async function addStudyTime(duration: number): Promise<void> {
+  return withErrorHandling(async () => {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction('studyTime', 'readwrite');
+      const store = transaction.objectStore('studyTime');
+      const record = { duration, timestamp: new Date().toISOString() };
+      const request = store.add(record);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(new OfflineStorageError('Failed to add study time', request.error));
+    });
+  }, 'Failed to add study time');
+}
+
+export async function getTotalStudyTime(): Promise<number> {
+  return withErrorHandling(async () => {
+    const records = await getAllFromStore<{ duration: number }>('studyTime');
+    return records.reduce((total, record) => total + record.duration, 0);
+  }, 'Failed to get total study time');
+}

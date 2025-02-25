@@ -6,6 +6,7 @@ import { useEffect, Suspense, lazy } from "react";
 import { syncFromServer } from "./lib/offlineStorage";
 import { Logo } from "@/components/Logo";
 import { Loader2 } from "lucide-react";
+import { useStudyTime } from "@/hooks/useStudyTime"; // Added import
 
 // Lazy load pages
 const Home = lazy(() => import("@/pages/Home"));
@@ -38,6 +39,9 @@ const PageLoader = () => (
 
 function Router() {
   const [location] = useLocation();
+
+  // Add study time tracking
+  useStudyTime();
 
   useEffect(() => {
     if (navigator.onLine) {
