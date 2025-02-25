@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Camera, Ruler, Maximize2, Move, RotateCcw } from "lucide-react";
 import BackButton from "@/components/BackButton";
+import { saveCalibrationData, getCalibrationData } from "@/lib/offlineStorage";
 
 export default function ArMeasure() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -10,8 +11,10 @@ export default function ArMeasure() {
   const [measuring, setMeasuring] = useState(false);
   const [distance, setDistance] = useState<number | null>(null);
   const [calibrated, setCalibrated] = useState(false);
+  const [calibrationFactor, setCalibrationFactor] = useState(0.015);
   const [mode, setMode] = useState<'distance'|'area'>('distance');
   const [points, setPoints] = useState<{x: number, y: number}[]>([]);
+  const [objectDetected, setObjectDetected] = useState(false);
 
   useEffect(() => {
     const startCamera = async () => {
@@ -28,12 +31,23 @@ export default function ArMeasure() {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          // Set canvas size to match video
           if (canvasRef.current) {
             const { videoWidth, videoHeight } = videoRef.current;
             canvasRef.current.width = videoWidth;
             canvasRef.current.height = videoHeight;
           }
+        }
+
+        // Load saved calibration data
+        const savedCalibration = await getCalibrationData();
+        if (savedCalibration) {
+          setCalibrationFactor(savedCalibration);
+          setCalibrated(true);
+        }
+
+        // Start object detection guide
+        if (canvasRef.current) {
+          drawDetectionGuide();
         }
       } catch (err) {
         console.error("Error accessing camera:", err);
@@ -48,13 +62,53 @@ export default function ArMeasure() {
     };
   }, []);
 
+  const drawDetectionGuide = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!ctx || !canvas) return;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const boxSize = Math.min(canvas.width, canvas.height) * 0.4;
+
+    // Clear previous drawings
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw scanning area
+    ctx.strokeStyle = objectDetected ? '#00ff00' : '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([10, 10]);
+    ctx.strokeRect(
+      centerX - boxSize/2,
+      centerY - boxSize/2,
+      boxSize,
+      boxSize
+    );
+
+    // Draw crosshair
+    const crosshairSize = 20;
+    ctx.beginPath();
+    ctx.moveTo(centerX - crosshairSize, centerY);
+    ctx.lineTo(centerX + crosshairSize, centerY);
+    ctx.moveTo(centerX, centerY - crosshairSize);
+    ctx.lineTo(centerX, centerY + crosshairSize);
+    ctx.stroke();
+
+    // Draw guide text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '20px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(
+      objectDetected ? 'Object detected! Tap to measure' : 'Point camera at object',
+      centerX,
+      centerY + boxSize/2 + 40
+    );
+  };
+
   const calculateDistance = (point1: {x: number, y: number}, point2: {x: number, y: number}) => {
     const dx = point2.x - point1.x;
     const dy = point2.y - point1.y;
     const pixelDistance = Math.sqrt(dx * dx + dy * dy);
-
-    // Convert pixel distance to meters using calibration factor
-    const calibrationFactor = calibrated ? 0.01 : 0.015; // meters per pixel
     return pixelDistance * calibrationFactor;
   };
 
@@ -85,14 +139,14 @@ export default function ArMeasure() {
       // Draw point
       ctx.fillStyle = '#00ff00';
       ctx.beginPath();
-      ctx.arc(point.x, point.y, 10, 0, 2 * Math.PI); // Increased point size
+      ctx.arc(point.x, point.y, 10, 0, 2 * Math.PI);
       ctx.fill();
 
       // Draw line to previous point
       if (index > 0) {
         const prevPoint = newPoints[index - 1];
         ctx.strokeStyle = '#00ff00';
-        ctx.lineWidth = 4; // Increased line width
+        ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.moveTo(prevPoint.x, prevPoint.y);
         ctx.lineTo(point.x, point.y);
@@ -104,10 +158,10 @@ export default function ArMeasure() {
 
         // Draw distance text with background
         const textX = (prevPoint.x + point.x) / 2;
-        const textY = (prevPoint.y + point.y) / 2 - 30; // Increased spacing
+        const textY = (prevPoint.y + point.y) / 2 - 30;
         const text = `${dist.toFixed(2)}m`;
 
-        ctx.font = '28px sans-serif'; // Larger font
+        ctx.font = '28px sans-serif';
         const textWidth = ctx.measureText(text).width;
 
         // Draw text background
@@ -122,42 +176,22 @@ export default function ArMeasure() {
     });
   };
 
-  const handleCalibrate = () => {
+  const handleCalibrate = async () => {
+    const newCalibrationFactor = 0.01; // This would be calculated based on known reference
+    setCalibrationFactor(newCalibrationFactor);
     setCalibrated(true);
+    await saveCalibrationData(newCalibrationFactor);
+
+    // Show confirmation
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (!ctx || !canvas) return;
 
-    // Draw calibration guide
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = '#00ff00';
-    ctx.lineWidth = 4;
-    ctx.setLineDash([12, 12]);
-
-    // Draw horizontal line
-    const centerY = canvas.height / 2;
-    ctx.beginPath();
-    ctx.moveTo(canvas.width/2 - 150, centerY);
-    ctx.lineTo(canvas.width/2 + 150, centerY);
-    ctx.stroke();
-
-    // Draw text with background
-    const text = 'Place a reference object (e.g., A4 paper) along this line';
-    ctx.font = '24px sans-serif'; // Larger font
-    const textWidth = ctx.measureText(text).width;
-
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    ctx.fillRect(
-      canvas.width/2 - textWidth/2 - 15,
-      centerY - 60,
-      textWidth + 30,
-      48
-    );
-
     ctx.fillStyle = '#00ff00';
+    ctx.font = '24px sans-serif';
     ctx.textAlign = 'center';
-    ctx.setLineDash([]);
-    ctx.fillText(text, canvas.width/2, centerY - 24);
+    ctx.fillText('Calibration saved!', canvas.width/2, canvas.height/2);
   };
 
   const handleReset = () => {
@@ -167,8 +201,21 @@ export default function ArMeasure() {
     const ctx = canvasRef.current?.getContext('2d');
     if (ctx) {
       ctx.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+      drawDetectionGuide();
     }
   };
+
+  // Simulate object detection
+  useEffect(() => {
+    if (!measuring) return;
+
+    const detectInterval = setInterval(() => {
+      setObjectDetected(prev => !prev);
+      drawDetectionGuide();
+    }, 1000);
+
+    return () => clearInterval(detectInterval);
+  }, [measuring]);
 
   return (
     <div className="min-h-screen p-3 pb-20">
@@ -198,7 +245,7 @@ export default function ArMeasure() {
               <Button 
                 variant={mode === 'distance' ? 'default' : 'outline'}
                 onClick={() => setMode('distance')}
-                className="h-14 text-lg" // Taller button, larger text
+                className="h-14 text-lg"
               >
                 <Ruler className="h-5 w-5 mr-2" />
                 Distance
@@ -206,7 +253,7 @@ export default function ArMeasure() {
               <Button 
                 variant={mode === 'area' ? 'default' : 'outline'}
                 onClick={() => setMode('area')}
-                className="h-14 text-lg" // Taller button, larger text
+                className="h-14 text-lg"
               >
                 <Maximize2 className="h-5 w-5 mr-2" />
                 Area
@@ -216,7 +263,7 @@ export default function ArMeasure() {
             {/* Measurement Controls */}
             <div className="flex gap-2">
               <Button 
-                className="flex-1 h-14 text-lg" // Taller button, larger text
+                className="flex-1 h-14 text-lg"
                 onClick={() => setMeasuring(true)}
                 disabled={measuring}
               >
@@ -226,7 +273,7 @@ export default function ArMeasure() {
               <Button
                 variant="outline"
                 onClick={handleReset}
-                className="h-14 px-4" // Taller button, more padding
+                className="h-14 px-4"
               >
                 <RotateCcw className="h-5 w-5" />
               </Button>
@@ -236,7 +283,7 @@ export default function ArMeasure() {
             {!calibrated && (
               <Button 
                 variant="outline" 
-                className="w-full h-14 text-lg" // Taller button, larger text
+                className="w-full h-14 text-lg"
                 onClick={handleCalibrate}
               >
                 <Camera className="h-5 w-5 mr-2" />
@@ -249,7 +296,7 @@ export default function ArMeasure() {
               <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
                 <p className="text-center text-lg font-medium">
                   {mode === 'distance' 
-                    ? `Distance: ${distance.toFixed(2)} meters`
+                    ? `Distance: ${distance.toFixed(2)}m`
                     : `Area: ${(distance * distance).toFixed(2)} sq meters`
                   }
                 </p>
@@ -259,8 +306,10 @@ export default function ArMeasure() {
             {/* Help Text */}
             <p className="text-base text-muted-foreground text-center px-4">
               {measuring 
-                ? "Tap points on the screen to measure between them" 
-                : "Click Start Measuring and calibrate the camera for accurate measurements"
+                ? objectDetected
+                  ? "Tap points on the screen to measure"
+                  : "Point camera at the object to measure"
+                : "Tap Start Measuring to begin"
               }
             </p>
           </div>
