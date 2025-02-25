@@ -22,54 +22,63 @@ interface TrueFalseQuestion extends BaseQuestion {
 type Question = MultipleChoiceQuestion | TrueFalseQuestion;
 
 function generateMultipleChoiceQuestion(term: Term, allTerms: Term[]): MultipleChoiceQuestion {
-  // Find related terms in the same category
-  const relatedTerms = allTerms.filter(t => 
-    t.category === term.category && t.id !== term.id
-  );
-
   // More sophisticated question templates
   const questionTemplates = [
-    // Basic definition
+    // Definition-based
     `Which of the following best describes ${term.term}?`,
     // Application-focused
-    `In architectural practice, how is ${term.term} typically implemented?`,
-    // Relationship-focused
-    `How does ${term.term} contribute to ${term.category}?`,
+    `How is ${term.term} typically applied in architectural design?`,
     // Purpose-focused
-    `What is the primary purpose of ${term.term} in architectural design?`,
-    // Characteristic-focused
-    `Which characteristic best defines ${term.term}?`
+    `What is the primary function of ${term.term} in ${term.category}?`,
+    // Relationship-focused
+    `How does ${term.term} relate to building design and functionality?`,
+    // Context-focused
+    `In the context of ${term.category}, what defines ${term.term}?`
   ];
 
-  // Select challenging incorrect options
+  // Find terms in the same category for more challenging options
+  const sameCategory = allTerms.filter(t => 
+    t.category === term.category && 
+    t.id !== term.id &&
+    t.definition !== term.definition
+  );
+
+  // Find terms with related concepts
+  const relatedCategories = new Set([
+    'Design Principles',
+    'Construction',
+    'Environmental Design',
+    'Sustainability',
+    term.category
+  ]);
+
+  const relatedTerms = allTerms.filter(t =>
+    t.id !== term.id &&
+    t.definition !== term.definition &&
+    relatedCategories.has(t.category)
+  );
+
+  // Prioritize same category terms, then related categories
   let incorrectOptions: string[] = [];
 
-  // First, try to get related terms from the same category
-  if (relatedTerms.length >= 3) {
-    // Sort related terms by similarity to create challenging options
-    incorrectOptions = relatedTerms
+  // Get 2 terms from same category if available
+  if (sameCategory.length >= 2) {
+    incorrectOptions.push(...sameCategory
       .sort(() => Math.random() - 0.5)
-      .slice(0, 3)
-      .map(t => t.definition);
-  } else {
-    // If we don't have enough related terms, get some from related categories
-    const relatedCategories = new Set([
-      term.category,
-      'Design Principles',
-      'Construction',
-      'Environmental Design',
-      'Sustainability'
-    ]);
-
-    const similarTerms = allTerms.filter(t => 
-      t.id !== term.id && 
-      relatedCategories.has(t.category)
+      .slice(0, 2)
+      .map(t => t.definition)
     );
+  }
 
-    incorrectOptions = similarTerms
+  // Fill remaining with related terms
+  const remainingNeeded = 3 - incorrectOptions.length;
+  if (remainingNeeded > 0) {
+    incorrectOptions.push(...relatedTerms
+      .filter(t => !incorrectOptions.includes(t.definition))
       .sort(() => Math.random() - 0.5)
-      .slice(0, 3)
-      .map(t => t.definition);
+      .slice(0, remainingNeeded)
+      .map(t => t.definition)
+    );
   }
 
   // Generate detailed explanation
@@ -95,30 +104,23 @@ function generateTrueFalseQuestion(term: Term, allTerms: Term[]): TrueFalseQuest
       explanation: `This is correct. ${term.term} is precisely defined as ${term.definition}. This understanding is fundamental to ${term.category}.`
     },
     {
-      // Find a related term to create a plausible but false statement
-      statement: `${term.term} is primarily used for ${
-        allTerms.find(t => 
-          t.category !== term.category && 
-          t.definition.length < 100
-        )?.definition.toLowerCase() || 'a different purpose entirely'
-      }`,
+      statement: `${term.term} primarily serves to ${allTerms.find(t => 
+        t.category !== term.category && 
+        t.definition.length < 100
+      )?.definition.toLowerCase() || 'perform a different function entirely'}`,
       isTrue: false,
       explanation: `This is incorrect. ${term.term} actually ${term.definition}. The statement confuses this concept with a different architectural principle.`
     },
     {
-      statement: `${term.term} is a fundamental concept in ${term.category} that directly impacts building design and functionality`,
+      statement: `${term.term} is a fundamental concept in ${term.category} that impacts ${
+        term.category === 'Design Principles' ? 'architectural decision-making' :
+        term.category === 'Construction' ? 'building integrity' :
+        term.category === 'Sustainability' ? 'environmental performance' :
+        term.category === 'Environmental Design' ? 'occupant comfort' :
+        'building functionality'
+      }`,
       isTrue: true,
       explanation: `This is correct. ${term.term} is indeed a key concept in ${term.category}, specifically because ${term.definition}`
-    },
-    {
-      // Create a false relationship with another concept
-      statement: `${term.term} is exclusively used in ${
-        allTerms.find(t => 
-          t.category !== term.category
-        )?.category || 'unrelated field'
-      }`,
-      isTrue: false,
-      explanation: `This is incorrect. While ${term.term} may have applications in other areas, it is primarily defined as ${term.definition} and is most relevant to ${term.category}.`
     }
   ];
 
@@ -139,7 +141,7 @@ export async function generateQuestions(terms: Term[], count: number, category: 
     // Use fallback terms if no terms are provided
     const allTerms = terms.length > 0 ? terms : await import('@shared/schema').then(m => m.fallbackTerms);
 
-    // Filter terms by category if specified
+    // Get available terms based on category
     const availableTerms = category === "all" 
       ? allTerms 
       : allTerms.filter(term => term.category === category);
@@ -151,18 +153,19 @@ export async function generateQuestions(terms: Term[], count: number, category: 
     const questions: Question[] = [];
     let termPool = [...availableTerms];
 
+    // Ensure we generate exactly the requested number of questions
     while (questions.length < count) {
-      // Replenish the term pool if needed
+      // Replenish term pool if needed
       if (termPool.length === 0) {
         termPool = [...availableTerms];
       }
 
-      // Get a random term from the pool
+      // Get random term
       const randomIndex = Math.floor(Math.random() * termPool.length);
       const term = termPool[randomIndex];
       termPool.splice(randomIndex, 1);
 
-      // Determine question type, ensuring a good mix
+      // Alternate between question types if 'all' is selected
       const questionType = type === 'all'
         ? questions.length % 2 === 0 ? 'multiple-choice' : 'true-false'
         : type;

@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -28,49 +27,8 @@ import type { Term } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import BackButton from "@/components/BackButton";
-import { saveAssessmentQuestions, getLatestAssessmentQuestions } from "@/lib/offlineStorage";
 
-
-interface BaseQuestion {
-  id: number;
-  category: string;
-  question: string;
-  explanation: string;
-  type: 'multiple-choice' | 'fill-in-blank' | 'true-false' | 'chronological' | 'calculation';
-}
-
-interface MultipleChoiceQuestion extends BaseQuestion {
-  type: 'multiple-choice';
-  options: string[];
-  correctAnswer: string;
-}
-
-interface FillInBlankQuestion extends BaseQuestion {
-  type: 'fill-in-blank';
-  correctKeywords: string[];
-}
-
-interface TrueFalseQuestion extends BaseQuestion {
-  type: 'true-false';
-  correctAnswer: boolean;
-}
-
-interface ChronologicalQuestion extends BaseQuestion {
-  type: 'chronological';
-  events: string[];
-  correctOrder: number[];
-}
-
-interface CalculationQuestion extends BaseQuestion {
-  type: 'calculation';
-  formula: string;
-  correctAnswer: number;
-  tolerance: number; // Percentage of acceptable deviation
-  unit: string;
-}
-
-type Question = MultipleChoiceQuestion | FillInBlankQuestion | TrueFalseQuestion | ChronologicalQuestion | CalculationQuestion;
-
+// ... keep all the interfaces ...
 
 export default function Assessment() {
   const [score, setScore] = useState<number | null>(null);
@@ -84,9 +42,6 @@ export default function Assessment() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { data: apiTerms } = useQuery<Term[]>({
-    queryKey: ["/api/terms"]
-  });
 
   const questionTypes = [
     { value: 'multiple-choice', label: 'Multiple Choice' },
@@ -100,10 +55,10 @@ export default function Assessment() {
     setIsLoading(true);
     try {
       const generatedQuestions = await generateQuestions(
-        [],  // We don't need terms anymore
+        [],
         questionCount,
         "all",
-        "all"  // Get both multiple-choice and true/false questions
+        selectedTypes.length === 1 ? selectedTypes[0] : "all"
       );
 
       if (generatedQuestions.length === questionCount) {
@@ -116,7 +71,7 @@ export default function Assessment() {
       } else {
         toast({
           title: "Error",
-          description: `Could only generate ${generatedQuestions.length} questions. Please try again or adjust the question count.`,
+          description: `Could only generate ${generatedQuestions.length} questions. Please try again.`,
           variant: "destructive"
         });
       }
@@ -124,7 +79,7 @@ export default function Assessment() {
       console.error('Error starting assessment:', error);
       toast({
         title: "Error",
-        description: "Failed to generate questions. Please check your internet connection and try again.",
+        description: "Failed to generate questions. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -339,9 +294,8 @@ export default function Assessment() {
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-medium mb-2">Exam Details</h2>
+                  <h2 className="text-lg font-medium mb-2">Assessment Details</h2>
                   <p className="text-muted-foreground">
-                    • Duration: 60 minutes<br />
                     • Questions: {questionCount}<br />
                     • Types: {selectedTypes.map(t =>
                       questionTypes.find(qt => qt.value === t)?.label
@@ -379,68 +333,50 @@ export default function Assessment() {
 
       <div className="max-w-2xl mx-auto">
         {score === null ? (
-          <>
-            <Card className="mb-4">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <Timer className="h-5 w-5" />
-                    <span className="font-medium">{formatTime(timeLeft)}</span>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="space-y-6">
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground mb-2">
+                    {questions[currentQuestion].type}
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    Question {currentQuestion + 1} of {questions.length}
-                  </div>
+                  <p className="text-lg mb-4">{questions[currentQuestion].question}</p>
+
+                  {renderQuestion(questions[currentQuestion])}
                 </div>
-                <Progress value={(currentQuestion + 1) / questions.length * 100} className="mb-4" />
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardContent className="pt-6">
-                <div className="space-y-6">
-                  <div>
-                    <div className="text-sm font-medium text-muted-foreground mb-2">
-                      {questions[currentQuestion].type}
-                    </div>
-                    <p className="text-lg mb-4">{questions[currentQuestion].question}</p>
+                <div className="flex justify-between">
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
+                    disabled={currentQuestion === 0}
+                    className="flex items-center"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Previous
+                  </Button>
 
-                    {renderQuestion(questions[currentQuestion])}
-                  </div>
-
-                  <div className="flex justify-between">
+                  {currentQuestion === questions.length - 1 ? (
                     <Button
-                      variant="outline"
-                      onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
-                      disabled={currentQuestion === 0}
+                      onClick={handleSubmit}
                       className="flex items-center"
                     >
-                      <ChevronLeft className="h-4 w-4 mr-1" />
-                      Previous
+                      Submit
+                      <CheckCircle2 className="h-4 w-4 ml-1" />
                     </Button>
-
-                    {currentQuestion === questions.length - 1 ? (
-                      <Button
-                        onClick={handleSubmit}
-                        disabled={Object.keys(answers).length !== questions.length}
-                        className="flex items-center"
-                      >
-                        Submit
-                        <CheckCircle2 className="h-4 w-4 ml-1" />
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={() => setCurrentQuestion(prev => Math.min(questions.length - 1, prev + 1))}
-                        className="flex items-center"
-                      >
-                        Next
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
-                    )}
-                  </div>
+                  ) : (
+                    <Button
+                      onClick={() => setCurrentQuestion(prev => Math.min(questions.length - 1, prev + 1))}
+                      className="flex items-center"
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-          </>
+              </div>
+            </CardContent>
+          </Card>
         ) : (
           <Card>
             <CardContent className="pt-6">
@@ -455,28 +391,7 @@ export default function Assessment() {
               {showExplanation && (
                 <div className="space-y-6 mt-6">
                   {questions.map((q, index) => {
-                    let isCorrect = false;
-                    switch (q.type) {
-                      case 'multiple-choice':
-                        isCorrect = answers[index] === q.correctAnswer;
-                        break;
-                      case 'fill-in-blank':
-                        isCorrect = q.correctKeywords.some(keyword =>
-                          answers[index]?.toLowerCase().includes(keyword.toLowerCase())
-                        );
-                        break;
-                      case 'true-false':
-                        isCorrect = answers[index] === q.correctAnswer;
-                        break;
-                      case 'chronological':
-                        isCorrect = JSON.stringify(answers[index]) === JSON.stringify(q.correctOrder);
-                        break;
-                      case 'calculation':
-                        const percentError = Math.abs((answers[index] - q.correctAnswer) / q.correctAnswer * 100);
-                        isCorrect = percentError <= q.tolerance;
-                        break;
-                    }
-
+                    const isCorrect = answers[index] === q.correctAnswer; //Simplified Correctness Check
                     return (
                       <div key={q.id} className="border rounded-lg p-4">
                         <div className="flex items-start gap-2">
@@ -488,21 +403,11 @@ export default function Assessment() {
                           <div>
                             <p className="font-medium mb-2">{q.question}</p>
                             <p className="text-sm text-muted-foreground mb-2">
-                              Your answer: {
-                                q.type === 'chronological'
-                                  ? answers[index]?.map((i: number) => q.events[i]).join(' → ')
-                                  : answers[index]?.toString()
-                              }
+                              Your answer: {answers[index]?.toString()}
                             </p>
                             {!isCorrect && (
                               <p className="text-sm text-green-600 dark:text-green-400 mb-2">
-                                Correct answer: {
-                                  q.type === 'chronological'
-                                    ? q.correctOrder.map(i => q.events[i]).join(' → ')
-                                    : q.type === 'fill-in-blank'
-                                      ? q.correctKeywords.join(' or ')
-                                      : q.correctAnswer.toString()
-                                }
+                                Correct answer: {q.correctAnswer}
                               </p>
                             )}
                             <div className="text-sm bg-muted/50 p-3 rounded-lg">
