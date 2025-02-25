@@ -1,20 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Camera, Ruler, Maximize2, Move, RotateCcw, ArrowLeft } from "lucide-react";
-import * as tf from '@tensorflow/tfjs';
-import '@tensorflow/tfjs-backend-webgl';
 
 interface Point {
   x: number;
   y: number;
-  worldX?: number;
-  worldY?: number;
-  worldZ?: number;
-}
-
-interface DetectedPlane {
-  points: Point[];
-  normal: { x: number; y: number; z: number };
 }
 
 export default function ArMeasure() {
@@ -24,19 +14,16 @@ export default function ArMeasure() {
   const [distance, setDistance] = useState<number | null>(null);
   const [mode, setMode] = useState<'distance'|'area'>('distance');
   const [points, setPoints] = useState<Point[]>([]);
-  const [detectedPlanes, setDetectedPlanes] = useState<DetectedPlane[]>([]);
-  const [orientation, setOrientation] = useState<DeviceOrientationEvent | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
 
   useEffect(() => {
     const initCamera = async () => {
       try {
-        // Request camera access with highest possible resolution
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: "environment",
-            width: { ideal: 4096 },
-            height: { ideal: 2160 }
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
           }
         });
 
@@ -45,12 +32,8 @@ export default function ArMeasure() {
           videoRef.current.onloadeddata = () => {
             setCameraReady(true);
             initCanvas();
-            startPlaneDetection();
           };
         }
-
-        // Listen for device orientation changes
-        window.addEventListener('deviceorientation', handleOrientation);
       } catch (err) {
         console.error("Error accessing camera:", err);
       }
@@ -59,15 +42,10 @@ export default function ArMeasure() {
     initCamera();
 
     return () => {
-      window.removeEventListener('deviceorientation', handleOrientation);
       const stream = videoRef.current?.srcObject as MediaStream;
       stream?.getTracks().forEach(track => track.stop());
     };
   }, []);
-
-  const handleOrientation = (event: DeviceOrientationEvent) => {
-    setOrientation(event);
-  };
 
   const initCanvas = () => {
     if (!canvasRef.current || !videoRef.current) return;
@@ -75,144 +53,60 @@ export default function ArMeasure() {
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
-    // Set canvas size to match video
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    // Initialize edge detection
-    startEdgeDetection();
+    drawGuideLines();
   };
 
-  const startPlaneDetection = async () => {
-    if (!videoRef.current || !canvasRef.current) return;
-
-    const detectPlanes = async () => {
-      if (!measuring) return;
-
-      // Process video frame to detect planes
-      const imageData = await processVideoFrame();
-      const planes = await detectPlanesInImage(imageData);
-      setDetectedPlanes(planes);
-
-      // Draw detected planes
-      drawPlanes(planes);
-
-      requestAnimationFrame(detectPlanes);
-    };
-
-    detectPlanes();
-  };
-
-  const processVideoFrame = async () => {
-    if (!videoRef.current || !canvasRef.current) return null;
-
-    const video = videoRef.current;
+  const drawGuideLines = () => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return null;
+    const ctx = canvas?.getContext('2d');
+    if (!ctx || !canvas) return;
 
-    // Draw video frame to canvas
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Get image data for processing
-    return ctx.getImageData(0, 0, canvas.width, canvas.height);
-  };
-
-  const detectPlanesInImage = async (imageData: ImageData | null) => {
-    if (!imageData) return [];
-
-    // Convert image data to tensor
-    const tensor = tf.browser.fromPixels(imageData);
-
-    // Process image to detect edges and planes
-    // This is a simplified version - in real implementation, 
-    // we would use more sophisticated plane detection algorithms
-    const processedTensor = tf.tidy(() => {
-      const normalized = tensor.toFloat().div(255);
-      return normalized;
-    });
-
-    tensor.dispose();
-    processedTensor.dispose();
-
-    // Return detected planes
-    // This is a placeholder - actual implementation would return real detected planes
-    return [];
-  };
-
-  const drawPlanes = (planes: DetectedPlane[]) => {
-    if (!canvasRef.current) return;
-    const ctx = canvasRef.current.getContext('2d');
-    if (!ctx) return;
-
-    planes.forEach(plane => {
-      ctx.strokeStyle = '#00ff00';
-      ctx.lineWidth = 2;
+    // Draw measurement points and lines
+    points.forEach((point, index) => {
+      // Draw point
+      ctx.fillStyle = '#00ff00';
       ctx.beginPath();
-      plane.points.forEach((point, index) => {
-        if (index === 0) {
-          ctx.moveTo(point.x, point.y);
-        } else {
-          ctx.lineTo(point.x, point.y);
-        }
-      });
-      ctx.closePath();
-      ctx.stroke();
+      ctx.arc(point.x, point.y, 8, 0, 2 * Math.PI);
+      ctx.fill();
 
-      // Draw plane normal vector
-      ctx.strokeStyle = '#ff0000';
-      const center = plane.points.reduce(
-        (acc, point) => ({ x: acc.x + point.x, y: acc.y + point.y }),
-        { x: 0, y: 0 }
-      );
-      center.x /= plane.points.length;
-      center.y /= plane.points.length;
+      // Draw line to previous point
+      if (index > 0) {
+        const prevPoint = points[index - 1];
+        ctx.strokeStyle = '#00ff00';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(prevPoint.x, prevPoint.y);
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
 
-      ctx.beginPath();
-      ctx.moveTo(center.x, center.y);
-      ctx.lineTo(
-        center.x + plane.normal.x * 50,
-        center.y + plane.normal.y * 50
-      );
-      ctx.stroke();
-    });
-  };
+        // Calculate and display distance
+        const dist = calculateDistance(prevPoint, point);
+        const textX = (prevPoint.x + point.x) / 2;
+        const textY = (prevPoint.y + point.y) / 2 - 20;
 
-  const startEdgeDetection = () => {
-    if (!canvasRef.current || !videoRef.current) return;
+        // Draw text background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.font = '20px sans-serif';
+        const text = `${dist.toFixed(2)}m`;
+        const textWidth = ctx.measureText(text).width;
+        ctx.fillRect(textX - textWidth/2 - 10, textY - 24, textWidth + 20, 36);
 
-    const detectEdges = () => {
-      if (!measuring) return;
-
-      const ctx = canvasRef.current!.getContext('2d');
-      if (!ctx) return;
-
-      // Draw current video frame
-      ctx.drawImage(videoRef.current!, 0, 0);
-
-      // Get image data
-      const imageData = ctx.getImageData(0, 0, canvasRef.current!.width, canvasRef.current!.height);
-      const data = imageData.data;
-
-      // Simple edge detection using Sobel operator
-      const edgeData = new Uint8ClampedArray(data.length);
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        const brightness = (r + g + b) / 3;
-        edgeData[i] = edgeData[i + 1] = edgeData[i + 2] = brightness;
-        edgeData[i + 3] = 255;
+        // Draw text
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText(text, textX, textY);
       }
+    });
 
-      // Draw edges
-      const edgeImage = new ImageData(edgeData, imageData.width, imageData.height);
-      ctx.putImageData(edgeImage, 0, 0);
-
-      requestAnimationFrame(detectEdges);
-    };
-
-    detectEdges();
+    if (measuring) {
+      requestAnimationFrame(drawGuideLines);
+    }
   };
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -226,54 +120,33 @@ export default function ArMeasure() {
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
 
-    // Find nearest edge point if available
-    const point = findNearestEdgePoint(x, y);
+    setPoints(prev => [...prev, { x, y }]);
 
-    setPoints(prev => [...prev, point]);
-
-    if (points.length === 2) {
-      // Calculate real-world distance
-      const dist = calculateRealWorldDistance(points[0], points[1]);
+    if (points.length === 1) {
+      const dist = calculateDistance(points[0], { x, y });
       setDistance(dist);
     }
   };
 
-  const findNearestEdgePoint = (x: number, y: number): Point => {
-    // In a real implementation, this would find the nearest detected edge point
-    // For now, just return the clicked point
-    return { x, y };
-  };
-
-  const calculateRealWorldDistance = (point1: Point, point2: Point): number => {
-    if (!orientation) return 0;
-
-    // This is a simplified calculation
-    // In a real implementation, we would use camera parameters and device orientation
-    // to calculate actual real-world distances
+  const calculateDistance = (point1: Point, point2: Point): number => {
     const dx = point2.x - point1.x;
     const dy = point2.y - point1.y;
     const pixelDistance = Math.sqrt(dx * dx + dy * dy);
 
-    // Convert pixel distance to meters using device orientation and camera parameters
-    const beta = orientation.beta || 0; // device tilt
-    const gamma = orientation.gamma || 0; // device rotation
-
-    // This is a very simplified conversion factor
-    // Real implementation would use proper camera calibration
-    const conversionFactor = 0.001 * Math.cos(beta * Math.PI / 180);
-
-    return pixelDistance * conversionFactor;
+    // Convert pixels to meters (approximation)
+    // This can be calibrated based on known reference objects
+    return pixelDistance * 0.001;
   };
 
   const handleReset = () => {
     setMeasuring(false);
     setPoints([]);
     setDistance(null);
+    drawGuideLines();
   };
 
   return (
     <div className="fixed inset-0 bg-black">
-      {/* Full screen camera view */}
       <div className="relative w-full h-full">
         <video
           ref={videoRef}
@@ -287,7 +160,6 @@ export default function ArMeasure() {
           className="absolute inset-0 w-full h-full touch-none"
         />
 
-        {/* Overlay UI */}
         <div className="absolute top-4 left-4">
           <Button
             variant="secondary"
@@ -299,7 +171,6 @@ export default function ArMeasure() {
           </Button>
         </div>
 
-        {/* Measurement Controls */}
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/50 backdrop-blur-sm space-y-4">
           <div className="flex gap-2">
             <Button 
@@ -323,7 +194,10 @@ export default function ArMeasure() {
           <div className="flex gap-2">
             <Button 
               className="flex-1 bg-white/10 hover:bg-white/20 h-14"
-              onClick={() => setMeasuring(true)}
+              onClick={() => {
+                setMeasuring(true);
+                drawGuideLines();
+              }}
               disabled={measuring || !cameraReady}
             >
               <Move className="h-5 w-5 mr-2" />
@@ -351,7 +225,7 @@ export default function ArMeasure() {
 
           <p className="text-sm text-white/70 text-center">
             {measuring 
-              ? "Tap on edges or surfaces to measure"
+              ? "Tap to place measurement points"
               : "Point camera at surface and tap Start Measuring"
             }
           </p>
