@@ -20,19 +20,24 @@ export default function ThemeSelect() {
 
     // Update theme CSS variables
     const root = document.documentElement;
+    const isDark = root.classList.contains("dark");
     const { colors } = theme;
 
-    root.style.setProperty("--background", colors.background);
-    root.style.setProperty("--foreground", colors.foreground);
-    root.style.setProperty("--muted", colors.muted);
-    root.style.setProperty("--accent", colors.accent);
+    // Get the appropriate color set based on dark mode
+    const colorSet = isDark ? colors.dark : colors;
+
+    // Apply colors
+    root.style.setProperty("--background", colorSet.background);
+    root.style.setProperty("--foreground", colorSet.foreground);
+    root.style.setProperty("--muted", colorSet.muted);
+    root.style.setProperty("--accent", colorSet.accent);
     root.style.setProperty("--primary", theme.primary);
     root.style.setProperty("--radius", `${theme.radius}rem`);
-    root.style.setProperty("--gradient", colors.gradient);
+    root.style.setProperty("--gradient", colorSet.gradient);
 
-    // Generate and apply texture
+    // Generate and apply texture with current theme
     const textureUrl = generateTexture(theme);
-    document.body.style.background = `${colors.gradient}, url(${textureUrl})`;
+    document.body.style.background = `${colorSet.gradient}, url(${textureUrl})`;
     document.body.style.backgroundSize = 'cover, 100px 100px';
     document.body.style.backgroundBlendMode = 'normal, overlay';
 
@@ -48,6 +53,24 @@ export default function ThemeSelect() {
       description: `Switched to ${theme.name} theme`,
     });
   };
+
+  // Listen for dark mode changes
+  useEffect(() => {
+    const darkModeObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "attributes" && mutation.attributeName === "class") {
+          applyTheme(currentTheme); // Reapply current theme with new dark/light mode
+        }
+      });
+    });
+
+    darkModeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => darkModeObserver.disconnect();
+  }, [currentTheme]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");

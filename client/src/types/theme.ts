@@ -10,6 +10,13 @@ export interface Theme {
     muted: string;
     accent: string;
     gradient: string;
+    dark: {
+      background: string;
+      foreground: string;
+      muted: string;
+      accent: string;
+      gradient: string;
+    };
   };
 }
 
