@@ -122,7 +122,7 @@ const subjects: Subject[] = [
   },
   {
     title: "Urban Planning",
-    icon: Building, 
+    icon: Building,
     description: "Principles of city planning and urban design",
     chapters: [
       {
@@ -228,6 +228,87 @@ const subjects: Subject[] = [
       },
     ]
   },
+  {
+    title: "Digital Design Tools",
+    icon: PenSquare,
+    description: "Modern architectural design and visualization tools",
+    chapters: [
+      {
+        title: "CAD Fundamentals",
+        content: "Essential computer-aided design principles and practices...",
+        keyPoints: [
+          "2D drafting basics",
+          "3D modeling concepts",
+          "Documentation standards",
+          "File management and collaboration"
+        ]
+      },
+      {
+        title: "BIM Technology",
+        content: "Understanding Building Information Modeling and its applications...",
+        keyPoints: [
+          "BIM workflow",
+          "Model coordination",
+          "Data management",
+          "Project collaboration"
+        ]
+      },
+    ]
+  },
+  {
+    title: "Site Planning",
+    icon: Compass,
+    description: "Principles of site analysis and development",
+    chapters: [
+      {
+        title: "Site Analysis",
+        content: "Methods and considerations for evaluating building sites...",
+        keyPoints: [
+          "Topography analysis",
+          "Environmental factors",
+          "Zoning regulations",
+          "Access and circulation"
+        ]
+      },
+      {
+        title: "Landscape Integration",
+        content: "Integrating architecture with landscape design...",
+        keyPoints: [
+          "Sustainable landscaping",
+          "Hardscape design",
+          "Water management",
+          "Native species selection"
+        ]
+      },
+    ]
+  },
+  {
+    title: "Interior Architecture",
+    icon: PaintBucket,
+    description: "Principles of interior space planning and design",
+    chapters: [
+      {
+        title: "Space Planning",
+        content: "Understanding spatial organization and circulation...",
+        keyPoints: [
+          "Functional zoning",
+          "Traffic flow analysis",
+          "Program requirements",
+          "Spatial relationships"
+        ]
+      },
+      {
+        title: "Materials and Finishes",
+        content: "Selection and application of interior materials...",
+        keyPoints: [
+          "Material properties",
+          "Durability factors",
+          "Aesthetic considerations",
+          "Sustainability criteria"
+        ]
+      },
+    ]
+  }
 ];
 
 export default function EBook() {
