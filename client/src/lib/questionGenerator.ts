@@ -19,70 +19,64 @@ interface TrueFalseQuestion extends BaseQuestion {
   correctAnswer: boolean;
 }
 
-type Question = MultipleChoiceQuestion | TrueFalseQuestion;
+export type Question = MultipleChoiceQuestion | TrueFalseQuestion;
 
 function generateMultipleChoiceQuestion(term: Term, allTerms: Term[]): MultipleChoiceQuestion {
-  // More sophisticated question templates
+  // Question templates for variety
   const questionTemplates = [
-    // Definition-based
     `Which of the following best describes ${term.term}?`,
-    // Application-focused
-    `How is ${term.term} typically applied in architectural design?`,
-    // Purpose-focused
-    `What is the primary function of ${term.term} in ${term.category}?`,
-    // Relationship-focused
-    `How does ${term.term} relate to building design and functionality?`,
-    // Context-focused
-    `In the context of ${term.category}, what defines ${term.term}?`
+    `In architectural practice, how is ${term.term} best defined?`,
+    `What is the primary function of ${term.term}?`,
+    `How would you correctly describe ${term.term}?`
   ];
 
-  // Find terms in the same category for more challenging options
-  const sameCategory = allTerms.filter(t => 
+  // Get terms from the same category for more relevant distractors
+  const sameCategoryTerms = allTerms.filter(t => 
     t.category === term.category && 
-    t.id !== term.id &&
-    t.definition !== term.definition
+    t.id !== term.id
   );
 
-  // Find terms with related concepts
-  const relatedCategories = new Set([
+  // Get terms from related categories for additional options if needed
+  const relatedCategories = [
     'Design Principles',
     'Construction',
     'Environmental Design',
-    'Sustainability',
-    term.category
-  ]);
+    'Sustainability'
+  ];
 
-  const relatedTerms = allTerms.filter(t =>
-    t.id !== term.id &&
-    t.definition !== term.definition &&
-    relatedCategories.has(t.category)
+  const relatedTerms = allTerms.filter(t => 
+    t.id !== term.id && 
+    t.category !== term.category &&
+    relatedCategories.includes(t.category)
   );
 
-  // Prioritize same category terms, then related categories
+  // Generate incorrect options
   let incorrectOptions: string[] = [];
 
-  // Get 2 terms from same category if available
-  if (sameCategory.length >= 2) {
-    incorrectOptions.push(...sameCategory
+  // Try to get at least 2 options from same category
+  if (sameCategoryTerms.length > 0) {
+    incorrectOptions = sameCategoryTerms
       .sort(() => Math.random() - 0.5)
-      .slice(0, 2)
-      .map(t => t.definition)
-    );
+      .slice(0, Math.min(2, sameCategoryTerms.length))
+      .map(t => t.definition);
   }
 
-  // Fill remaining with related terms
-  const remainingNeeded = 3 - incorrectOptions.length;
-  if (remainingNeeded > 0) {
-    incorrectOptions.push(...relatedTerms
-      .filter(t => !incorrectOptions.includes(t.definition))
+  // Fill remaining options from related terms
+  if (incorrectOptions.length < 3) {
+    const additionalOptions = relatedTerms
       .sort(() => Math.random() - 0.5)
-      .slice(0, remainingNeeded)
-      .map(t => t.definition)
-    );
+      .slice(0, 3 - incorrectOptions.length)
+      .map(t => t.definition);
+    incorrectOptions = [...incorrectOptions, ...additionalOptions];
   }
 
-  // Generate detailed explanation
-  const explanation = `${term.term} is ${term.definition}. This concept is crucial in ${term.category}, particularly when considering architectural design and implementation. Understanding this helps architects make informed decisions about building design and functionality.`;
+  // Ensure we have unique options
+  incorrectOptions = Array.from(new Set(incorrectOptions));
+
+  // If we still don't have enough options, add some generic plausible options
+  while (incorrectOptions.length < 3) {
+    incorrectOptions.push(`A different aspect of ${term.category.toLowerCase()}`);
+  }
 
   return {
     id: Date.now() + Math.random(),
@@ -91,40 +85,27 @@ function generateMultipleChoiceQuestion(term: Term, allTerms: Term[]): MultipleC
     question: questionTemplates[Math.floor(Math.random() * questionTemplates.length)],
     options: [term.definition, ...incorrectOptions].sort(() => Math.random() - 0.5),
     correctAnswer: term.definition,
-    explanation
+    explanation: `${term.term} is ${term.definition}. This concept is important in ${term.category} for architectural design and implementation.`
   };
 }
 
 function generateTrueFalseQuestion(term: Term, allTerms: Term[]): TrueFalseQuestion {
-  // More sophisticated true/false templates
-  const trueFalseTemplates = [
+  const templates = [
     {
-      statement: `${term.definition}`,
+      statement: term.definition,
       isTrue: true,
-      explanation: `This is correct. ${term.term} is precisely defined as ${term.definition}. This understanding is fundamental to ${term.category}.`
+      explanation: `This is correct. ${term.term} is indeed ${term.definition}.`
     },
     {
-      statement: `${term.term} primarily serves to ${allTerms.find(t => 
-        t.category !== term.category && 
-        t.definition.length < 100
-      )?.definition.toLowerCase() || 'perform a different function entirely'}`,
-      isTrue: false,
-      explanation: `This is incorrect. ${term.term} actually ${term.definition}. The statement confuses this concept with a different architectural principle.`
-    },
-    {
-      statement: `${term.term} is a fundamental concept in ${term.category} that impacts ${
-        term.category === 'Design Principles' ? 'architectural decision-making' :
-        term.category === 'Construction' ? 'building integrity' :
-        term.category === 'Sustainability' ? 'environmental performance' :
-        term.category === 'Environmental Design' ? 'occupant comfort' :
-        'building functionality'
+      statement: `${term.term} is primarily used in ${
+        allTerms.find(t => t.category !== term.category)?.category || 'unrelated fields'
       }`,
-      isTrue: true,
-      explanation: `This is correct. ${term.term} is indeed a key concept in ${term.category}, specifically because ${term.definition}`
+      isTrue: false,
+      explanation: `This is incorrect. ${term.term} is primarily used in ${term.category} and is defined as: ${term.definition}`
     }
   ];
 
-  const template = trueFalseTemplates[Math.floor(Math.random() * trueFalseTemplates.length)];
+  const template = templates[Math.floor(Math.random() * templates.length)];
 
   return {
     id: Date.now() + Math.random(),
@@ -138,10 +119,10 @@ function generateTrueFalseQuestion(term: Term, allTerms: Term[]): TrueFalseQuest
 
 export async function generateQuestions(terms: Term[], count: number, category: string, type: string): Promise<Question[]> {
   try {
-    // Use fallback terms if no terms are provided
+    // Use fallback terms if no terms provided
     const allTerms = terms.length > 0 ? terms : await import('@shared/schema').then(m => m.fallbackTerms);
 
-    // Get available terms based on category
+    // Filter terms by category if specified
     const availableTerms = category === "all" 
       ? allTerms 
       : allTerms.filter(term => term.category === category);
@@ -153,8 +134,8 @@ export async function generateQuestions(terms: Term[], count: number, category: 
     const questions: Question[] = [];
     let termPool = [...availableTerms];
 
-    // Ensure we generate exactly the requested number of questions
-    while (questions.length < count) {
+    // Generate exactly the requested number of questions
+    for (let i = 0; i < count; i++) {
       // Replenish term pool if needed
       if (termPool.length === 0) {
         termPool = [...availableTerms];
@@ -165,9 +146,9 @@ export async function generateQuestions(terms: Term[], count: number, category: 
       const term = termPool[randomIndex];
       termPool.splice(randomIndex, 1);
 
-      // Alternate between question types if 'all' is selected
+      // Determine question type
       const questionType = type === 'all'
-        ? questions.length % 2 === 0 ? 'multiple-choice' : 'true-false'
+        ? i % 2 === 0 ? 'multiple-choice' : 'true-false'
         : type;
 
       const question = questionType === 'multiple-choice'
