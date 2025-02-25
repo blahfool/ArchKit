@@ -116,7 +116,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col items-center justify-start p-4 relative overflow-hidden">
       {showAnimation && (
         <div className="absolute inset-0 flex items-center justify-center logo-animation">
-          <div className="text-6xl font-light tracking-wide text-primary">
+          <div className="text-6xl font-light tracking-wide bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
             <span className="logo-letter">A</span>
             <span className="logo-letter">r</span>
             <span className="logo-letter">c</span>
@@ -156,9 +156,9 @@ export default function Home() {
       />
 
       <div className={`w-full max-w-4xl mx-auto text-center pt-12 pb-8 ${showAnimation ? 'opacity-0 animate-content-appear' : 'opacity-100'}`}>
-        <h1 className="text-5xl sm:text-6xl font-light mb-4 tracking-tight">
-          <span className="text-primary">Arch</span>
-          <span className="font-bold text-primary">Kit</span>
+        <h1 className="text-5xl sm:text-6xl font-light mb-4 tracking-tight bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
+          <span className="font-light">Arch</span>
+          <span className="font-bold">Kit</span>
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground mb-4 max-w-lg mx-auto">
           Your complete toolkit for architecture studies and professional practice

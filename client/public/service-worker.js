@@ -1,16 +1,16 @@
-const CACHE_NAME = 'archkit-cache-v1';
+const CACHE_NAME = 'archkit-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.json',
   '/src/main.tsx',
   '/src/index.css',
-  '/icons/icon-192x192.svg',
-  '/icons/icon-512x512.svg'
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png'
 ];
 
 // Data caches
-const DATA_CACHE_NAME = 'archkit-data-v1';
+const DATA_CACHE_NAME = 'archkit-data-v2';
 const API_URLS = ['/api/terms', '/api/formulas'];
 
 // Helper function to get full URL including Replit's environment
@@ -88,28 +88,22 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // For all other requests - cache first, network fallback
+  // For all other requests - network first, cache fallback
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response) {
-        // Return cached response immediately
-        return response;
-      }
-
-      // Not in cache, try network
-      return fetch(event.request).then((response) => {
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response;
+    fetch(event.request)
+      .then(response => {
+        // Cache successful responses
+        if (response.ok && response.type === 'basic') {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
         }
-
-        const responseToCache = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-
         return response;
-      });
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
   );
 });
 
