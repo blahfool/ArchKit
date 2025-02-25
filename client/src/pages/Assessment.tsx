@@ -164,7 +164,7 @@ export default function Assessment() {
           isCorrect = answer === q.correctAnswer;
           break;
         case 'fill-in-blank':
-          isCorrect = q.correctKeywords.some(keyword => 
+          isCorrect = q.correctKeywords.some(keyword =>
             answer?.toLowerCase().includes(keyword.toLowerCase())
           );
           break;
@@ -305,7 +305,14 @@ export default function Assessment() {
                     min={1}
                     max={50}
                     value={questionCount}
-                    onChange={(e) => setQuestionCount(parseInt(e.target.value) || 10)}
+                    className="w-full"
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? 1 : parseInt(e.target.value);
+                      if (!isNaN(value) && value >= 1 && value <= 50) {
+                        setQuestionCount(value);
+                      }
+                    }}
+                    onFocus={(e) => e.target.select()}
                   />
                 </div>
 
@@ -331,14 +338,14 @@ export default function Assessment() {
                     • Duration: 60 minutes<br />
                     • Questions: {filteredQuestions.length}<br />
                     • Category: {selectedCategory === "all" ? "All Categories" : selectedCategory}<br />
-                    • Types: {selectedTypes.map(t => 
+                    • Types: {selectedTypes.map(t =>
                       questionTypes.find(qt => qt.value === t)?.label
                     ).join(', ')}
                   </p>
                 </div>
 
-                <Button 
-                  onClick={handleStart} 
+                <Button
+                  onClick={handleStart}
                   className="w-full"
                   disabled={selectedTypes.length === 0 || filteredQuestions.length === 0}
                 >
@@ -401,7 +408,7 @@ export default function Assessment() {
                   </Button>
 
                   {currentQuestion === filteredQuestions.length - 1 ? (
-                    <Button 
+                    <Button
                       onClick={handleSubmit}
                       disabled={Object.keys(answers).length !== filteredQuestions.length}
                       className="flex items-center"
@@ -442,7 +449,7 @@ export default function Assessment() {
                         isCorrect = answers[index] === q.correctAnswer;
                         break;
                       case 'fill-in-blank':
-                        isCorrect = q.correctKeywords.some(keyword => 
+                        isCorrect = q.correctKeywords.some(keyword =>
                           answers[index]?.toLowerCase().includes(keyword.toLowerCase())
                         );
                         break;
@@ -466,7 +473,7 @@ export default function Assessment() {
                             <p className="font-medium mb-2">{q.question}</p>
                             <p className="text-sm text-muted-foreground mb-2">
                               Your answer: {
-                                q.type === 'chronological' 
+                                q.type === 'chronological'
                                   ? answers[index]?.map((i: number) => q.events[i]).join(' → ')
                                   : answers[index]?.toString()
                               }
@@ -477,8 +484,8 @@ export default function Assessment() {
                                   q.type === 'chronological'
                                     ? q.correctOrder.map(i => q.events[i]).join(' → ')
                                     : q.type === 'fill-in-blank'
-                                    ? q.correctKeywords.join(' or ')
-                                    : q.correctAnswer.toString()
+                                      ? q.correctKeywords.join(' or ')
+                                      : q.correctAnswer.toString()
                                 }
                               </p>
                             )}
@@ -501,8 +508,8 @@ export default function Assessment() {
                 <Button onClick={handleStart} className="flex-1">
                   Try Again
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setShowExplanation(prev => !prev)}
                   className="flex-1"
                 >
