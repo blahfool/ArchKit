@@ -12,6 +12,7 @@ export const architecturalThemes: Record<string, Theme> = {
       foreground: "hsl(220 40% 20%)",
       muted: "hsl(220 20% 94%)",
       accent: "hsl(220 40% 40%)",
+      gradient: "linear-gradient(135deg, hsl(220 30% 96%), hsl(220 30% 98%))"
     }
   },
   brutalist: {
@@ -25,6 +26,7 @@ export const architecturalThemes: Record<string, Theme> = {
       foreground: "hsl(0 0% 20%)",
       muted: "hsl(0 0% 90%)",
       accent: "hsl(0 0% 40%)",
+      gradient: "linear-gradient(45deg, hsl(0 0% 93%), hsl(0 0% 97%))"
     }
   },
   warmMinimal: {
@@ -38,6 +40,7 @@ export const architecturalThemes: Record<string, Theme> = {
       foreground: "hsl(30 20% 20%)",
       muted: "hsl(30 20% 94%)",
       accent: "hsl(30 30% 40%)",
+      gradient: "linear-gradient(135deg, hsl(30 30% 96%), hsl(30 20% 98%))"
     }
   },
   industrial: {
@@ -51,6 +54,7 @@ export const architecturalThemes: Record<string, Theme> = {
       foreground: "hsl(200 30% 20%)",
       muted: "hsl(200 20% 94%)",
       accent: "hsl(200 30% 45%)",
+      gradient: "linear-gradient(45deg, hsl(200 20% 96%), hsl(200 30% 98%))"
     }
   },
   earthen: {
@@ -64,6 +68,7 @@ export const architecturalThemes: Record<string, Theme> = {
       foreground: "hsl(25 30% 25%)",
       muted: "hsl(25 20% 94%)",
       accent: "hsl(25 30% 45%)",
+      gradient: "linear-gradient(135deg, hsl(25 30% 96%), hsl(25 20% 98%))"
     }
   }
 };

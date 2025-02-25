@@ -27,6 +27,10 @@ export default function ThemeSelect() {
     root.style.setProperty("--accent", colors.accent);
     root.style.setProperty("--primary", theme.primary);
     root.style.setProperty("--radius", `${theme.radius}rem`);
+    root.style.setProperty("--gradient", colors.gradient);
+
+    // Apply background gradient
+    document.body.style.background = colors.gradient;
 
     // Update theme.json values through data attributes
     root.setAttribute('data-theme', theme.variant);

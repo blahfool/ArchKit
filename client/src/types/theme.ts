@@ -9,6 +9,7 @@ export interface Theme {
     foreground: string;
     muted: string;
     accent: string;
+    gradient: string;
   };
 }
 
