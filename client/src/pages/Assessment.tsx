@@ -55,6 +55,157 @@ interface ChronologicalQuestion extends BaseQuestion {
 
 type Question = MultipleChoiceQuestion | FillInBlankQuestion | TrueFalseQuestion | ChronologicalQuestion;
 
+// Mock questions - extensive set covering various architectural topics
+const mockQuestions: Question[] = [
+  // Design Principles and Theory
+  {
+    id: 1,
+    type: 'multiple-choice',
+    category: "Design Principles",
+    question: "Which architectural principle emphasizes that the shape of a building should primarily be based on its intended function or purpose?",
+    options: [
+      "Form follows function",
+      "Less is more",
+      "Unity in diversity",
+      "Truth to materials"
+    ],
+    correctAnswer: "Form follows function",
+    explanation: "Form follows function, coined by Louis Sullivan, is a principle that suggests the shape of a building or object should primarily be based on its intended function or purpose."
+  },
+  {
+    id: 2,
+    type: 'multiple-choice',
+    category: "Design Principles",
+    question: "In tropical architecture, which design element is most crucial for natural ventilation?",
+    options: [
+      "Cross ventilation with properly placed openings",
+      "Solid concrete walls",
+      "Small windows",
+      "Low ceilings"
+    ],
+    correctAnswer: "Cross ventilation with properly placed openings",
+    explanation: "Cross ventilation is essential in tropical architecture to maintain air flow and reduce heat buildup, achieved through strategic placement of openings."
+  },
+  // Construction Technology
+  {
+    id: 3,
+    type: 'multiple-choice',
+    category: "Construction Technology",
+    question: "What is the primary advantage of using post-tensioned concrete in construction?",
+    options: [
+      "Increased span capabilities with reduced structural depth",
+      "Lower initial cost",
+      "Simpler construction process",
+      "Reduced construction time"
+    ],
+    correctAnswer: "Increased span capabilities with reduced structural depth",
+    explanation: "Post-tensioning allows for longer spans with thinner structural elements, making it ideal for buildings requiring large column-free spaces."
+  },
+  // Environmental Design
+  {
+    id: 4,
+    type: 'true-false',
+    category: "Environmental Design",
+    question: "Green walls only provide aesthetic benefits and do not contribute to building energy efficiency.",
+    correctAnswer: false,
+    explanation: "Green walls provide multiple benefits including thermal insulation, reducing heat gain, improving air quality, and managing stormwater, in addition to aesthetic value."
+  },
+  // Professional Practice
+  {
+    id: 5,
+    type: 'multiple-choice',
+    category: "Professional Practice",
+    question: "Under Philippine law, what is the minimum professional experience required before an architect can apply for registration as an Environmental Planner?",
+    options: [
+      "2 years",
+      "3 years",
+      "5 years",
+      "7 years"
+    ],
+    correctAnswer: "2 years",
+    explanation: "According to Philippine regulations, architects need a minimum of 2 years of professional experience before being eligible for Environmental Planner registration."
+  },
+  // Building Systems
+  {
+    id: 6,
+    type: 'fill-in-blank',
+    category: "Building Systems",
+    question: "A _______ is a mechanical system that removes excess moisture from the air to maintain comfortable indoor humidity levels.",
+    correctKeywords: ["dehumidifier", "dehumidification system"],
+    explanation: "Dehumidifiers are crucial in tropical climates to maintain indoor comfort and prevent mold growth by controlling humidity levels."
+  },
+  // Urban Planning
+  {
+    id: 7,
+    type: 'multiple-choice',
+    category: "Urban Planning",
+    question: "Which urban planning concept promotes the development of self-contained communities with mixed land uses within walking distance?",
+    options: [
+      "Transit-oriented development",
+      "Suburban sprawl",
+      "Industrial zoning",
+      "Commercial strip development"
+    ],
+    correctAnswer: "Transit-oriented development",
+    explanation: "Transit-oriented development focuses on creating walkable communities with mixed uses centered around public transportation hubs."
+  },
+  // Structural Design
+  {
+    id: 8,
+    type: 'multiple-choice',
+    category: "Structural Design",
+    question: "In seismic design, what is the primary purpose of a base isolation system?",
+    options: [
+      "To separate the building from ground motion during earthquakes",
+      "To increase building weight",
+      "To reduce construction costs",
+      "To improve aesthetic appearance"
+    ],
+    correctAnswer: "To separate the building from ground motion during earthquakes",
+    explanation: "Base isolation systems protect buildings during earthquakes by decoupling the structure from ground motion, reducing seismic forces transmitted to the building."
+  },
+  // Materials and Methods
+  {
+    id: 9,
+    type: 'true-false',
+    category: "Materials",
+    question: "Bamboo used in construction must always be treated with preservatives to ensure durability.",
+    correctAnswer: true,
+    explanation: "Untreated bamboo is susceptible to insect attack and decay. Proper treatment with preservatives is essential for durability in construction applications."
+  },
+  // Building Codes
+  {
+    id: 10,
+    type: 'multiple-choice',
+    category: "Building Codes",
+    question: "According to the National Building Code of the Philippines, what is the minimum width requirement for a main stairway in a public building?",
+    options: [
+      "1.20 meters",
+      "1.50 meters",
+      "0.90 meters",
+      "2.00 meters"
+    ],
+    correctAnswer: "1.20 meters",
+    explanation: "The National Building Code requires a minimum width of 1.20 meters for main stairways in public buildings to ensure safe egress during emergencies."
+  },
+  // Heritage Conservation
+  {
+    id: 11,
+    type: 'chronological',
+    category: "Heritage Conservation",
+    question: "Arrange these steps in the correct order for heritage building restoration:",
+    events: [
+      "Documentation and assessment",
+      "Historical research",
+      "Conservation plan development",
+      "Implementation of restoration work",
+      "Post-restoration monitoring"
+    ],
+    correctOrder: [1, 0, 2, 3, 4],
+    explanation: "Proper heritage restoration follows a systematic process starting with historical research, followed by documentation, planning, implementation, and monitoring."
+  }
+];
+
 export default function Assessment() {
   const [score, setScore] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -65,55 +216,6 @@ export default function Assessment() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [questionCount, setQuestionCount] = useState(10);
   const [selectedTypes, setSelectedTypes] = useState<string[]>(['multiple-choice']);
-
-  // Mock questions - in real app, these would be generated from Terms Index and E-Book content
-  const mockQuestions: Question[] = [
-    {
-      id: 1,
-      type: 'multiple-choice',
-      category: "Design Principles",
-      question: "Which architectural principle emphasizes that the shape of a building should primarily be based on its intended function or purpose?",
-      options: [
-        "Form follows function",
-        "Less is more",
-        "Unity in diversity",
-        "Truth to materials"
-      ],
-      correctAnswer: "Form follows function",
-      explanation: "Form follows function, coined by Louis Sullivan, is a principle that suggests the shape of a building or object should primarily be based on its intended function or purpose."
-    },
-    {
-      id: 2,
-      type: 'fill-in-blank',
-      category: "Building Systems",
-      question: "A _______ is a structural element used to span an opening and carry loads above it to the support on either side.",
-      correctKeywords: ["beam", "girder"],
-      explanation: "A beam is a horizontal structural element that primarily resists loads applied laterally to its axis."
-    },
-    {
-      id: 3,
-      type: 'true-false',
-      category: "History",
-      question: "The Gothic style of architecture originated in Renaissance Italy.",
-      correctAnswer: false,
-      explanation: "Gothic architecture actually originated in 12th-century France and spread throughout medieval Europe."
-    },
-    {
-      id: 4,
-      type: 'chronological',
-      category: "Architectural History",
-      question: "Arrange these architectural periods in chronological order:",
-      events: [
-        "Ancient Egyptian",
-        "Classical Greek",
-        "Roman Empire",
-        "Gothic",
-        "Renaissance"
-      ],
-      correctOrder: [0, 1, 2, 3, 4],
-      explanation: "The progression of architectural styles follows this historical timeline, each building upon and influencing the next."
-    }
-  ];
 
   const categories = ["all", ...new Set(mockQuestions.map(q => q.category))];
   const questionTypes = [
