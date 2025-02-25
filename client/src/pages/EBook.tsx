@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
+import StudyNotes from "@/components/StudyNotes";
 
 interface Chapter {
   title: string;
@@ -313,6 +314,8 @@ const subjects: Subject[] = [
 
 export default function EBook() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
+  const [studyNotesOpen, setStudyNotesOpen] = useState(false);
 
   const filteredSubjects = subjects.filter(subject =>
     subject.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -378,6 +381,10 @@ export default function EBook() {
                             variant="outline"
                             size="sm"
                             className="mt-4"
+                            onClick={() => {
+                              setSelectedChapter(chapter);
+                              setStudyNotesOpen(true);
+                            }}
                           >
                             Study Notes
                           </Button>
@@ -391,6 +398,14 @@ export default function EBook() {
           </CardContent>
         </Card>
       </div>
+
+      {selectedChapter && (
+        <StudyNotes
+          open={studyNotesOpen}
+          onOpenChange={setStudyNotesOpen}
+          chapter={selectedChapter}
+        />
+      )}
 
       <BackButton />
     </div>
