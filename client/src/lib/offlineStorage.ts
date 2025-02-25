@@ -11,11 +11,12 @@ interface OfflineDB {
   studyTime: { duration: number; timestamp: string }[];
   settings: { key: string; value: any }[];
   assessmentQuestions: { questions: Question[]; timestamp: string; type: string; }[];
+  customTerms: Term[]; // New store for user-added terms
 }
 
 export async function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    const request = indexedDB.open(DB_NAME, DB_VERSION + 1); // Increment version for new store
 
     request.onerror = () => reject(request.error);
     request.onsuccess = () => resolve(request.result);
@@ -42,11 +43,46 @@ export async function initDB(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains('assessmentQuestions')) {
         db.createObjectStore('assessmentQuestions', { keyPath: 'timestamp' });
       }
+      if (!db.objectStoreNames.contains('customTerms')) {
+        db.createObjectStore('customTerms', { keyPath: 'id', autoIncrement: true });
+      }
     };
   });
 }
 
-// Save cached assessment questions
+// Add functions to manage custom terms
+export async function addCustomTerm(term: Omit<Term, 'id'>): Promise<void> {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction('customTerms', 'readwrite');
+    const store = transaction.objectStore('customTerms');
+    const request = store.add({
+      ...term,
+      isCustom: true,
+      createdAt: new Date().toISOString()
+    });
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve();
+  });
+}
+
+export async function getCustomTerms(): Promise<Term[]> {
+  return getAllFromStore<Term>('customTerms');
+}
+
+export async function deleteCustomTerm(id: number): Promise<void> {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction('customTerms', 'readwrite');
+    const store = transaction.objectStore('customTerms');
+    const request = store.delete(id);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve();
+  });
+}
+
 export async function saveAssessmentQuestions(questions: Question[], type: string): Promise<void> {
   await saveToStore('assessmentQuestions', {
     questions,
@@ -55,7 +91,6 @@ export async function saveAssessmentQuestions(questions: Question[], type: strin
   });
 }
 
-// Get latest cached questions by type
 export async function getLatestAssessmentQuestions(type: string): Promise<Question[] | null> {
   const questions = await getAllFromStore<{questions: Question[], timestamp: string, type: string}>('assessmentQuestions');
   const typeQuestions = questions.filter(q => q.type === type);
@@ -105,7 +140,6 @@ export async function getFromStore<T>(storeName: keyof OfflineDB, key: string): 
   });
 }
 
-// Function to sync data from server to IndexedDB
 export async function syncFromServer() {
   try {
     // Only sync if online
@@ -126,7 +160,6 @@ export async function syncFromServer() {
   }
 }
 
-// Save AR calibration data
 export async function saveCalibrationData(calibrationFactor: number): Promise<void> {
   await saveToStore('settings', {
     key: 'arCalibration',
@@ -135,7 +168,6 @@ export async function saveCalibrationData(calibrationFactor: number): Promise<vo
   });
 }
 
-// Get AR calibration data
 export async function getCalibrationData(): Promise<number | null> {
   const data = await getFromStore<{value: number}>('settings', 'arCalibration');
   return data ? data.value : null;
