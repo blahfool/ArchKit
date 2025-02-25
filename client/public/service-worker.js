@@ -15,7 +15,8 @@ const API_URLS = ['/api/terms', '/api/formulas'];
 
 // Helper function to get full URL including Replit's environment
 function getFullUrl(path) {
-  return `${self.location.origin}${path}`;
+  const port = self.location.port ? `:${self.location.port}` : '';
+  return `${self.location.protocol}//${self.location.hostname}${port}${path}`;
 }
 
 // Install event - cache static assets
@@ -92,15 +93,6 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((response) => {
       if (response) {
         // Return cached response immediately
-        // Fetch updated version in background
-        const fetchPromise = fetch(event.request).then(networkResponse => {
-          if (networkResponse && networkResponse.ok) {
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, networkResponse.clone());
-            });
-          }
-          return networkResponse;
-        });
         return response;
       }
 
