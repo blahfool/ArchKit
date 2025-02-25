@@ -29,21 +29,32 @@ function generateMultipleChoiceQuestion(term: Term, allTerms: Term[]): MultipleC
 
   // Question templates for variety
   const questionTemplates = [
+    `What is ${term.term}?`,
     `Which of the following best describes ${term.term}?`,
-    `In architectural design, what is the primary function of ${term.term}?`,
-    `How is ${term.term} typically implemented in architectural practice?`,
-    `What is the key characteristic of ${term.term}?`
+    `In architectural design, what is ${term.term}?`,
+    `How would you define ${term.term}?`
   ];
 
   // Create plausible but incorrect options
-  const incorrectOptions = relatedTerms
+  let incorrectOptions = relatedTerms
     .map(t => t.definition)
     .filter(def => def !== term.definition)
     .sort(() => Math.random() - 0.5)
     .slice(0, 3);
 
+  // If we don't have enough related terms, use terms from other categories
+  if (incorrectOptions.length < 3) {
+    const otherTerms = allTerms
+      .filter(t => t.category !== term.category && t.id !== term.id)
+      .map(t => t.definition)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3 - incorrectOptions.length);
+
+    incorrectOptions = [...incorrectOptions, ...otherTerms];
+  }
+
   return {
-    id: Date.now(),
+    id: Date.now() + Math.random(),
     type: 'multiple-choice',
     category: term.category,
     question: questionTemplates[Math.floor(Math.random() * questionTemplates.length)],
@@ -54,76 +65,85 @@ function generateMultipleChoiceQuestion(term: Term, allTerms: Term[]): MultipleC
 }
 
 function generateTrueFalseQuestion(term: Term, allTerms: Term[]): TrueFalseQuestion {
-  // Generate true/false statements about the term
   const trueFalseTemplates = [
-    { 
+    {
       statement: term.definition,
-      isTrue: true
-    },
-    { 
-      statement: `${term.term} is primarily used for ${allTerms.find(t => t.category !== term.category)?.definition.toLowerCase() || 'a different purpose entirely'}`,
-      isTrue: false
+      isTrue: true,
+      explanation: `This is correct. ${term.term} is indeed ${term.definition}.`
     },
     {
-      statement: `${term.term} is a key concept in ${term.category}`,
-      isTrue: true
+      statement: `${term.term} is ${allTerms.find(t => t.category !== term.category)?.definition}`,
+      isTrue: false,
+      explanation: `This is incorrect. ${term.term} actually refers to ${term.definition}.`
+    },
+    {
+      statement: `${term.term} is a concept primarily used in ${term.category}`,
+      isTrue: true,
+      explanation: `This is correct. ${term.term} is a key concept in ${term.category}.`
     }
   ];
 
-  const selectedTemplate = trueFalseTemplates[Math.floor(Math.random() * trueFalseTemplates.length)];
+  const template = trueFalseTemplates[Math.floor(Math.random() * trueFalseTemplates.length)];
 
   return {
-    id: Date.now(),
+    id: Date.now() + Math.random(),
     type: 'true-false',
     category: term.category,
-    question: `True or False: ${selectedTemplate.statement}`,
-    correctAnswer: selectedTemplate.isTrue,
-    explanation: selectedTemplate.isTrue 
-      ? `This statement is correct. ${term.term} ${term.definition}`
-      : `This statement is false. ${term.term} actually ${term.definition}`
+    question: `True or False: ${template.statement}`,
+    correctAnswer: template.isTrue,
+    explanation: template.explanation
   };
 }
 
 export async function generateQuestions(terms: Term[], count: number, category: string, type: string): Promise<Question[]> {
   try {
+    // Use fallback terms if no terms are provided
+    const allTerms = terms.length > 0 ? terms : await import('@shared/schema').then(m => m.fallbackTerms);
+
+    // Filter terms by category if specified
     const availableTerms = category === "all" 
-      ? terms 
-      : terms.filter(term => term.category === category);
+      ? allTerms 
+      : allTerms.filter(term => term.category === category);
 
     if (availableTerms.length === 0) {
       throw new Error('No terms available for question generation');
     }
 
     const questions: Question[] = [];
-    const usedTerms = new Set<number>();
 
-    while (questions.length < count && usedTerms.size < availableTerms.length) {
-      // Get random unused term
-      const availableIndices = availableTerms
-        .map((_, index) => index)
-        .filter(index => !usedTerms.has(index));
+    // Create a copy of terms that we can shuffle and reuse if needed
+    let termPool = [...availableTerms];
 
-      if (availableIndices.length === 0) break;
+    while (questions.length < count) {
+      // If we've used all terms, reset the pool
+      if (termPool.length === 0) {
+        termPool = [...availableTerms];
+      }
 
-      const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-      usedTerms.add(randomIndex);
-      const term = availableTerms[randomIndex];
+      // Get a random term from the pool
+      const randomIndex = Math.floor(Math.random() * termPool.length);
+      const term = termPool[randomIndex];
+
+      // Remove the used term from the pool
+      termPool.splice(randomIndex, 1);
 
       // Generate either multiple choice or true/false question
       const questionType = type === 'all'
         ? Math.random() > 0.5 ? 'multiple-choice' : 'true-false'
         : type;
 
-      if (questionType === 'multiple-choice') {
-        questions.push(generateMultipleChoiceQuestion(term, availableTerms));
-      } else {
-        questions.push(generateTrueFalseQuestion(term, availableTerms));
-      }
+      const question = questionType === 'multiple-choice'
+        ? generateMultipleChoiceQuestion(term, availableTerms)
+        : generateTrueFalseQuestion(term, availableTerms);
+
+      questions.push(question);
     }
 
-    return questions.slice(0, count);
+    console.log(`Generated ${questions.length} questions successfully`);
+    return questions;
+
   } catch (error) {
     console.error('Error generating questions:', error);
-    return [];
+    throw error;
   }
 }
