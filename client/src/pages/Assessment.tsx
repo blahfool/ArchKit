@@ -106,11 +106,14 @@ export default function Assessment() {
             onValueChange={(value) => {
               setAnswers(prev => ({ ...prev, [currentQuestion]: value }));
             }}
+            className="space-y-3"
           >
             {question.options.map((option, index) => (
-              <div key={index} className="flex items-center space-x-2 mb-2">
+              <div key={index} className="flex items-center space-x-2 p-2 rounded hover:bg-muted/50">
                 <RadioGroupItem value={option} id={`option-${index}`} />
-                <Label htmlFor={`option-${index}`}>{option}</Label>
+                <Label className="cursor-pointer flex-1" htmlFor={`option-${index}`}>
+                  {option}
+                </Label>
               </div>
             ))}
           </RadioGroup>
@@ -123,14 +126,15 @@ export default function Assessment() {
             onValueChange={(value) => {
               setAnswers(prev => ({ ...prev, [currentQuestion]: value === 'true' }));
             }}
+            className="space-y-3"
           >
-            <div className="flex items-center space-x-2 mb-2">
+            <div className="flex items-center space-x-2 p-2 rounded hover:bg-muted/50">
               <RadioGroupItem value="true" id="true" />
-              <Label htmlFor="true">True</Label>
+              <Label className="cursor-pointer" htmlFor="true">True</Label>
             </div>
-            <div className="flex items-center space-x-2 mb-2">
+            <div className="flex items-center space-x-2 p-2 rounded hover:bg-muted/50">
               <RadioGroupItem value="false" id="false" />
-              <Label htmlFor="false">False</Label>
+              <Label className="cursor-pointer" htmlFor="false">False</Label>
             </div>
           </RadioGroup>
         );
@@ -183,7 +187,6 @@ export default function Assessment() {
                         setQuestionCount(value);
                       }
                     }}
-                    onFocus={(e) => e.target.select()}
                   />
                 </div>
 
@@ -231,8 +234,9 @@ export default function Assessment() {
             <CardContent className="pt-6">
               <div className="space-y-6">
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-2">
-                    Question {currentQuestion + 1} of {questions.length} • {questions[currentQuestion].type}
+                  <div className="text-sm font-medium flex items-center justify-between mb-4">
+                    <span>Question {currentQuestion + 1} of {questions.length}</span>
+                    <span className="text-muted-foreground">{questions[currentQuestion].type}</span>
                   </div>
                   <p className="text-lg mb-4">{questions[currentQuestion].question}</p>
 
