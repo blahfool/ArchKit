@@ -25,18 +25,26 @@ export default function About() {
               <Heart className="text-red-500 mt-2 mx-auto h-6 w-6" />
             </div>
 
-            <h3 className="text-xl font-semibold mb-3">Features</h3>
+            <h3 className="text-xl font-semibold mb-3">Key Features</h3>
             <ul>
               <li>Architectural formula calculator with common equations</li>
-              <li>Comprehensive terms index for quick reference</li>
+              <li>Comprehensive terms index with detailed architectural definitions</li>
               <li>AR measurement tool for quick spatial estimates</li>
-              <li>Random exam generator for test preparation</li>
+              <li>Advanced online exam generator with challenging questions</li>
+              <li>Study progress tracking with detailed analytics</li>
+              <li>Professional E-Book library with study resources</li>
+              <li>Portfolio builder for showcasing work</li>
+              <li>Building codes reference and guidelines</li>
+              <li>Professional tools for practicing architects</li>
+              <li>Complete offline functionality with PWA support</li>
+              <li>Enhanced dark mode with improved visibility</li>
+              <li>Multi-format question types for exam preparation</li>
             </ul>
 
             <h3 className="text-xl font-semibold mb-3">Tech Stack</h3>
             <p>
-              Built with React, Tailwind CSS, and Express. Deployed as a Progressive
-              Web App for easy access on any device.
+              Built with React, Tailwind CSS, and modern web technologies. Deployed as a Progressive
+              Web App for seamless offline access on any device.
             </p>
 
             <div className="flex items-center justify-center mt-8 gap-2">
