@@ -28,6 +28,7 @@ import type { Term } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import BackButton from "@/components/BackButton";
+import { saveAssessmentQuestions, getLatestAssessmentQuestions } from "@/lib/offlineStorage";
 
 
 interface BaseQuestion {
@@ -98,11 +99,42 @@ export default function Assessment() {
   const handleStart = async () => {
     setIsLoading(true);
     try {
+      let generatedQuestions: Question[] = [];
+
+      // Try to get cached questions first if offline
+      if (!navigator.onLine) {
+        const cachedQuestions = await Promise.all(
+          selectedTypes.map(type => getLatestAssessmentQuestions(type))
+        );
+
+        generatedQuestions = cachedQuestions
+          .filter((q): q is Question[] => q !== null)
+          .flat()
+          .slice(0, questionCount);
+
+        if (generatedQuestions.length > 0) {
+          setQuestions(generatedQuestions);
+          setIsActive(true);
+          setScore(null);
+          setAnswers({});
+          setCurrentQuestion(0);
+          setTimeLeft(3600);
+          return;
+        } else {
+          toast({
+            title: "Offline Mode",
+            description: "No cached questions available. Please connect to the internet to generate new questions.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
+      // If online or no cached questions available, generate new ones
       const terms = apiTerms
         ? [...apiTerms, ...fallbackTerms.map((t, i) => ({ ...t, id: 1000 + i }))]
         : fallbackTerms.map((t, i) => ({ ...t, id: 1000 + i }));
 
-      let generatedQuestions: Question[] = [];
       for (const type of selectedTypes) {
         const typeQuestions = generateQuestions(
           terms,
@@ -111,6 +143,11 @@ export default function Assessment() {
           type
         );
         generatedQuestions = [...generatedQuestions, ...typeQuestions];
+
+        // Cache the generated questions for offline use
+        if (typeQuestions.length > 0) {
+          await saveAssessmentQuestions(typeQuestions, type);
+        }
       }
 
       if (generatedQuestions.length > 0) {
