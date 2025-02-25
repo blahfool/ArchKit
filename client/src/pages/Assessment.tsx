@@ -6,6 +6,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Timer,
   CheckCircle2,
   XCircle,
@@ -21,7 +28,6 @@ import type { Term } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import BackButton from "@/components/BackButton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@nextui-org/react";
 
 
 interface BaseQuestion {

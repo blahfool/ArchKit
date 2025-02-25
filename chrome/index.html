@@ -88,7 +88,7 @@
             
             <button onclick="generateQuizSetup()">Set Up Questions</button>
         </div>
-
+        
         <!-- Quiz Configuration Section -->
         <div id="quizConfig" style="display: none;">
             <div id="questionConfigs">
@@ -96,7 +96,7 @@
             </div>
             <button onclick="generateQuiz()">Generate Quiz</button>
         </div>
-
+        
         <!-- Quiz Taking Section -->
         <div class="quiz-section" id="quizSection" style="display: none;">
             <div id="questions">
@@ -105,18 +105,18 @@
             <button onclick="checkAnswers()">Submit Quiz</button>
         </div>
     </div>
-
+    
     <script>
         // Store quiz data
         let quizData = {
             questions: []
         };
-
+        
         function generateQuizSetup() {
             const numQuestions = parseInt(document.getElementById('numQuestions').value);
             const configSection = document.getElementById('questionConfigs');
             configSection.innerHTML = '';
-
+            
             for (let i = 0; i < numQuestions; i++) {
                 const questionConfig = document.createElement('div');
                 questionConfig.className = 'question';
@@ -141,15 +141,15 @@
                 configSection.appendChild(questionConfig);
                 updateQuestionForm(document.getElementById(`questionType${i}`), i);
             }
-
+            
             document.getElementById('setupSection').style.display = 'none';
             document.getElementById('quizConfig').style.display = 'block';
         }
-
+        
         function updateQuestionForm(select, questionIndex) {
             const optionsContainer = document.getElementById(`questionOptions${questionIndex}`);
             const type = select.value;
-
+            
             switch (type) {
                 case 'multiple-choice':
                     optionsContainer.innerHTML = `
@@ -183,22 +183,22 @@
                     break;
             }
         }
-
+        
         function generateQuiz() {
             const numQuestions = parseInt(document.getElementById('numQuestions').value);
             quizData.questions = [];
-
+            
             for (let i = 0; i < numQuestions; i++) {
                 const type = document.getElementById(`questionType${i}`).value;
                 const questionText = document.getElementById(`questionText${i}`).value;
                 const correctAnswer = document.getElementById(`correctAnswer${i}`).value;
-
+                
                 let question = {
                     type,
                     questionText,
                     correctAnswer
                 };
-
+                
                 if (type === 'multiple-choice') {
                     const options = document.getElementById(`options${i}`).value.split('\n').filter(opt => opt.trim());
                     question.options = options;
@@ -206,17 +206,17 @@
                     question.formula = document.getElementById(`formula${i}`).value;
                     question.errorMargin = parseFloat(document.getElementById(`errorMargin${i}`).value);
                 }
-
+                
                 quizData.questions.push(question);
             }
-
+            
             displayQuiz();
         }
-
+        
         function displayQuiz() {
             const quizSection = document.getElementById('questions');
             quizSection.innerHTML = '';
-
+            
             quizData.questions.forEach((question, index) => {
                 const questionElement = document.createElement('div');
                 questionElement.className = 'question';
@@ -229,7 +229,7 @@
                         <img src="attached_assets/image_1740473153384.png" class="sad-emoji" alt="Incorrect">
                     </div>
                 `;
-
+                
                 switch (question.type) {
                     case 'multiple-choice':
                         questionContent += `<div class="options">`;
@@ -259,21 +259,21 @@
                         `;
                         break;
                 }
-
+                
                 questionElement.innerHTML = questionContent;
                 quizSection.appendChild(questionElement);
             });
-
+            
             document.getElementById('quizConfig').style.display = 'none';
             document.getElementById('quizSection').style.display = 'block';
         }
-
+        
         function checkAnswers() {
             quizData.questions.forEach((question, index) => {
                 const questionElement = document.querySelector(`.question:nth-child(${index + 1})`);
                 let userAnswer;
                 let isCorrect = false;
-
+                
                 switch (question.type) {
                     case 'multiple-choice':
                         const selected = document.querySelector(`input[name="q${index}"]:checked`);
@@ -291,10 +291,42 @@
                         isCorrect = userAnswer === question.correctAnswer.toLowerCase();
                         break;
                 }
-
+                
                 const happyEmoji = questionElement.querySelector('.happy-emoji');
                 const sadEmoji = questionElement.querySelector('.sad-emoji');
-
+                
+                // Add correct answer display
+                const answerBox = document.createElement('div');
+                answerBox.className = 'mt-3 p-3 bg-gray-100 rounded-lg';
+                
+                let answerText = '';
+                switch (question.type) {
+                    case 'calculation':
+                        answerText = `Correct Answer: ${question.correctAnswer} ${question.errorMargin ? `(±${question.errorMargin}%)` : ''}`;
+                        break;
+                    case 'multiple-choice':
+                        answerText = `Correct Answer: ${question.correctAnswer}`;
+                        break;
+                    case 'fill-in':
+                        answerText = `Correct Answer: ${question.correctAnswer}`;
+                        break;
+                }
+                
+                answerBox.innerHTML = `
+                    <div class="font-bold mb-1">Your Answer: ${userAnswer}</div>
+                    <div class="text-green-600">${answerText}</div>
+                `;
+                
+                // Only show answer box if the question was answered
+                if (userAnswer !== undefined && userAnswer !== '') {
+                    const existingAnswerBox = questionElement.querySelector('.answer-box');
+                    if (existingAnswerBox) {
+                        existingAnswerBox.remove();
+                    }
+                    answerBox.classList.add('answer-box');
+                    questionElement.appendChild(answerBox);
+                }
+                
                 happyEmoji.style.display = isCorrect ? 'inline' : 'none';
                 sadEmoji.style.display = isCorrect ? 'none' : 'inline';
             });

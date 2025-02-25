@@ -1,7 +1,7 @@
 import { Term } from "@shared/schema";
 
 interface QuestionTemplate {
-  type: 'multiple-choice' | 'true-false' | 'fill-in-blank' | 'chronological';
+  type: 'multiple-choice' | 'true-false' | 'fill-in-blank' | 'chronological' | 'calculation';
   generate: (term: Term) => Question;
 }
 
@@ -11,10 +11,13 @@ interface Question {
   category: string;
   question: string;
   options?: string[];
-  correctAnswer?: string | boolean;
+  correctAnswer?: string | boolean | number;
   correctKeywords?: string[];
   events?: string[];
   correctOrder?: number[];
+  formula?: string;
+  tolerance?: number;
+  unit?: string;
   explanation: string;
 }
 
@@ -22,7 +25,6 @@ const templates: QuestionTemplate[] = [
   {
     type: 'multiple-choice',
     generate: (term: Term) => {
-      // Generate incorrect options based on the category
       const otherOptions = [
         `Not related to ${term.category}`,
         `Opposite of ${term.term}`,
@@ -61,6 +63,57 @@ const templates: QuestionTemplate[] = [
       correctKeywords: [term.term.toLowerCase()],
       explanation: `The correct term is ${term.term}, which is defined as: ${term.definition}`
     })
+  },
+  {
+    type: 'calculation',
+    generate: (term: Term) => {
+      // List of architectural calculations
+      const calculations = [
+        {
+          question: "Calculate the floor area ratio (FAR) for a building with total floor area of 25,000 sq ft on a lot of 10,000 sq ft.",
+          formula: "FAR = Total Floor Area / Lot Area",
+          correctAnswer: 2.5,
+          tolerance: 0.1,
+          unit: "ratio"
+        },
+        {
+          question: "Calculate the required number of parking spaces for a 30,000 sq ft office building if the requirement is 1 space per 300 sq ft.",
+          formula: "Parking Spaces = Total Floor Area / Area per Space",
+          correctAnswer: 100,
+          tolerance: 0,
+          unit: "spaces"
+        },
+        {
+          question: "Calculate the U-value of a wall assembly if R-value is 15 ft²·°F·h/BTU.",
+          formula: "U-value = 1 / R-value",
+          correctAnswer: 0.067,
+          tolerance: 0.005,
+          unit: "BTU/(ft²·°F·h)"
+        },
+        {
+          question: "Calculate the minimum width of an emergency egress corridor that needs to accommodate 200 occupants (0.2 inches per occupant).",
+          formula: "Width = Number of Occupants × Width per Occupant",
+          correctAnswer: 40,
+          tolerance: 0,
+          unit: "inches"
+        }
+      ];
+
+      // Pick a random calculation
+      const calc = calculations[Math.floor(Math.random() * calculations.length)];
+
+      return {
+        id: Date.now(),
+        type: 'calculation',
+        category: 'Building Systems',
+        question: calc.question,
+        formula: calc.formula,
+        correctAnswer: calc.correctAnswer,
+        tolerance: calc.tolerance,
+        unit: calc.unit,
+        explanation: `Using the formula: ${calc.formula}, we can solve this problem. This is a common calculation in architectural practice.`
+      };
+    }
   }
 ];
 
@@ -79,11 +132,18 @@ export function generateQuestions(terms: Term[], count: number, category: string
   const usedTerms = new Set<number>();
 
   while (questions.length < count && usedTerms.size < availableTerms.length) {
-    // Pick a random term that hasn't been used yet
+    // For calculation type, we don't need to track used terms
+    if (type === 'calculation') {
+      questions.push(template.generate(availableTerms[0]));
+      if (questions.length >= count) break;
+      continue;
+    }
+
+    // For other types, pick a random unused term
     let availableIndices = availableTerms
       .map((_, index) => index)
       .filter(index => !usedTerms.has(index));
-    
+
     if (availableIndices.length === 0) break;
 
     const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
