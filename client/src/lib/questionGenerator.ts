@@ -39,9 +39,7 @@ function generateExplanation(answer: string, category: string): string {
     "This knowledge is essential for sustainable architecture practices.",
     "This relates directly to building safety and regulations.",
     "This concept influences both form and function in design.",
-    "This is a key consideration in modern architectural practices.",
-    "This principle affects spatial organization and flow.",
-    "This element is critical for environmental design considerations."
+    "This is a key consideration in modern architectural practices."
   ];
 
   return `The correct answer is ${answer}. ${explanations[Math.floor(Math.random() * explanations.length)]} This topic frequently appears in architectural examinations and professional practice.`;
@@ -78,46 +76,52 @@ async function fetchQuestionsWithRetry(amount: number, retries = 3): Promise<any
 // Function to fetch questions from online source
 async function fetchQuestions(requestedCount: number): Promise<Question[]> {
   try {
-    // Fetch extra questions to ensure we meet the requested count
-    const results = await fetchQuestionsWithRetry(requestedCount * 1.5);
-
     const questions: Question[] = [];
+    let attempts = 0;
+    const maxAttempts = 3;
 
-    for (const q of results) {
-      const question = decodeHTMLEntities(q.question);
-      const isMultipleChoice = q.type === 'multiple';
+    while (questions.length < requestedCount && attempts < maxAttempts) {
+      const results = await fetchQuestionsWithRetry(requestedCount * 2);
+      console.log(`Fetched ${results.length} questions from API`);
 
-      if (isMultipleChoice) {
-        const options = [q.correct_answer, ...q.incorrect_answers]
-          .map(decodeHTMLEntities)
-          .sort(() => Math.random() - 0.5);
+      for (const q of results) {
+        const question = decodeHTMLEntities(q.question);
+        const isMultipleChoice = q.type === 'multiple';
 
-        questions.push({
-          id: Date.now() + questions.length,
-          type: 'multiple-choice',
-          category: 'Architecture & Engineering',
-          question,
-          options,
-          correctAnswer: decodeHTMLEntities(q.correct_answer),
-          explanation: generateExplanation(decodeHTMLEntities(q.correct_answer), q.category)
-        });
-      } else {
-        questions.push({
-          id: Date.now() + questions.length,
-          type: 'true-false',
-          category: 'Architecture & Engineering',
-          question,
-          correctAnswer: q.correct_answer === "True",
-          explanation: generateExplanation(q.correct_answer, q.category)
-        });
+        if (isMultipleChoice) {
+          const options = [q.correct_answer, ...q.incorrect_answers]
+            .map(decodeHTMLEntities)
+            .sort(() => Math.random() - 0.5);
+
+          questions.push({
+            id: Date.now() + questions.length,
+            type: 'multiple-choice',
+            category: 'Architecture & Engineering',
+            question,
+            options,
+            correctAnswer: decodeHTMLEntities(q.correct_answer),
+            explanation: generateExplanation(decodeHTMLEntities(q.correct_answer), q.category)
+          });
+        } else {
+          questions.push({
+            id: Date.now() + questions.length,
+            type: 'true-false',
+            category: 'Architecture & Engineering',
+            question,
+            correctAnswer: q.correct_answer === "True",
+            explanation: generateExplanation(q.correct_answer, q.category)
+          });
+        }
+
+        if (questions.length >= requestedCount) {
+          break;
+        }
       }
 
-      // Stop if we have enough questions
-      if (questions.length >= requestedCount) {
-        break;
-      }
+      attempts++;
     }
 
+    console.log(`Generated ${questions.length} questions total`);
     return questions;
   } catch (error) {
     console.error('Failed to fetch questions:', error);
@@ -125,8 +129,7 @@ async function fetchQuestions(requestedCount: number): Promise<Question[]> {
   }
 }
 
-// Function to get questions, either from cache or fetch new ones
-async function getQuestions(count: number): Promise<Question[]> {
+export async function generateQuestions(terms: Term[], count: number, category: string, type: string): Promise<Question[]> {
   try {
     const newQuestions = await fetchQuestions(count);
     if (newQuestions.length >= count) {
@@ -137,18 +140,20 @@ async function getQuestions(count: number): Promise<Question[]> {
     const combinedQuestions = [...newQuestions, ...questionCache];
     questionCache = combinedQuestions; // Update cache with new questions
 
-    return combinedQuestions
+    const finalQuestions = combinedQuestions
       .sort(() => Math.random() - 0.5)
       .slice(0, count);
+
+    console.log(`Returning ${finalQuestions.length} questions`);
+    return finalQuestions;
   } catch (error) {
     console.error('Error getting questions:', error);
     // Fallback to cache if available
-    return questionCache
+    const cachedQuestions = questionCache
       .sort(() => Math.random() - 0.5)
       .slice(0, count);
-  }
-}
 
-export async function generateQuestions(terms: Term[], count: number, category: string, type: string): Promise<Question[]> {
-  return getQuestions(count);
+    console.log(`Returning ${cachedQuestions.length} cached questions`);
+    return cachedQuestions;
+  }
 }
