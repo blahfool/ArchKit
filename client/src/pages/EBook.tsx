@@ -24,87 +24,115 @@ const academicResources = [
     institution: "Open Access Resources",
     resources: [
       {
-        title: "Time-Saver Standards for Architectural Design",
-        author: "Donald Watson",
-        year: "2021",
-        description: "Comprehensive reference for architectural design data and standards",
+        title: "Building Design and Construction Handbook, 6th Edition",
+        author: "Frederick Merritt & Jonathan Ricketts",
+        year: "2024",
+        description: "Comprehensive handbook covering architectural design, construction methods, and building systems",
         type: "Reference",
-        size: "25.3 MB",
+        url: "https://archive.org/details/building-construction-handbook-6th-edition"
+      },
+      {
+        title: "Architectural Design Standards - Time Saver Standards",
+        author: "Donald Watson",
+        year: "2023",
+        description: "Essential reference for architectural design data and standards",
+        type: "Reference",
         url: "https://www.academia.edu/44951101/Time_Saver_Standards_for_Architectural_Design_Data"
       },
       {
+        title: "Architecture Exam Prep by NCARB",
+        author: "NCARB",
+        year: "2024",
+        description: "Official study guides and practice questions for architecture licensing exams",
+        type: "Study Material",
+        url: "https://www.ncarb.org/study"
+      }
+    ]
+  },
+  {
+    institution: "Free Online Courses",
+    resources: [
+      {
         title: "MIT OpenCourseWare - Architecture",
         author: "MIT",
-        year: "2023",
-        description: "Free access to MIT's architecture course materials including lectures, assignments, and readings",
+        year: "2024",
+        description: "Complete architecture course materials including lectures, assignments, and readings",
         type: "Course Material",
         url: "https://ocw.mit.edu/courses/architecture/"
       },
       {
-        title: "Architectural Design Principles",
-        author: "Harvard Graduate School of Design",
-        year: "2023",
-        description: "Open learning initiative covering fundamental principles of architectural design",
+        title: "edX - Environmental Technologies in Buildings",
+        author: "ETH Zurich",
+        year: "2024",
+        description: "Free course on sustainable building technologies and environmental design",
         type: "Course Material",
-        url: "https://www.gsd.harvard.edu/resources/open-learning"
+        url: "https://www.edx.org/learn/environmental-science/eth-zurich-environmental-technologies-in-buildings"
+      },
+      {
+        title: "Coursera - Construction Management Specialization",
+        author: "Columbia University",
+        year: "2024",
+        description: "Free course series covering construction management principles",
+        type: "Course Material",
+        url: "https://www.coursera.org/specializations/construction-management"
       }
     ]
   },
   {
-    institution: "Technical Resources",
+    institution: "Exam Preparation Resources",
     resources: [
       {
-        title: "National Building Code of the Philippines",
-        author: "DPWH",
-        year: "2023",
-        description: "Official building code and implementing rules and regulations",
-        type: "Technical Guide",
-        url: "https://www.dpwh.gov.ph/dpwh/references/laws_codes_orders/national_building_code"
+        title: "Architecture Registration Exam (ARE) Study Materials",
+        author: "AIA",
+        year: "2024",
+        description: "Free study materials and practice questions from the American Institute of Architects",
+        type: "Study Material",
+        url: "https://www.aia.org/pages/11831-are-resources"
       },
       {
-        title: "Philippine Green Building Code",
-        author: "DPWH",
-        year: "2023",
-        description: "Guidelines for green building design and construction",
-        type: "Technical Guide",
-        url: "https://www.dpwh.gov.ph/dpwh/references/laws_codes_orders/green_building_code"
-      },
-      {
-        title: "UAP Professional Practice Resources",
-        author: "United Architects of the Philippines",
+        title: "Young Architect - ARE Exam Prep",
+        author: "Michael Riscica",
         year: "2024",
-        description: "Professional practice guidelines and resources",
-        type: "Professional Guide",
-        url: "https://united-architects.org.ph/resources-2/"
-      }
-    ]
-  },
-  {
-    institution: "Educational Videos",
-    resources: [
-      {
-        title: "30x40 Design Workshop",
-        author: "Eric Reinholdt",
-        year: "2024",
-        description: "Comprehensive architectural design tutorials and professional practice guides",
-        type: "Video Series",
-        url: "https://www.youtube.com/@30x40DesignWorkshop"
-      },
-      {
-        title: "How to Architect",
-        author: "Doug Patt",
-        year: "2024",
-        description: "Educational series covering architectural concepts and professional practice",
-        type: "Video Series",
-        url: "https://www.youtube.com/@howtoarchitect"
-      },
-      {
-        title: "Architecture License Exam Preparation",
-        author: "Young Architect",
-        year: "2024",
-        description: "ARE exam prep resources and professional development guides",
-        type: "Educational Resource",
+        description: "Free blog posts and study guides for architecture licensing exams",
+        type: "Study Material",
         url: "https://youngarchitect.com/are-blog/"
+      },
+      {
+        title: "Building Code Illustrated Guide",
+        author: "Francis D.K. Ching",
+        year: "2024",
+        description: "Visual guide to understanding building codes and regulations",
+        type: "Reference",
+        url: "https://archive.org/details/building-codes-illustrated"
+      }
+    ]
+  },
+  {
+    institution: "Professional Practice Resources",
+    resources: [
+      {
+        title: "Architect's Handbook of Professional Practice",
+        author: "AIA",
+        year: "2024",
+        description: "Comprehensive guide to architectural professional practice",
+        type: "Reference",
+        url: "https://archive.org/details/architects-handbook-professional-practice"
+      },
+      {
+        title: "Construction Specifications Writing Guide",
+        author: "CSI",
+        year: "2024",
+        description: "Guide to writing construction specifications and contract documents",
+        type: "Reference",
+        url: "https://www.csinet.org/learning-education"
+      },
+      {
+        title: "Architecture Drawing Course",
+        author: "OpenLearn",
+        year: "2024",
+        description: "Free course materials for architectural drawing and visualization",
+        type: "Course Material",
+        url: "https://www.open.edu/openlearn/science-maths-technology/engineering-technology/architectural-drawing"
       }
     ]
   }
