@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calculator, BookOpen, Ruler, PenTool, Info, LineChart } from "lucide-react";
+import { Calculator, BookOpen, Ruler, PenTool, Info, LineChart, Book } from "lucide-react";
 
 export default function Home() {
   const menuItems = [
@@ -10,6 +10,7 @@ export default function Home() {
     { icon: Ruler, label: "AR Measure", href: "/ar" },
     { icon: PenTool, label: "Exam Generator", href: "/exam" },
     { icon: LineChart, label: "Progress", href: "/progress" },
+    { icon: Book, label: "E-Book", href: "/ebook" },
     { icon: Info, label: "About", href: "/about" },
   ];
 

@@ -9,6 +9,7 @@ import Calculator from "@/pages/Calculator";
 import TermsIndex from "@/pages/TermsIndex";
 import ArMeasure from "@/pages/ArMeasure";
 import ExamGenerator from "@/pages/ExamGenerator";
+import EBook from "@/pages/EBook";
 import About from "@/pages/About";
 import NotFound from "@/pages/not-found";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -33,6 +34,7 @@ function Router() {
         <Route path="/terms" component={TermsIndex} />
         <Route path="/ar" component={ArMeasure} />
         <Route path="/exam" component={ExamGenerator} />
+        <Route path="/ebook" component={EBook} />
         <Route path="/about" component={About} />
         <Route component={NotFound} />
       </Switch>
