@@ -50,6 +50,169 @@ export const formulas: Formula[] = [
     }
   },
   {
+    name: "Window-to-Wall Ratio",
+    description: "Calculate the ratio between window area and total wall area",
+    category: "Building Envelope",
+    inputs: [
+      {
+        name: "windowArea",
+        unit: "sq ft",
+        description: "Total area of windows"
+      },
+      {
+        name: "wallArea",
+        unit: "sq ft",
+        description: "Total wall area"
+      }
+    ],
+    calculate: (inputs): CalculationResult => {
+      const ratio = (inputs.windowArea / inputs.wallArea) * 100;
+      return {
+        result: ratio,
+        unit: "%",
+        steps: [
+          `Window Area: ${inputs.windowArea} sq ft`,
+          `Wall Area: ${inputs.wallArea} sq ft`,
+          `Window-to-Wall Ratio = (${inputs.windowArea} / ${inputs.wallArea}) × 100`,
+          `Window-to-Wall Ratio = ${ratio.toFixed(2)}%`
+        ]
+      };
+    }
+  },
+  {
+    name: "Occupancy Load Calculator",
+    description: "Calculate maximum occupancy based on floor area",
+    category: "Building Code",
+    inputs: [
+      {
+        name: "floorArea",
+        unit: "sq ft",
+        description: "Total usable floor area"
+      },
+      {
+        name: "areaPerOccupant",
+        unit: "sq ft",
+        description: "Required area per occupant"
+      }
+    ],
+    calculate: (inputs): CalculationResult => {
+      const occupants = Math.floor(inputs.floorArea / inputs.areaPerOccupant);
+      return {
+        result: occupants,
+        unit: "people",
+        steps: [
+          `Floor Area: ${inputs.floorArea} sq ft`,
+          `Area per Occupant: ${inputs.areaPerOccupant} sq ft`,
+          `Occupancy = Floor Area ÷ Area per Occupant`,
+          `Occupancy = ${inputs.floorArea} ÷ ${inputs.areaPerOccupant} = ${occupants} people`
+        ]
+      };
+    }
+  },
+  {
+    name: "Room Acoustics",
+    description: "Calculate reverberation time using Sabine's formula",
+    category: "Acoustics",
+    inputs: [
+      {
+        name: "volume",
+        unit: "cu ft",
+        description: "Room volume"
+      },
+      {
+        name: "surfaceArea",
+        unit: "sq ft",
+        description: "Total surface area"
+      },
+      {
+        name: "absorptionCoeff",
+        unit: "α",
+        description: "Average absorption coefficient (0-1)"
+      }
+    ],
+    calculate: (inputs): CalculationResult => {
+      const rt60 = (0.049 * inputs.volume) / (inputs.surfaceArea * inputs.absorptionCoeff);
+      return {
+        result: rt60,
+        unit: "seconds",
+        steps: [
+          `Room Volume: ${inputs.volume} cu ft`,
+          `Surface Area: ${inputs.surfaceArea} sq ft`,
+          `Absorption Coefficient: ${inputs.absorptionCoeff}`,
+          `RT60 = (0.049 × Volume) / (Surface Area × Absorption)`,
+          `RT60 = (0.049 × ${inputs.volume}) / (${inputs.surfaceArea} × ${inputs.absorptionCoeff})`,
+          `RT60 = ${rt60.toFixed(2)} seconds`
+        ]
+      };
+    }
+  },
+  {
+    name: "Thermal Resistance (R-Value)",
+    description: "Calculate total R-value for a wall assembly",
+    category: "Building Envelope",
+    inputs: [
+      {
+        name: "layers",
+        unit: "R-values",
+        description: "Number of material layers"
+      },
+      {
+        name: "rValuePerLayer",
+        unit: "ft²·°F·h/BTU",
+        description: "R-value per layer"
+      }
+    ],
+    calculate: (inputs): CalculationResult => {
+      const totalR = inputs.layers * inputs.rValuePerLayer;
+      return {
+        result: totalR,
+        unit: "ft²·°F·h/BTU",
+        steps: [
+          `Number of Layers: ${inputs.layers}`,
+          `R-Value per Layer: ${inputs.rValuePerLayer}`,
+          `Total R-Value = Layers × R-Value per Layer`,
+          `Total R-Value = ${inputs.layers} × ${inputs.rValuePerLayer} = ${totalR.toFixed(2)}`
+        ]
+      };
+    }
+  },
+  {
+    name: "Daylight Factor",
+    description: "Calculate average daylight factor for a room",
+    category: "Environmental Design",
+    inputs: [
+      {
+        name: "windowArea",
+        unit: "sq ft",
+        description: "Total window area"
+      },
+      {
+        name: "floorArea",
+        unit: "sq ft",
+        description: "Floor area"
+      },
+      {
+        name: "glazingTransmittance",
+        unit: "%",
+        description: "Glass transmittance (0-100)"
+      }
+    ],
+    calculate: (inputs): CalculationResult => {
+      const df = (inputs.windowArea * (inputs.glazingTransmittance / 100)) / (inputs.floorArea * 0.2) * 100;
+      return {
+        result: df,
+        unit: "%",
+        steps: [
+          `Window Area: ${inputs.windowArea} sq ft`,
+          `Floor Area: ${inputs.floorArea} sq ft`,
+          `Glass Transmittance: ${inputs.glazingTransmittance}%`,
+          `Daylight Factor = (Window Area × Transmittance) / (Floor Area × 0.2) × 100`,
+          `Daylight Factor = ${df.toFixed(2)}%`
+        ]
+      };
+    }
+  },
+  {
     name: "Parking Space Requirements",
     description: "Calculate required parking spaces based on building area",
     category: "Parking",
@@ -118,7 +281,7 @@ export const formulas: Formula[] = [
       }
     ],
     calculate: (inputs): CalculationResult => {
-      const totalR = inputs.exteriorFilm + inputs.wallMaterial + inputs.insulation + 
+      const totalR = inputs.exteriorFilm + inputs.wallMaterial + inputs.insulation +
                     inputs.interiorFinish + inputs.interiorFilm;
       const uValue = 1 / totalR;
       return {

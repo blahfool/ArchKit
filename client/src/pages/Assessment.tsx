@@ -25,6 +25,15 @@ export default function Assessment() {
   const { toast } = useToast();
 
   const handleStart = async () => {
+    if (questionCount < 1 || questionCount > 50) {
+      toast({
+        title: "Invalid Question Count",
+        description: "Please enter a number between 1 and 50",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const generatedQuestions = await generateQuestions([], questionCount, "all");
@@ -37,7 +46,7 @@ export default function Assessment() {
       } else {
         toast({
           title: "Error",
-          description: `Could only generate ${generatedQuestions.length} questions. Please try again.`,
+          description: "Failed to generate the requested number of questions. Please try again.",
           variant: "destructive"
         });
       }
@@ -59,7 +68,7 @@ export default function Assessment() {
     const correctKeywords = correctAnswer.toLowerCase().split(/\s+/);
 
     // Check if any significant keywords from the correct answer appear in the user's answer
-    return correctKeywords.some(keyword => 
+    return correctKeywords.some(keyword =>
       keyword.length > 3 && // Only check keywords longer than 3 characters
       userKeywords.some(userWord => userWord.includes(keyword))
     );
