@@ -6,10 +6,12 @@ const ASSETS_TO_CACHE = [
   '/src/main.tsx',
   '/src/index.css',
   '/icons/icon-192x192.svg',
-  '/icons/icon-512x512.svg',
-  '/api/terms',
-  '/api/formulas'
+  '/icons/icon-512x512.svg'
 ];
+
+// Data caches
+const DATA_CACHE_NAME = 'archkit-data-v1';
+const API_URLS = ['/api/terms', '/api/formulas'];
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
@@ -26,7 +28,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
+          if (cacheName !== CACHE_NAME && cacheName !== DATA_CACHE_NAME) {
             return caches.delete(cacheName);
           }
         })
@@ -37,6 +39,42 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fall back to network
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Special handling for API requests
+  if (API_URLS.some(apiUrl => url.pathname.includes(apiUrl))) {
+    event.respondWith(
+      caches.open(DATA_CACHE_NAME).then((cache) => {
+        return fetch(event.request)
+          .then((response) => {
+            if (response.ok) {
+              cache.put(event.request, response.clone());
+            }
+            return response;
+          })
+          .catch(() => {
+            return cache.match(event.request);
+          });
+      })
+    );
+    return;
+  }
+
+  // For assessment questions generation - always try network first
+  if (url.pathname.includes('/api/questions/generate')) {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => {
+          return new Response(
+            JSON.stringify({ error: 'Offline: Cannot generate new questions' }),
+            { headers: { 'Content-Type': 'application/json' } }
+          );
+        })
+    );
+    return;
+  }
+
+  // For all other requests - cache first, network fallback
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) {
@@ -44,28 +82,17 @@ self.addEventListener('fetch', (event) => {
       }
 
       return fetch(event.request).then((response) => {
-        // Don't cache non-GET requests
-        if (event.request.method !== 'GET') {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
         }
 
-        // Clone the response since it can only be consumed once
         const responseToCache = response.clone();
-
-        // Cache the fetched response
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseToCache);
         });
 
         return response;
       });
-    }).catch(() => {
-      // Return offline fallback content if network request fails
-      if (event.request.url.includes('/api/')) {
-        return new Response(JSON.stringify([]), {
-          headers: { 'Content-Type': 'application/json' }
-        });
-      }
     })
   );
 });
