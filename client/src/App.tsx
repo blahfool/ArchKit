@@ -23,6 +23,7 @@ const NotFound = lazy(() => import("@/pages/not-found"));
 
 // Components
 import ThemeToggle from "@/components/ThemeToggle";
+import ThemeSelect from "@/components/ThemeSelect";
 import OfflineIndicator from "@/components/OfflineIndicator";
 
 // Loading component for Suspense fallback
@@ -39,7 +40,6 @@ function Router() {
   const [location] = useLocation();
 
   useEffect(() => {
-    // Initial sync when app loads and is online
     if (navigator.onLine) {
       syncFromServer().catch(error => {
         console.error('Failed to sync from server:', error);
@@ -54,7 +54,8 @@ function Router() {
           <Logo size={40} />
         </div>
       )}
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+        <ThemeSelect />
         <ThemeToggle />
       </div>
       <Suspense fallback={<PageLoader />}>

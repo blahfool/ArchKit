@@ -147,6 +147,8 @@
   }
 
   body {
-    @apply font-sans antialiased text-foreground;
+    @apply font-sans antialiased;
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--background));
   }
 }
