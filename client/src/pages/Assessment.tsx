@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Timer,
   CheckCircle2,
   XCircle,
   AlertCircle,
@@ -21,21 +20,14 @@ import {
   ListFilter,
   Loader2
 } from "lucide-react";
-import { generateQuestions } from "@/lib/questionGenerator";
-import { fallbackTerms } from "@shared/schema";
-import type { Term } from "@shared/schema";
-import { useQuery } from "@tanstack/react-query";
+import { generateQuestions, type Question } from "@/lib/questionGenerator";
 import { useToast } from "@/hooks/use-toast";
 import BackButton from "@/components/BackButton";
-
-// ... keep all the interfaces ...
 
 export default function Assessment() {
   const [score, setScore] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, any>>({});
-  const [timeLeft, setTimeLeft] = useState(3600);
-  const [isActive, setIsActive] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [questionCount, setQuestionCount] = useState(10);
   const [selectedTypes, setSelectedTypes] = useState<string[]>(['multiple-choice']);
@@ -45,10 +37,7 @@ export default function Assessment() {
 
   const questionTypes = [
     { value: 'multiple-choice', label: 'Multiple Choice' },
-    { value: 'fill-in-blank', label: 'Fill in the Blank' },
-    { value: 'true-false', label: 'True/False' },
-    { value: 'chronological', label: 'Chronological Order' },
-    { value: 'calculation', label: 'Calculation' }
+    { value: 'true-false', label: 'True/False' }
   ];
 
   const handleStart = async () => {
@@ -63,11 +52,9 @@ export default function Assessment() {
 
       if (generatedQuestions.length === questionCount) {
         setQuestions(generatedQuestions);
-        setIsActive(true);
         setScore(null);
         setAnswers({});
         setCurrentQuestion(0);
-        setTimeLeft(3600);
       } else {
         toast({
           title: "Error",
@@ -87,22 +74,6 @@ export default function Assessment() {
     }
   };
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft(time => time - 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isActive, timeLeft]);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
   const handleSubmit = () => {
     if (!questions.length) return;
 
@@ -114,20 +85,8 @@ export default function Assessment() {
         case 'multiple-choice':
           isCorrect = answer === q.correctAnswer;
           break;
-        case 'fill-in-blank':
-          isCorrect = q.correctKeywords.some(keyword =>
-            answer?.toLowerCase().includes(keyword.toLowerCase())
-          );
-          break;
         case 'true-false':
           isCorrect = answer === q.correctAnswer;
-          break;
-        case 'chronological':
-          isCorrect = JSON.stringify(answer) === JSON.stringify(q.correctOrder);
-          break;
-        case 'calculation':
-          const percentError = Math.abs((answer - q.correctAnswer) / q.correctAnswer * 100);
-          isCorrect = percentError <= q.tolerance;
           break;
       }
 
@@ -135,34 +94,11 @@ export default function Assessment() {
     }, 0);
 
     setScore((correct / questions.length) * 100);
-    setIsActive(false);
     setShowExplanation(true);
   };
 
   const renderQuestion = (question: Question) => {
     switch (question.type) {
-      case 'calculation':
-        return (
-          <div className="space-y-4">
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <p className="font-mono">{question.formula}</p>
-            </div>
-            <Input
-              type="number"
-              step="0.01"
-              value={answers[currentQuestion] || ''}
-              onChange={(e) => {
-                const value = parseFloat(e.target.value);
-                if (!isNaN(value)) {
-                  setAnswers(prev => ({ ...prev, [currentQuestion]: value }));
-                }
-              }}
-              placeholder={`Enter your answer (${question.unit})`}
-              className="mt-2"
-            />
-          </div>
-        );
-
       case 'multiple-choice':
         return (
           <RadioGroup
@@ -178,18 +114,6 @@ export default function Assessment() {
               </div>
             ))}
           </RadioGroup>
-        );
-
-      case 'fill-in-blank':
-        return (
-          <Input
-            value={answers[currentQuestion] || ''}
-            onChange={(e) => {
-              setAnswers(prev => ({ ...prev, [currentQuestion]: e.target.value }));
-            }}
-            placeholder="Type your answer..."
-            className="mt-2"
-          />
         );
 
       case 'true-false':
@@ -210,40 +134,10 @@ export default function Assessment() {
             </div>
           </RadioGroup>
         );
-
-      case 'chronological':
-        return (
-          <div className="space-y-2">
-            {question.events.map((event, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <Select
-                  value={answers[currentQuestion]?.[index]?.toString()}
-                  onValueChange={(value) => {
-                    const newOrder = [...(answers[currentQuestion] || Array(question.events.length).fill(null))];
-                    newOrder[index] = parseInt(value);
-                    setAnswers(prev => ({ ...prev, [currentQuestion]: newOrder }));
-                  }}
-                >
-                  <SelectTrigger className="w-20">
-                    <SelectValue placeholder="#" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {question.events.map((_, i) => (
-                      <SelectItem key={i} value={i.toString()}>
-                        {i + 1}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <span>{event}</span>
-              </div>
-            ))}
-          </div>
-        );
     }
   };
 
-  if (!isActive && score === null) {
+  if (!questions.length) {
     return (
       <div className="min-h-screen p-4 pb-20">
         <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Architecture Assessment</h1>
@@ -338,7 +232,7 @@ export default function Assessment() {
               <div className="space-y-6">
                 <div>
                   <div className="text-sm font-medium text-muted-foreground mb-2">
-                    {questions[currentQuestion].type}
+                    Question {currentQuestion + 1} of {questions.length} • {questions[currentQuestion].type}
                   </div>
                   <p className="text-lg mb-4">{questions[currentQuestion].question}</p>
 
@@ -383,15 +277,12 @@ export default function Assessment() {
               <h2 className="text-lg font-medium mb-4">Assessment Results</h2>
               <div className="text-center mb-6">
                 <p className="text-4xl font-bold mb-2">{score.toFixed(1)}%</p>
-                <p className="text-muted-foreground">
-                  Completed in {formatTime(3600 - timeLeft)}
-                </p>
               </div>
 
               {showExplanation && (
                 <div className="space-y-6 mt-6">
                   {questions.map((q, index) => {
-                    const isCorrect = answers[index] === q.correctAnswer; //Simplified Correctness Check
+                    const isCorrect = answers[index] === q.correctAnswer;
                     return (
                       <div key={q.id} className="border rounded-lg p-4">
                         <div className="flex items-start gap-2">
