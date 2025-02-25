@@ -20,76 +20,159 @@ export default function StudyNotes({ open, onOpenChange, chapter }: StudyNotesPr
   // Generate detailed content for each page
   const pages = [
     {
-      title: "Introduction",
+      title: "Introduction and Overview",
       content: `
 ${chapter.content}
 
 Detailed Overview:
-This section provides a comprehensive introduction to ${chapter.title.toLowerCase()}. We'll explore 
-the fundamental concepts, historical context, and modern applications of these principles in 
-contemporary architecture.
+This comprehensive guide explores ${chapter.title.toLowerCase()}, a fundamental aspect of architectural practice. 
+We'll examine both theoretical foundations and practical applications, providing you with a thorough 
+understanding of this critical subject matter.
+
+Historical Context:
+The evolution of ${chapter.title.toLowerCase()} can be traced back through various architectural periods,
+each contributing unique perspectives and methodologies. From classical interpretations to contemporary
+innovations, we'll explore how this field has shaped the built environment.
 
 ${chapter.keyPoints ? `
-Key Learning Objectives:
-${chapter.keyPoints.map((point, index) => `${index + 1}. ${point}
-   • Detailed understanding of ${point.toLowerCase()}
-   • Practical applications in modern architecture
-   • Case studies and historical examples`).join('\n\n')}` : ''}
+Learning Objectives and Key Concepts:
+${chapter.keyPoints.map((point, index) => `
+${index + 1}. ${point}
+   • Historical Development: Trace the evolution of ${point.toLowerCase()} through different architectural periods
+   • Contemporary Applications: Modern interpretations and technological innovations
+   • Technical Considerations: Practical implementation guidelines and best practices
+   • Case Studies: Real-world examples demonstrating successful applications
+   • Future Perspectives: Emerging trends and potential developments`).join('\n\n')}
+
+Practical Applications:
+Understanding how these concepts translate into real-world scenarios is crucial for architectural practice.
+We'll examine various implementation strategies and their impact on design outcomes.` : ''}
+
+Research and Development:
+Recent advancements in technology and methodology have significantly influenced how we approach
+${chapter.title.toLowerCase()}. We'll explore cutting-edge developments and their implications for
+future architectural practice.
       `,
     },
     {
-      title: "Core Concepts",
+      title: "Technical Principles and Methodology",
       content: `
-Understanding ${chapter.title}
+Core Technical Concepts of ${chapter.title}
 
-Theoretical Framework:
-1. Historical Development
-   • Origins and evolution
-   • Key influential figures
-   • Major paradigm shifts
+1. Fundamental Principles
+   A. Theoretical Framework
+      • Historical foundations and evolution
+      • Contemporary interpretations
+      • Integration with modern architectural practice
+      • Impact on design methodology
 
-2. Modern Applications
-   • Contemporary interpretations
-   • Technological integration
-   • Sustainable approaches
+   B. Technical Requirements
+      • Standards and specifications
+      • Performance criteria
+      • Regulatory compliance
+      • Quality assurance measures
 
-3. Design Principles
-   • Spatial relationships
-   • Form and function
-   • Material considerations
-   • Environmental impact
+2. Implementation Methodology
+   A. Planning Phase
+      • Site analysis and context evaluation
+      • Resource assessment
+      • Feasibility studies
+      • Preliminary design considerations
 
-4. Implementation Strategies
-   • Planning and preparation
-   • Execution methodology
-   • Quality control measures
-   • Performance evaluation
+   B. Development Process
+      • Design development stages
+      • Technical documentation
+      • Coordination with other disciplines
+      • Quality control procedures
+
+3. Advanced Concepts
+   A. Innovation in Design
+      • Emerging technologies
+      • Sustainable solutions
+      • Smart integration
+      • Future-proofing strategies
+
+   B. Performance Optimization
+      • Efficiency measures
+      • Cost-effectiveness
+      • Environmental impact
+      • Long-term sustainability
+
+4. Integration with Other Systems
+   A. Interdisciplinary Coordination
+      • Structural considerations
+      • Environmental systems
+      • Material selection
+      • Construction methodology
+
+   B. Quality Management
+      • Performance monitoring
+      • Maintenance requirements
+      • Lifecycle assessment
+      • Continuous improvement strategies
       `,
     },
     {
-      title: "Case Studies",
+      title: "Case Studies and Practical Applications",
       content: `
-Real-World Applications of ${chapter.title}
+Real-World Applications and Analysis of ${chapter.title}
 
-Example Projects:
+1. Contemporary Case Study: Urban Innovation
+   Project: Metropolitan Design Center
+   Location: Singapore
+   • Project Overview:
+     - Scale: 50,000 square meters
+     - Budget: $100 million
+     - Timeline: 2020-2023
+   • Key Features:
+     - Innovative use of sustainable materials
+     - Integration of smart technologies
+     - Adaptive reuse strategies
+   • Outcomes and Lessons:
+     - 40% reduction in energy consumption
+     - Enhanced user experience
+     - Award-winning design solutions
 
-1. Modern Implementation
-   • Project: Contemporary Urban Development
-   • Location: Various global cities
-   • Key Features: Integration of modern technology with traditional principles
-   • Outcome: Successful blend of form and function
+2. Historical Case Study: Classical Implementation
+   Project: Heritage Restoration
+   Period: 19th Century Revival
+   • Original Features:
+     - Traditional construction methods
+     - Period-specific materials
+     - Historical significance
+   • Restoration Approach:
+     - Conservation principles
+     - Modern adaptations
+     - Preservation techniques
+   • Results and Impact:
+     - Successfully preserved historical elements
+     - Improved functionality
+     - Enhanced cultural value
 
-2. Historical Analysis
-   • Project: Classical Architectural Examples
-   • Period: Various historical eras
-   • Key Features: Traditional methods and materials
-   • Lessons Learned: Timeless principles and adaptations
+3. Future Trends and Innovations
+   A. Emerging Technologies
+      • Artificial Intelligence in design
+      • Virtual and Augmented Reality applications
+      • Advanced materials and systems
+      • Automated construction methods
 
-3. Future Directions
-   • Emerging trends
-   • Technological innovations
-   • Sustainable practices
-   • Integration with smart systems
+   B. Sustainable Practices
+      • Green building strategies
+      • Energy efficiency measures
+      • Waste reduction techniques
+      • Environmental impact assessment
+
+   C. Integration Strategies
+      • Smart building systems
+      • IoT implementation
+      • Data-driven design
+      • Adaptive technologies
+
+Conclusion and Future Perspectives:
+The evolution of ${chapter.title.toLowerCase()} continues to shape architectural practice,
+with emerging technologies and methodologies opening new possibilities for innovation
+and sustainability. Understanding these developments is crucial for staying at the
+forefront of architectural design and implementation.
       `,
     }
   ];
