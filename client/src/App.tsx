@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { queryClient } from "./lib/queryClient";
@@ -25,6 +25,8 @@ import ThemeToggle from "@/components/ThemeToggle";
 import OfflineIndicator from "@/components/OfflineIndicator";
 
 function Router() {
+  const [location] = useLocation();
+
   useEffect(() => {
     // Initial sync when app loads and is online
     if (navigator.onLine) {
@@ -34,9 +36,12 @@ function Router() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="fixed top-4 left-4 z-50">
-        <Logo size={40} />
-      </div>
+      {/* Only show logo on home screen */}
+      {location === "/" && (
+        <div className="fixed top-4 left-4 z-50">
+          <Logo size={40} />
+        </div>
+      )}
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>

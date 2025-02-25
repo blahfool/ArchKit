@@ -18,7 +18,7 @@ export function Logo({ size = 40, className, ...props }: LogoProps) {
         {/* A triangle for the letter A */}
         <path
           d="M20 4L34 36H6L20 4Z"
-          className="stroke-primary"
+          className="stroke-foreground"
           strokeWidth="1.5"
           fill="none"
         />
@@ -28,7 +28,7 @@ export function Logo({ size = 40, className, ...props }: LogoProps) {
           y1="25"
           x2="27"
           y2="25"
-          className="stroke-primary"
+          className="stroke-foreground"
           strokeWidth="1.5"
         />
       </svg>
