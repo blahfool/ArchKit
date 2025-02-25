@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { architecturalThemes } from "@/lib/themes";
+import { generateTexture } from "@/lib/textureGenerator";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ThemeSelect() {
@@ -29,8 +30,11 @@ export default function ThemeSelect() {
     root.style.setProperty("--radius", `${theme.radius}rem`);
     root.style.setProperty("--gradient", colors.gradient);
 
-    // Apply background gradient
-    document.body.style.background = colors.gradient;
+    // Generate and apply texture
+    const textureUrl = generateTexture(theme);
+    document.body.style.background = `${colors.gradient}, url(${textureUrl})`;
+    document.body.style.backgroundSize = 'cover, 100px 100px';
+    document.body.style.backgroundBlendMode = 'normal, overlay';
 
     // Update theme.json values through data attributes
     root.setAttribute('data-theme', theme.variant);
