@@ -65,10 +65,11 @@ export default function Home() {
                   variant="outline"
                   className="w-full h-24 flex flex-col items-center justify-center gap-2 
                            hover:bg-primary/5 hover:border-primary/30 transition-all
-                           hover:shadow-lg hover:-translate-y-0.5"
+                           hover:shadow-lg hover:-translate-y-0.5
+                           active:scale-95 touch-manipulation"
                 >
-                  <item.icon className="h-6 w-6" />
-                  <span className="font-light tracking-wide">{item.label}</span>
+                  <item.icon className="h-8 w-8" />
+                  <span className="font-medium text-lg tracking-wide">{item.label}</span>
                 </Button>
               </Link>
             ))}

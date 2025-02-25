@@ -9,9 +9,9 @@ export default function BackButton() {
     <Button
       variant="secondary"
       onClick={() => setLocation("/")}
-      className="fixed bottom-6 left-6 shadow-lg bg-background/80 backdrop-blur-sm"
+      className="fixed bottom-6 left-6 shadow-lg bg-background/80 backdrop-blur-sm h-12 px-5 active:scale-95 touch-manipulation"
     >
-      <ArrowLeft className="h-4 w-4 mr-2" />
+      <ArrowLeft className="h-5 w-5 mr-2" />
       Back to Home
     </Button>
   );

@@ -65,7 +65,6 @@ export default function ArMeasure() {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    // Calculate the scaling factor between canvas coordinates and display coordinates
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
@@ -86,14 +85,14 @@ export default function ArMeasure() {
       // Draw point
       ctx.fillStyle = '#00ff00';
       ctx.beginPath();
-      ctx.arc(point.x, point.y, 8, 0, 2 * Math.PI);
+      ctx.arc(point.x, point.y, 10, 0, 2 * Math.PI); // Increased point size
       ctx.fill();
 
       // Draw line to previous point
       if (index > 0) {
         const prevPoint = newPoints[index - 1];
         ctx.strokeStyle = '#00ff00';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 4; // Increased line width
         ctx.beginPath();
         ctx.moveTo(prevPoint.x, prevPoint.y);
         ctx.lineTo(point.x, point.y);
@@ -105,15 +104,15 @@ export default function ArMeasure() {
 
         // Draw distance text with background
         const textX = (prevPoint.x + point.x) / 2;
-        const textY = (prevPoint.y + point.y) / 2 - 20;
+        const textY = (prevPoint.y + point.y) / 2 - 30; // Increased spacing
         const text = `${dist.toFixed(2)}m`;
 
-        ctx.font = '24px sans-serif';
+        ctx.font = '28px sans-serif'; // Larger font
         const textWidth = ctx.measureText(text).width;
 
         // Draw text background
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(textX - textWidth/2 - 5, textY - 20, textWidth + 10, 30);
+        ctx.fillRect(textX - textWidth/2 - 10, textY - 24, textWidth + 20, 36);
 
         // Draw text
         ctx.fillStyle = '#00ff00';
@@ -132,33 +131,33 @@ export default function ArMeasure() {
     // Draw calibration guide
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = '#00ff00';
-    ctx.lineWidth = 3;
-    ctx.setLineDash([10, 10]);
+    ctx.lineWidth = 4;
+    ctx.setLineDash([12, 12]);
 
     // Draw horizontal line
     const centerY = canvas.height / 2;
     ctx.beginPath();
-    ctx.moveTo(canvas.width/2 - 100, centerY);
-    ctx.lineTo(canvas.width/2 + 100, centerY);
+    ctx.moveTo(canvas.width/2 - 150, centerY);
+    ctx.lineTo(canvas.width/2 + 150, centerY);
     ctx.stroke();
 
     // Draw text with background
     const text = 'Place a reference object (e.g., A4 paper) along this line';
-    ctx.font = '20px sans-serif';
+    ctx.font = '24px sans-serif'; // Larger font
     const textWidth = ctx.measureText(text).width;
 
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     ctx.fillRect(
-      canvas.width/2 - textWidth/2 - 10,
-      centerY - 50,
-      textWidth + 20,
-      40
+      canvas.width/2 - textWidth/2 - 15,
+      centerY - 60,
+      textWidth + 30,
+      48
     );
 
     ctx.fillStyle = '#00ff00';
     ctx.textAlign = 'center';
     ctx.setLineDash([]);
-    ctx.fillText(text, canvas.width/2, centerY - 20);
+    ctx.fillText(text, canvas.width/2, centerY - 24);
   };
 
   const handleReset = () => {
@@ -172,11 +171,11 @@ export default function ArMeasure() {
   };
 
   return (
-    <div className="min-h-screen p-4 pb-20">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">AR Measurement</h1>
+    <div className="min-h-screen p-3 pb-20">
+      <h1 className="text-2xl font-bold mb-4 text-center">AR Measurement</h1>
 
       <Card className="max-w-2xl mx-auto">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           {/* Camera View */}
           <div className="relative aspect-[4/3] bg-black rounded-lg overflow-hidden mb-4">
             <video
@@ -193,23 +192,23 @@ export default function ArMeasure() {
           </div>
 
           {/* Controls */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Mode Selection */}
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <Button 
                 variant={mode === 'distance' ? 'default' : 'outline'}
                 onClick={() => setMode('distance')}
-                className="flex-1"
+                className="h-14 text-lg" // Taller button, larger text
               >
-                <Ruler className="h-4 w-4 mr-2" />
+                <Ruler className="h-5 w-5 mr-2" />
                 Distance
               </Button>
               <Button 
                 variant={mode === 'area' ? 'default' : 'outline'}
                 onClick={() => setMode('area')}
-                className="flex-1"
+                className="h-14 text-lg" // Taller button, larger text
               >
-                <Maximize2 className="h-4 w-4 mr-2" />
+                <Maximize2 className="h-5 w-5 mr-2" />
                 Area
               </Button>
             </div>
@@ -217,18 +216,19 @@ export default function ArMeasure() {
             {/* Measurement Controls */}
             <div className="flex gap-2">
               <Button 
-                className="flex-1"
+                className="flex-1 h-14 text-lg" // Taller button, larger text
                 onClick={() => setMeasuring(true)}
                 disabled={measuring}
               >
-                <Move className="h-4 w-4 mr-2" />
+                <Move className="h-5 w-5 mr-2" />
                 Start Measuring
               </Button>
               <Button
                 variant="outline"
                 onClick={handleReset}
+                className="h-14 px-4" // Taller button, more padding
               >
-                <RotateCcw className="h-4 w-4" />
+                <RotateCcw className="h-5 w-5" />
               </Button>
             </div>
 
@@ -236,10 +236,10 @@ export default function ArMeasure() {
             {!calibrated && (
               <Button 
                 variant="outline" 
-                className="w-full"
+                className="w-full h-14 text-lg" // Taller button, larger text
                 onClick={handleCalibrate}
               >
-                <Camera className="h-4 w-4 mr-2" />
+                <Camera className="h-5 w-5 mr-2" />
                 Calibrate Camera
               </Button>
             )}
@@ -247,7 +247,7 @@ export default function ArMeasure() {
             {/* Measurement Results */}
             {distance && (
               <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                <p className="text-center font-medium">
+                <p className="text-center text-lg font-medium">
                   {mode === 'distance' 
                     ? `Distance: ${distance.toFixed(2)} meters`
                     : `Area: ${(distance * distance).toFixed(2)} sq meters`
@@ -257,7 +257,7 @@ export default function ArMeasure() {
             )}
 
             {/* Help Text */}
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="text-base text-muted-foreground text-center px-4">
               {measuring 
                 ? "Tap points on the screen to measure between them" 
                 : "Click Start Measuring and calibrate the camera for accurate measurements"
