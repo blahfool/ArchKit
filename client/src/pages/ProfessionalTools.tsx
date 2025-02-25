@@ -23,7 +23,8 @@ import {
   FileSpreadsheet,
   CheckSquare,
   Plus,
-  Trash2
+  Trash2,
+  AlertTriangle
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -478,6 +479,111 @@ export default function ProfessionalTools() {
                               </div>
                               <div className="font-medium">₱25.00</div>
                             </div>
+                            <div className="p-3 flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">Portland Cement (per bag)</div>
+                                <div className="text-sm text-muted-foreground">
+                                  <div>• Holcim Excel: ₱285.00</div>
+                                  <div>• Republic Cement: ₱280.00</div>
+                                  <div>• Cemex APO: ₱278.00</div>
+                                  <div>• Eagle Cement: ₱275.00</div>
+                                  <div>Type 1, 40kg</div>
+                                </div>
+                              </div>
+                              <div className="font-medium">₱275.00 - ₱285.00</div>
+                            </div>
+                            <div className="p-3 flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">Reinforcing Steel (per kg)</div>
+                                <div className="text-sm text-muted-foreground">
+                                  <div>• SteelAsia Grade 60: ₱68.00</div>
+                                  <div>• Pag-asa Steel Grade 40: ₱65.00</div>
+                                  <div>• Metal Crown Grade 40: ₱64.00</div>
+                                </div>
+                              </div>
+                              <div className="font-medium">₱64.00 - ₱68.00</div>
+                            </div>
+                            <div className="p-3 flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">Plywood (per piece)</div>
+                                <div className="text-sm text-muted-foreground">
+                                  <div>• Santa Clara Marine: ₱1,250.00</div>
+                                  <div>• Phoenix Marine: ₱1,200.00</div>
+                                  <div>• Mindanao Marine: ₱1,150.00</div>
+                                  <div>1/2" x 4' x 8'</div>
+                                </div>
+                              </div>
+                              <div className="font-medium">₱1,150.00 - ₱1,250.00</div>
+                            </div>
+                            <div className="p-3 flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">Metal Roofing (per meter)</div>
+                                <div className="text-sm text-muted-foreground">
+                                  <div>• DN Steel Gauge 26: ₱290.00</div>
+                                  <div>• Puyat Steel Gauge 26: ₱285.00</div>
+                                  <div>• Union Galvasteel: ₱280.00</div>
+                                  <div>Corrugated GI</div>
+                                </div>
+                              </div>
+                              <div className="font-medium">₱280.00 - ₱290.00</div>
+                            </div>
+                            <div className="p-3 flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">Electrical Wire (per roll)</div>
+                                <div className="text-sm text-muted-foreground">
+                                  <div>• Phelps Dodge THHN: ₱4,200.00</div>
+                                  <div>• American Wire THHN: ₱3,800.00</div>
+                                  <div>• Philflex THHN: ₱3,600.00</div>
+                                  <div>3.5mm² x 150m</div>
+                                </div>
+                              </div>
+                              <div className="font-medium">₱3,600.00 - ₱4,200.00</div>
+                            </div>
+                            <div className="p-3 flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">PVC Pipes (per piece)</div>
+                                <div className="text-sm text-muted-foreground">
+                                  <div>• Neltex Premium: ₱380.00</div>
+                                  <div>• Atlanta Standard: ₱350.00</div>
+                                  <div>• Moldex Regular: ₱320.00</div>
+                                  <div>4" x 3m Sanitary</div>
+                                </div>
+                              </div>
+                              <div className="font-medium">₱320.00 - ₱380.00</div>
+                            </div>
+                            <div className="p-3 flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">Paint (per gallon)</div>
+                                <div className="text-sm text-muted-foreground">
+                                  <div>• Boysen Premium: ₱1,850.00</div>
+                                  <div>• Davies Elastomeric: ₱1,750.00</div>
+                                  <div>• Rain or Shine: ₱1,650.00</div>
+                                  <div>Exterior Acrylic</div>
+                                </div>
+                              </div>
+                              <div className="font-medium">₱1,650.00 - ₱1,850.00</div>
+                            </div>
+                            <div className="p-3 flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">Tiles (per sqm)</div>
+                                <div className="text-sm text-muted-foreground">
+                                  <div>• Mariwasa Premium: ₱580.00</div>
+                                  <div>• Arte Series: ₱520.00</div>
+                                  <div>• Eurotiles Standard: ₱480.00</div>
+                                  <div>60x60 Ceramic</div>
+                                </div>
+                              </div>
+                              <div className="font-medium">₱480.00 - ₱580.00</div>
+                            </div>
+                            <div className="mt-4 p-3 bg-muted/50 rounded-lg text-sm">
+                              <div className="flex items-start gap-2">
+                                <AlertTriangle className="h-4 w-4 mt-0.5 text-yellow-500" />
+                                <div>
+                                  <span className="font-medium">Note:</span>
+                                  <p>Prices are approximate and may vary by location and quantity. Last updated: February 2024. Contact suppliers for exact quotations.</p>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                           <Button className="w-full" onClick={() => {
                             toast({
@@ -554,172 +660,79 @@ export default function ProfessionalTools() {
                 <CardContent className="pt-6">
                   <h2 className="text-lg font-semibold mb-4">Professional Resources</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="h-auto py-4 px-6">
-                          <FileText className="h-5 w-5 mr-3" />
-                          <div className="text-left">
-                            <div className="font-medium">Practice Guidelines</div>
-                            <div className="text-sm text-muted-foreground">Standard procedures</div>
-                          </div>
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Practice Guidelines</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4 pt-4">
-                          <div className="space-y-2">
-                            {[
-                              'UAP Project Management Guidelines',
-                              'PRC Code of Ethics',
-                              'AAIF Standard Contract Documents',
-                              'DPWH Standard Specifications'
-                            ].map(guide => (
-                              <Button
-                                key={guide}
-                                variant="outline"
-                                className="w-full justify-start h-auto py-3"
-                                onClick={() => {
-                                  toast({
-                                    title: guide,
-                                    description: "This guide will be available in the next update."
-                                  });
-                                }}
-                              >
-                                <FileText className="h-4 w-4 mr-2" />
-                                {guide}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="h-auto py-4 px-6">
-                          <Users className="h-5 w-5 mr-3" />
-                          <div className="text-left">
-                            <div className="font-medium">Client Relations</div>
-                            <div className="text-sm text-muted-foreground">Communication guides</div>
-                          </div>
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Client Relations Resources</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4 pt-4">
-                          <div className="space-y-2">
-                            {[
-                              'Client Meeting Templates',
-                              'Presentation Guidelines',
-                              'Communication Best Practices',
-                              'Client Feedback Forms'
-                            ].map(resource => (
-                              <Button
-                                key={resource}
-                                variant="outline"
-                                className="w-full justify-start h-auto py-3"
-                                onClick={() => {
-                                  toast({
-                                    title: resource,
-                                    description: "This resource will be available in the next update."
-                                  });
-                                }}
-                              >
-                                <FileText className="h-4 w-4 mr-2" />
-                                {resource}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="h-auto py-4 px-6">
-                          <CalcIcon className="h-5 w-5 mr-3" />
-                          <div className="text-left">
-                            <div className="font-medium">Financial Tools</div>
-                            <div className="text-sm text-muted-foreground">Budgeting resources</div>
-                          </div>
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Financial Management Tools</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4 pt-4">
-                          <div className="space-y-2">
-                            {[
-                              'Project Budget Templates',
-                              'Cash Flow Forecasting',
-                              'Fee Calculation Guides',
-                              'Financial Report Templates'
-                            ].map(tool => (
-                              <Button
-                                key={tool}
-                                variant="outline"
-                                className="w-full justify-start h-auto py-3"
-                                onClick={() => {
-                                  toast({
-                                    title: tool,
-                                    description: "This tool will be available in the next update."
-                                  });
-                                }}
-                              >
-                                <FileText className="h-4 w-4 mr-2" />
-                                {tool}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="h-auto py-4 px-6">
-                          <CheckSquare className="h-5 w-5 mr-3" />
-                          <div className="text-left">
-                            <div className="font-medium">Quality Control</div>
-                            <div className="text-sm text-muted-foreground">Review checklists</div>
-                          </div>
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Quality Control Resources</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4 pt-4">
-                          <div className="space-y-2">
-                            {[
-                              'Design Review Checklist',
-                              'Construction Document Review',
-                              'Site Inspection Forms',
-                              'Quality Assurance Guidelines'
-                            ].map(resource => (
-                              <Button
-                                key={resource}
-                                variant="outline"
-                                className="w-full justify-start h-auto py-3"
-                                onClick={() => {
-                                  toast({
-                                    title: resource,
-                                    description: "This resource will be available in the next update."
-                                  });
-                                }}
-                              >
-                                <FileText className="h-4 w-4 mr-2" />
-                                {resource}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    {[
+                      {
+                        title: 'Practice Guidelines',
+                        items: [
+                          'UAP Minimum Standards for Registration',
+                          'PRC Resolution No. 1439 Guidelines',
+                          'AAIF Code of Ethics and Responsibilities',
+                          'DPWH Design Guidelines and Standards',
+                          'Philippine Green Building Code Requirements',
+                          'Construction Occupational Safety Guidelines',
+                          'Professional Liability Requirements',
+                          'Environmental Compliance Certificates'
+                        ]
+                      },
+                      {
+                        title: 'Client Relations',
+                        items: [
+                          'Standard Client-Architect Agreement Forms',
+                          'UAP Project Delivery Guidelines',
+                          'Professional Fee Guidelines 2024',
+                          'Client Presentation Templates',
+                          'Project Milestone Documentation',
+                          'Change Order Procedures',
+                          'Site Visit Report Templates',
+                          'Client Feedback and Evaluation Forms'
+                        ]
+                      },
+                      {
+                        title: 'Financial Management',
+                        items: [
+                          'UAP Professional Fee Calculator',
+                          'Project Cost Estimation Templates',
+                          'Payment Schedule Guidelines',
+                          'Construction Cost Database 2024',
+                          'VAT and Tax Compliance Guide',
+                          'Professional Insurance Requirements',
+                          'Contract Payment Terms Templates',
+                          'Financial Report Formats'
+                        ]
+                      },
+                      {
+                        title: 'Quality Control',
+                        items: [
+                          'DPWH Quality Assurance Manual',
+                          'Construction Specifications Template',
+                          'Site Inspection Checklist',
+                          'Material Testing Requirements',
+                          'As-Built Documentation Guidelines',
+                          'Project Completion Certificates',
+                          'Warranty Documentation Templates',
+                          'Building Maintenance Guidelines'
+                        ]
+                      }
+                    ].map(section => (
+                      <div key={section.title} className="space-y-2">
+                        {section.items.map(item => (
+                          <Button
+                            key={item}
+                            variant="outline"
+                            className="w-full justify-start h-auto py-3"
+                            onClick={() => {
+                              toast({
+                                title: item,
+                                description: "This resource will be available in the next update."
+                              });
+                            }}
+                          >
+                            <FileText className="h-4 w-4 mr-2" />
+                            {item}
+                          </Button>
+                        ))}
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>

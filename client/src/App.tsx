@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { queryClient } from "./lib/queryClient";
 import { useEffect } from "react";
 import { syncFromServer } from "./lib/offlineStorage";
+import { Logo } from "@/components/Logo";
 
 // Pages
 import Home from "@/pages/Home";
@@ -33,6 +34,9 @@ function Router() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <div className="fixed top-4 left-4 z-50">
+        <Logo size={40} />
+      </div>
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
