@@ -5,34 +5,32 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import BackButton from "@/components/BackButton";
-import { evaluate } from "mathjs";
-import type { Formula } from "@shared/schema";
+import { formulas, type Formula } from "@/lib/calculatorFormulas";
 
 export default function Calculator() {
   const [selectedFormula, setSelectedFormula] = useState<Formula | null>(null);
   const [variables, setVariables] = useState<Record<string, number>>({});
-  const [result, setResult] = useState<number | null>(null);
-
-  const { data: formulas } = useQuery<Formula[]>({ 
-    queryKey: ["/api/formulas"]
-  });
+  const [result, setResult] = useState<{
+    result: number;
+    unit: string;
+    steps: string[];
+  } | null>(null);
 
   const calculateResult = () => {
     if (!selectedFormula) return;
 
     try {
-      const scope = variables;
-      const result = evaluate(selectedFormula.formula, scope);
-      setResult(Number(result));
+      const calcResult = selectedFormula.calculate(variables);
+      setResult(calcResult);
     } catch (error) {
       console.error("Calculation error:", error);
     }
   };
 
-  const handleVariableChange = (variable: string, value: string) => {
+  const handleVariableChange = (name: string, value: string) => {
     setVariables(prev => ({
       ...prev,
-      [variable]: Number(value)
+      [name]: Number(value)
     }));
   };
 
@@ -58,7 +56,7 @@ export default function Calculator() {
         <CardContent className="pt-6">
           <Select
             onValueChange={(value) => {
-              const formula = formulas?.find(f => f.id === Number(value));
+              const formula = formulas.find(f => f.name === value);
               setSelectedFormula(formula || null);
               setVariables({});
               setResult(null);
@@ -68,8 +66,8 @@ export default function Calculator() {
               <SelectValue placeholder="Select a formula" />
             </SelectTrigger>
             <SelectContent>
-              {formulas?.map((formula) => (
-                <SelectItem key={formula.id} value={formula.id.toString()}>
+              {formulas.map((formula) => (
+                <SelectItem key={formula.name} value={formula.name}>
                   {formula.name}
                 </SelectItem>
               ))}
@@ -80,14 +78,17 @@ export default function Calculator() {
             <div className="mt-4 space-y-4">
               <p className="text-sm text-muted-foreground">{selectedFormula.description}</p>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                {selectedFormula.variables.split(",").map((variable) => (
-                  <div key={variable} className="space-y-2">
-                    <label className="text-sm font-medium">{variable.trim()}</label>
+              <div className="grid gap-4">
+                {selectedFormula.inputs.map((input) => (
+                  <div key={input.name} className="space-y-2">
+                    <label className="text-sm font-medium flex justify-between">
+                      <span>{input.description}</span>
+                      <span className="text-muted-foreground">{input.unit}</span>
+                    </label>
                     <Input
                       type="number"
-                      placeholder={`Enter ${variable.trim()}`}
-                      onChange={(e) => handleVariableChange(variable.trim(), e.target.value)}
+                      placeholder={`Enter ${input.name}`}
+                      onChange={(e) => handleVariableChange(input.name, e.target.value)}
                       className="transition-all hover:border-primary/50 focus:border-primary"
                     />
                   </div>
@@ -101,11 +102,17 @@ export default function Calculator() {
                 Calculate
               </Button>
 
-              {result !== null && (
-                <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
+              {result && (
+                <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20 space-y-4">
                   <p className="text-center font-medium">
-                    Result: {result.toFixed(2)}
+                    Result: {result.result.toFixed(2)} {result.unit}
                   </p>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <p className="font-medium">Calculation Steps:</p>
+                    {result.steps.map((step, index) => (
+                      <p key={index}>{step}</p>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
