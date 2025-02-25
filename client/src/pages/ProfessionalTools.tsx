@@ -394,13 +394,28 @@ export default function ProfessionalTools() {
                               <SelectContent>
                                 <SelectItem value="residential">Residential</SelectItem>
                                 <SelectItem value="commercial">Commercial</SelectItem>
+                                <SelectItem value="institutional">Institutional</SelectItem>
                                 <SelectItem value="industrial">Industrial</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                           <div>
-                            <Label>Floor Area (sq ft)</Label>
+                            <Label>Floor Area (sq m)</Label>
                             <Input type="number" placeholder="Enter floor area" />
+                          </div>
+                          <div>
+                            <Label>Location</Label>
+                            <Select>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select location" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="metro-manila">Metro Manila</SelectItem>
+                                <SelectItem value="luzon">Other Luzon Areas</SelectItem>
+                                <SelectItem value="visayas">Visayas</SelectItem>
+                                <SelectItem value="mindanao">Mindanao</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </div>
                           <div>
                             <Label>Quality Grade</Label>
@@ -409,10 +424,10 @@ export default function ProfessionalTools() {
                                 <SelectValue placeholder="Select quality grade" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="luxury">Luxury</SelectItem>
-                                <SelectItem value="high">High End</SelectItem>
-                                <SelectItem value="medium">Medium</SelectItem>
-                                <SelectItem value="standard">Standard</SelectItem>
+                                <SelectItem value="luxury">Class AA (Luxury)</SelectItem>
+                                <SelectItem value="high">Class A (High-End)</SelectItem>
+                                <SelectItem value="medium">Class B (Mid-Range)</SelectItem>
+                                <SelectItem value="standard">Class C (Standard)</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -444,24 +459,24 @@ export default function ProfessionalTools() {
                           <div className="border rounded-lg divide-y">
                             <div className="p-3 flex justify-between items-center">
                               <div>
-                                <div className="font-medium">Concrete (per cubic yard)</div>
-                                <div className="text-sm text-muted-foreground">Standard mix, 4000 PSI</div>
+                                <div className="font-medium">Concrete (per cubic meter)</div>
+                                <div className="text-sm text-muted-foreground">Ready-mix, 4000 PSI</div>
                               </div>
-                              <div className="font-medium">$125.00</div>
+                              <div className="font-medium">₱3,500.00</div>
                             </div>
                             <div className="p-3 flex justify-between items-center">
                               <div>
-                                <div className="font-medium">Steel Reinforcement (per ton)</div>
-                                <div className="text-sm text-muted-foreground">Grade 60</div>
+                                <div className="font-medium">Reinforcing Steel (per kg)</div>
+                                <div className="text-sm text-muted-foreground">Grade 40/60</div>
                               </div>
-                              <div className="font-medium">$1,200.00</div>
+                              <div className="font-medium">₱65.00</div>
                             </div>
                             <div className="p-3 flex justify-between items-center">
                               <div>
-                                <div className="font-medium">Lumber (per board foot)</div>
-                                <div className="text-sm text-muted-foreground">Construction grade</div>
+                                <div className="font-medium">CHB (per piece)</div>
+                                <div className="text-sm text-muted-foreground">6" Concrete Hollow Block</div>
                               </div>
-                              <div className="font-medium">$3.50</div>
+                              <div className="font-medium">₱25.00</div>
                             </div>
                           </div>
                           <Button className="w-full" onClick={() => {
@@ -489,7 +504,7 @@ export default function ProfessionalTools() {
                         </DialogHeader>
                         <div className="space-y-4 pt-4">
                           <div>
-                            <Label>Project Value</Label>
+                            <Label>Project Value (PHP)</Label>
                             <Input type="number" placeholder="Enter project value" />
                           </div>
                           <div>
@@ -499,9 +514,23 @@ export default function ProfessionalTools() {
                                 <SelectValue placeholder="Select service scope" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="full">Full Service</SelectItem>
-                                <SelectItem value="design">Design Only</SelectItem>
-                                <SelectItem value="supervision">Supervision Only</SelectItem>
+                                <SelectItem value="full">Full Architectural Services</SelectItem>
+                                <SelectItem value="design">Design Development Only</SelectItem>
+                                <SelectItem value="documentation">Construction Documents Only</SelectItem>
+                                <SelectItem value="supervision">Construction Supervision Only</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label>Project Location</Label>
+                            <Select>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select location" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="metro-manila">Metro Manila</SelectItem>
+                                <SelectItem value="provincial">Provincial</SelectItem>
+                                <SelectItem value="international">International</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -542,10 +571,10 @@ export default function ProfessionalTools() {
                         <div className="space-y-4 pt-4">
                           <div className="space-y-2">
                             {[
-                              'Project Management Procedures',
-                              'Quality Control Guidelines',
-                              'Client Communication Protocol',
-                              'Document Control Systems'
+                              'UAP Project Management Guidelines',
+                              'PRC Code of Ethics',
+                              'AAIF Standard Contract Documents',
+                              'DPWH Standard Specifications'
                             ].map(guide => (
                               <Button
                                 key={guide}
@@ -608,7 +637,6 @@ export default function ProfessionalTools() {
                         </div>
                       </DialogContent>
                     </Dialog>
-
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button variant="outline" className="h-auto py-4 px-6">

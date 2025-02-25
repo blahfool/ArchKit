@@ -43,109 +43,68 @@ export default function BuildingCodes() {
   const [selectedSection, setSelectedSection] = useState<CodeSection | null>(null);
   const { toast } = useToast();
 
-  // Mock building code sections
   const codeSections: Record<string, CodeSection[]> = {
-    "Building Planning and Design": [
+    "NBCP Requirements": [
       {
-        id: "occ-1",
-        title: "Occupancy Classification",
-        description: "Guidelines for determining building occupancy types and related requirements",
+        id: "nbcp-1",
+        title: "General Building Requirements",
+        description: "National Building Code of the Philippines (NBCP) - P.D. 1096 general requirements for building design and construction",
         requirements: [
-          "Assembly (A-1 to A-5)",
-          "Business (B)",
-          "Educational (E)",
-          "Factory (F-1, F-2)",
-          "High Hazard (H-1 to H-5)",
-          "Institutional (I-1 to I-4)",
-          "Mercantile (M)",
-          "Residential (R-1 to R-4)",
-          "Storage (S-1, S-2)",
-          "Utility (U)"
+          "Building Height and Floor Area Requirements",
+          "Fire Safety and Protection Systems",
+          "Structural Design Requirements",
+          "Sanitation and Plumbing Requirements",
+          "Electrical and Mechanical Requirements"
         ],
-        references: ["IBC Chapter 3", "NFPA 101 Chapter 6"]
+        references: ["NBCP P.D. 1096", "IRR of P.D. 1096"]
       },
       {
-        id: "egress-1",
-        title: "Means of Egress",
-        description: "Requirements for safe building evacuation and emergency exits",
+        id: "nbcp-2",
+        title: "Occupancy Classifications",
+        description: "Building occupancy classifications according to NBCP",
         requirements: [
-          "Minimum number of exits",
-          "Exit access travel distance",
-          "Common path of travel",
-          "Exit discharge",
-          "Emergency lighting",
-          "Exit signs"
+          "Group A - Residential",
+          "Group B - Educational",
+          "Group C - Institutional",
+          "Group D - Commercial",
+          "Group E - Industrial",
+          "Group F - Storage and Hazardous",
+          "Group G - Miscellaneous",
+          "Group H - Assembly",
+          "Group I - Agricultural"
         ],
-        references: ["IBC Chapter 10", "NFPA 101 Chapter 7"]
-      },
-      {
-        id: "access-1",
-        title: "Accessibility Requirements",
-        description: "Standards for accessible design and accommodations",
-        requirements: [
-          "Accessible routes",
-          "Ramps and elevators",
-          "Door clearances",
-          "Bathroom facilities",
-          "Parking spaces"
-        ],
-        references: ["ADA Standards", "ICC A117.1"]
+        references: ["NBCP Rule VII", "DPWH Guidelines"]
       }
     ],
-    "Structural Provisions": [
+    "Green Building Requirements": [
       {
-        id: "struct-1",
-        title: "Structural Design Requirements",
-        description: "Basic requirements for structural systems and load calculations",
+        id: "green-1",
+        title: "Philippine Green Building Code",
+        description: "Mandatory standards for planning, design, construction, and management of buildings in the Philippines",
         requirements: [
-          "Dead loads",
-          "Live loads",
-          "Wind loads",
-          "Seismic loads",
-          "Load combinations"
+          "Energy Efficiency and Conservation",
+          "Water Conservation and Management",
+          "Material Sustainability",
+          "Solid Waste Management",
+          "Site Sustainability",
+          "Indoor Environmental Quality"
         ],
-        references: ["IBC Chapter 16", "ASCE 7"]
-      },
-      {
-        id: "found-1",
-        title: "Foundation Systems",
-        description: "Requirements for building foundation design and construction",
-        requirements: [
-          "Soil investigation",
-          "Footing design",
-          "Foundation walls",
-          "Waterproofing",
-          "Drainage"
-        ],
-        references: ["IBC Chapter 18", "ASCE 7 Chapter 12"]
+        references: ["Philippine Green Building Code 2015", "BERDE Program Guidelines"]
       }
     ],
-    "Fire Safety": [
+    "Local Building Regulations": [
       {
-        id: "fire-1",
-        title: "Fire-Resistance Requirements",
-        description: "Standards for fire-resistant construction and materials",
+        id: "local-1",
+        title: "Zoning and Land Use",
+        description: "Local government requirements for zoning and land use",
         requirements: [
-          "Fire-resistance ratings",
-          "Protected assemblies",
-          "Opening protectives",
-          "Penetration firestopping",
-          "Fire walls and barriers"
+          "Comprehensive Land Use Plan (CLUP)",
+          "Floor Area Ratio (FAR)",
+          "Setback Requirements",
+          "Building Height Restrictions",
+          "Parking Requirements"
         ],
-        references: ["IBC Chapter 7", "NFPA 251"]
-      },
-      {
-        id: "fire-2",
-        title: "Fire Protection Systems",
-        description: "Requirements for fire suppression and detection systems",
-        requirements: [
-          "Sprinkler systems",
-          "Fire alarm systems",
-          "Smoke control",
-          "Standpipes",
-          "Fire extinguishers"
-        ],
-        references: ["IBC Chapter 9", "NFPA 13"]
+        references: ["Local Government Code", "HLURB Guidelines"]
       }
     ]
   };
@@ -158,7 +117,6 @@ export default function BuildingCodes() {
   };
 
   const generateCodeSummary = (section: CodeSection) => {
-    // In a real app, this would generate a PDF
     const content = `
 # ${section.title}
 ${section.description}
@@ -187,10 +145,10 @@ ${section.references.map(ref => `- ${ref}`).join('\n')}
   };
 
   const regions = [
-    { id: 'california', name: 'California' },
-    { id: 'new-york', name: 'New York' },
-    { id: 'texas', name: 'Texas' },
-    { id: 'florida', name: 'Florida' }
+    { id: 'ncr', name: 'National Capital Region' },
+    { id: 'region3', name: 'Central Luzon' },
+    { id: 'region4a', name: 'CALABARZON' },
+    { id: 'region7', name: 'Central Visayas' }
   ];
 
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -345,6 +303,9 @@ ${section.references.map(ref => `- ${ref}`).join('\n')}
                         {category === "Building Planning and Design" && <Building className="h-5 w-5" />}
                         {category === "Structural Provisions" && <Shield className="h-5 w-5" />}
                         {category === "Fire Safety" && <Flame className="h-5 w-5" />}
+                        {category === "NBCP Requirements" && <Shield className="h-5 w-5" />}
+                        {category === "Green Building Requirements" && <Globe className="h-5 w-5" />}
+                        {category === "Local Building Regulations" && <Building className="h-5 w-5" />}
                         <span>{category}</span>
                       </div>
                     </AccordionTrigger>
