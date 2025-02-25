@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { saveAs } from 'file-saver';
 
 interface Project {
   id: string;
@@ -62,6 +63,53 @@ const projectTemplates = [
   { id: 'interior', name: 'Interior Design' },
   { id: 'landscape', name: 'Landscape Design' },
 ];
+
+const generateImageTemplate = (type: string) => {
+  const template = {
+    presentation: `
+Project Presentation Template
+----------------------------
+1. Cover Page
+2. Project Overview
+3. Site Analysis
+4. Design Concept
+5. Floor Plans
+6. Elevations
+7. Sections
+8. Renderings
+9. Details
+10. Sustainability Features`,
+    documentation: `
+Project Documentation Template
+-----------------------------
+1. Executive Summary
+2. Project Scope
+3. Design Intent
+4. Technical Specifications
+5. Material Schedule
+6. Construction Details
+7. Sustainability Features
+8. Cost Estimates
+9. Timeline
+10. Appendices`,
+    caseStudy: `
+Case Study Template
+------------------
+1. Project Background
+2. Design Challenge
+3. Solution Approach
+4. Implementation
+5. Results & Impact
+6. Lessons Learned
+7. Client Testimonials
+8. Project Images
+9. Technical Details
+10. Awards & Recognition`
+  };
+
+  return new Blob([template[type] || template.presentation], { type: 'text/plain;charset=utf-8' });
+};
+
 
 export default function Portfolio() {
   const [projects, setProjects] = useState<Project[]>([
@@ -103,8 +151,8 @@ export default function Portfolio() {
   const handleImageUpload = (projectId: string, file: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
-      setProjects(prev => prev.map(p => 
-        p.id === projectId 
+      setProjects(prev => prev.map(p =>
+        p.id === projectId
           ? { ...p, thumbnailUrl: e.target?.result as string }
           : p
       ));
@@ -160,8 +208,8 @@ export default function Portfolio() {
   const handleEditProject = () => {
     if (!selectedProject) return;
 
-    setProjects(prev => prev.map(p => 
-      p.id === selectedProject.id 
+    setProjects(prev => prev.map(p =>
+      p.id === selectedProject.id
         ? { ...selectedProject, lastEdited: new Date() }
         : p
     ));
@@ -182,7 +230,6 @@ export default function Portfolio() {
   };
 
   const handleExport = (project: Project) => {
-    // In a real app, this would generate a PDF or other document format
     const content = `
 # ${project.title}
 ## ${project.type}
@@ -394,13 +441,13 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                      <div 
+                      <div
                         className="aspect-[3/2] bg-secondary rounded-lg mb-3 relative group cursor-pointer"
                         onClick={() => fileInputRef.current?.click()}
                       >
                         {project.thumbnailUrl ? (
-                          <img 
-                            src={project.thumbnailUrl} 
+                          <img
+                            src={project.thumbnailUrl}
                             alt={project.title}
                             className="w-full h-full object-cover rounded-lg"
                           />
@@ -448,7 +495,7 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
                 <Input
                   id="edit-title"
                   value={selectedProject?.title}
-                  onChange={(e) => setSelectedProject(prev => 
+                  onChange={(e) => setSelectedProject(prev =>
                     prev ? { ...prev, title: e.target.value } : null
                   )}
                 />
@@ -458,7 +505,7 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
                 <Input
                   id="edit-type"
                   value={selectedProject?.type}
-                  onChange={(e) => setSelectedProject(prev => 
+                  onChange={(e) => setSelectedProject(prev =>
                     prev ? { ...prev, type: e.target.value } : null
                   )}
                 />
@@ -468,7 +515,7 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
                 <Textarea
                   id="edit-description"
                   value={selectedProject?.description}
-                  onChange={(e) => setSelectedProject(prev => 
+                  onChange={(e) => setSelectedProject(prev =>
                     prev ? { ...prev, description: e.target.value } : null
                   )}
                 />
@@ -480,7 +527,7 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
                   <Textarea
                     id="edit-overview"
                     value={selectedProject?.content?.overview}
-                    onChange={(e) => setSelectedProject(prev => 
+                    onChange={(e) => setSelectedProject(prev =>
                       prev ? {
                         ...prev,
                         content: { ...prev.content, overview: e.target.value }
@@ -493,7 +540,7 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
                   <Textarea
                     id="edit-challenge"
                     value={selectedProject?.content?.challenge}
-                    onChange={(e) => setSelectedProject(prev => 
+                    onChange={(e) => setSelectedProject(prev =>
                       prev ? {
                         ...prev,
                         content: { ...prev.content, challenge: e.target.value }
@@ -506,7 +553,7 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
                   <Textarea
                     id="edit-solution"
                     value={selectedProject?.content?.solution}
-                    onChange={(e) => setSelectedProject(prev => 
+                    onChange={(e) => setSelectedProject(prev =>
                       prev ? {
                         ...prev,
                         content: { ...prev.content, solution: e.target.value }
@@ -519,7 +566,7 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
                   <Textarea
                     id="edit-outcome"
                     value={selectedProject?.content?.outcome}
-                    onChange={(e) => setSelectedProject(prev => 
+                    onChange={(e) => setSelectedProject(prev =>
                       prev ? {
                         ...prev,
                         content: { ...prev.content, outcome: e.target.value }
@@ -544,8 +591,8 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
             <div className="space-y-6 pt-4">
               {selectedProject?.thumbnailUrl && (
                 <div className="aspect-[16/9] rounded-lg overflow-hidden">
-                  <img 
-                    src={selectedProject.thumbnailUrl} 
+                  <img
+                    src={selectedProject.thumbnailUrl}
                     alt={selectedProject.title}
                     className="w-full h-full object-cover"
                   />
@@ -606,9 +653,11 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
             <h2 className="text-lg font-semibold mb-4">Tools & Resources</h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <Button variant="outline" className="h-auto py-4 px-6" onClick={() => {
+                const blob = generateImageTemplate('presentation');
+                saveAs(blob, 'presentation-template.txt');
                 toast({
-                  title: "Coming Soon",
-                  description: "Image templates will be available in the next update."
+                  title: "Template Downloaded",
+                  description: "Presentation template has been downloaded to your device."
                 });
               }}>
                 <ImageIcon className="h-5 w-5 mr-3" />
@@ -619,9 +668,11 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
               </Button>
 
               <Button variant="outline" className="h-auto py-4 px-6" onClick={() => {
+                const blob = generateImageTemplate('documentation');
+                saveAs(blob, 'documentation-template.txt');
                 toast({
-                  title: "Coming Soon",
-                  description: "Documentation templates will be available in the next update."
+                  title: "Template Downloaded",
+                  description: "Documentation template has been downloaded to your device."
                 });
               }}>
                 <FileText className="h-5 w-5 mr-3" />
@@ -632,9 +683,11 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
               </Button>
 
               <Button variant="outline" className="h-auto py-4 px-6" onClick={() => {
+                const blob = generateImageTemplate('caseStudy');
+                saveAs(blob, 'case-study-template.txt');
                 toast({
-                  title: "Coming Soon",
-                  description: "Case study templates will be available in the next update."
+                  title: "Template Downloaded",
+                  description: "Case study template has been downloaded to your device."
                 });
               }}>
                 <Layout className="h-5 w-5 mr-3" />
@@ -645,15 +698,26 @@ Last edited: ${project.lastEdited.toLocaleDateString()}
               </Button>
 
               <Button variant="outline" className="h-auto py-4 px-6" onClick={() => {
-                toast({
-                  title: "Coming Soon",
-                  description: "Export options will be available in the next update."
-                });
+                if (selectedProject) {
+                  const projectData = JSON.stringify(selectedProject, null, 2);
+                  const blob = new Blob([projectData], { type: 'application/json' });
+                  saveAs(blob, `${selectedProject.title.toLowerCase().replace(/\s+/g, '-')}.json`);
+                  toast({
+                    title: "Project Exported",
+                    description: "Project data has been exported successfully."
+                  });
+                } else {
+                  toast({
+                    title: "No Project Selected",
+                    description: "Please select a project to export.",
+                    variant: "destructive"
+                  });
+                }
               }}>
                 <Download className="h-5 w-5 mr-3" />
                 <div className="text-left">
                   <div className="font-medium">Export Options</div>
-                  <div className="text-sm text-muted-foreground">PDF and digital formats</div>
+                  <div className="text-sm text-muted-foreground">Export project data</div>
                 </div>
               </Button>
             </div>
