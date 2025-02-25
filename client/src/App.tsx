@@ -58,8 +58,7 @@ function Router() {
           <Logo size={40} />
         </div>
       )}
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
-        <ThemeSelect />
+      <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
       <Suspense fallback={<PageLoader />}>

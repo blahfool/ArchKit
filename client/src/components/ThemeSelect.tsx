@@ -1,73 +1,48 @@
 import { useState, useEffect } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { architecturalThemes } from "@/lib/themes";
-import { generateTexture } from "@/lib/textureGenerator";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ThemeSelect() {
-  const [currentTheme, setCurrentTheme] = useState(localStorage.getItem("theme") || "modern");
+  const [isDark, setIsDark] = useState(localStorage.getItem("appearance") === "dark");
   const { toast } = useToast();
 
-  const applyTheme = (themeName: string) => {
-    const theme = architecturalThemes[themeName];
-    if (!theme) return;
+  const toggleTheme = () => {
+    const newIsDark = !isDark;
+    setIsDark(newIsDark);
 
     const root = document.documentElement;
-    const { colors } = theme;
+    root.classList.toggle('dark', newIsDark);
 
-    // Apply colors
-    root.style.setProperty("--background", colors.background);
-    root.style.setProperty("--foreground", colors.foreground);
-    root.style.setProperty("--muted", colors.muted);
-    root.style.setProperty("--accent", colors.accent);
-    root.style.setProperty("--primary", theme.primary);
-    root.style.setProperty("--radius", `${theme.radius}rem`);
-    root.style.setProperty("--gradient", colors.gradient);
-
-    // Generate and apply texture
-    const textureUrl = generateTexture(theme);
-    document.body.style.background = `${colors.gradient}, url(${textureUrl})`;
-    document.body.style.backgroundSize = 'cover, 100px 100px';
-    document.body.style.backgroundBlendMode = 'normal, overlay';
-
-    // Set theme variant and radius
-    root.setAttribute('data-theme', theme.variant);
-    root.setAttribute('data-radius', theme.radius.toString());
-
-    localStorage.setItem("theme", themeName);
-    setCurrentTheme(themeName);
+    localStorage.setItem("appearance", newIsDark ? "dark" : "light");
 
     toast({
       title: "Theme Updated",
-      description: `Switched to ${theme.name} theme`,
+      description: `Switched to ${newIsDark ? 'dark' : 'light'} mode`,
     });
   };
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme && architecturalThemes[savedTheme]) {
-      applyTheme(savedTheme);
+    const savedAppearance = localStorage.getItem("appearance");
+    if (savedAppearance) {
+      setIsDark(savedAppearance === "dark");
+      document.documentElement.classList.toggle('dark', savedAppearance === "dark");
     }
   }, []);
 
   return (
-    <Select value={currentTheme} onValueChange={applyTheme}>
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Select theme" />
-      </SelectTrigger>
-      <SelectContent>
-        {Object.entries(architecturalThemes).map(([key, theme]) => (
-          <SelectItem key={key} value={key}>
-            {theme.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleTheme}
+      className="h-9 w-9"
+    >
+      {isDark ? (
+        <Moon className="h-4 w-4" />
+      ) : (
+        <Sun className="h-4 w-4" />
+      )}
+      <span className="sr-only">Toggle theme</span>
+    </Button>
   );
 }
