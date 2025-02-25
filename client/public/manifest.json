@@ -35,17 +35,13 @@
     }
   ],
   "categories": ["education", "productivity"],
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": ["standalone", "minimal-ui", "fullscreen"],
   "lang": "en",
   "dir": "ltr",
   "offline_enabled": true,
-  "screenshots": [
-    {
-      "src": "./screenshots/home.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Home Screen"
-    }
-  ]
+  "scope": "./",
+  "id": "archkit-pwa",
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  }
 }

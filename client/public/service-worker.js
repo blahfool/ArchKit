@@ -3,19 +3,10 @@ const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  './src/main.tsx',
-  './src/index.css',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
-  // Add all routes that need to work offline
-  './calculator',
-  './terms',
-  './exam',
-  './ebook',
-  './portfolio',
-  './codes',
-  './professional',
-  './about'
+  // Add all static assets and routes
+  './assets/'
 ];
 
 // Install event - cache static assets
@@ -45,46 +36,42 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - offline-first strategy
+// Fetch event - offline-first with network fallback
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
+        // Return cached response if found
         if (response) {
-          return response; // Return cached response immediately
+          return response;
         }
 
-        // Clone the request because it can only be used once
+        // Clone the request
         const fetchRequest = event.request.clone();
 
-        // Try network
+        // Try network, then cache response
         return fetch(fetchRequest)
           .then(response => {
-            // Check if we received a valid response
             if (!response || response.status !== 200) {
               return response;
             }
 
-            // Clone the response because it can only be used once
+            // Clone the response
             const responseToCache = response.clone();
 
-            // Add to cache for future offline access
+            // Add successful responses to cache
             caches.open(CACHE_NAME)
               .then((cache) => {
-                cache.put(event.request, responseToCache);
+                if (event.request.url.startsWith(self.location.origin)) {
+                  cache.put(event.request, responseToCache);
+                }
               });
 
             return response;
           })
           .catch(() => {
-            // If both cache and network fail, return a fallback
-            return new Response('You are offline. Some content may not be available.', {
-              status: 503,
-              statusText: 'Service Unavailable',
-              headers: new Headers({
-                'Content-Type': 'text/plain',
-              }),
-            });
+            // If both cache and network fail, return offline page
+            return caches.match('./index.html');
           });
       })
   );
@@ -92,7 +79,22 @@ self.addEventListener('fetch', (event) => {
 
 // Handle messages from clients
 self.addEventListener('message', (event) => {
-  if (event.data === 'skipWaiting') {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  }
+});
+
+// Background sync for offline updates
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'content-sync') {
+    event.waitUntil(
+      // Update cached content
+      fetch('./').then(response => {
+        if (response.ok) {
+          const cache = caches.open(CACHE_NAME);
+          return cache.then(cache => cache.put('./', response));
+        }
+      })
+    );
   }
 });
