@@ -69,6 +69,7 @@ self.addEventListener('fetch', (event) => {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME)
               .then((cache) => {
+                // Only cache same-origin requests to avoid CORS issues
                 if (event.request.url.startsWith(self.location.origin)) {
                   cache.put(event.request, responseToCache);
                 }
@@ -98,7 +99,6 @@ self.addEventListener('message', (event) => {
 self.addEventListener('sync', (event) => {
   if (event.tag === 'content-sync') {
     event.waitUntil(
-      // Update cached content
       fetch('./').then(response => {
         if (response.ok) {
           const cache = caches.open(CACHE_NAME);
