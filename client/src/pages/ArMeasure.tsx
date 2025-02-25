@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera, Ruler, Maximize2, Move, RotateCcw, ArrowLeft } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Camera, Ruler, Maximize2, Move, RotateCcw } from "lucide-react";
+import BackButton from "@/components/BackButton";
 
 export default function ArMeasure() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -17,8 +19,9 @@ export default function ArMeasure() {
         const constraints = {
           video: {
             facingMode: "environment",
-            width: { ideal: window.innerWidth },
-            height: { ideal: window.innerHeight }
+            aspectRatio: 4/3,
+            width: { ideal: 1024 },
+            height: { ideal: 768 }
           }
         };
 
@@ -27,8 +30,9 @@ export default function ArMeasure() {
           videoRef.current.srcObject = stream;
           // Set canvas size to match video
           if (canvasRef.current) {
-            canvasRef.current.width = window.innerWidth;
-            canvasRef.current.height = window.innerHeight;
+            const { videoWidth, videoHeight } = videoRef.current;
+            canvasRef.current.width = videoWidth;
+            canvasRef.current.height = videoHeight;
           }
         }
       } catch (err) {
@@ -38,19 +42,9 @@ export default function ArMeasure() {
 
     startCamera();
 
-    // Handle orientation changes
-    const handleResize = () => {
-      if (canvasRef.current && videoRef.current) {
-        canvasRef.current.width = window.innerWidth;
-        canvasRef.current.height = window.innerHeight;
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
     return () => {
       const stream = videoRef.current?.srcObject as MediaStream;
       stream?.getTracks().forEach(track => track.stop());
-      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -71,8 +65,12 @@ export default function ArMeasure() {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    // Calculate the scaling factor between canvas coordinates and display coordinates
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
 
     const newPoints = [...points, {x, y}];
     setPoints(newPoints);
@@ -174,101 +172,102 @@ export default function ArMeasure() {
   };
 
   return (
-    <div className="fixed inset-0 bg-black">
-      {/* Full screen camera view */}
-      <div className="relative w-full h-full">
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <canvas
-          ref={canvasRef}
-          onClick={handleCanvasClick}
-          className="absolute inset-0 w-full h-full touch-none"
-        />
+    <div className="min-h-screen p-4 pb-20">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">AR Measurement</h1>
 
-        {/* Top controls */}
-        <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-          <Button
-            variant="secondary"
-            onClick={() => window.history.back()}
-            className="bg-black/50 hover:bg-black/70 backdrop-blur-sm"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-
-          {!calibrated && (
-            <Button 
-              variant="secondary"
-              onClick={handleCalibrate}
-              className="bg-black/50 hover:bg-black/70 backdrop-blur-sm"
-            >
-              <Camera className="h-4 w-4 mr-2" />
-              Calibrate
-            </Button>
-          )}
-        </div>
-
-        {/* Bottom controls */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/50 backdrop-blur-sm space-y-4">
-          <div className="flex gap-2">
-            <Button 
-              variant={mode === 'distance' ? 'default' : 'outline'}
-              onClick={() => setMode('distance')}
-              className="flex-1 bg-white/10 hover:bg-white/20"
-            >
-              <Ruler className="h-4 w-4 mr-2" />
-              Distance
-            </Button>
-            <Button 
-              variant={mode === 'area' ? 'default' : 'outline'}
-              onClick={() => setMode('area')}
-              className="flex-1 bg-white/10 hover:bg-white/20"
-            >
-              <Maximize2 className="h-4 w-4 mr-2" />
-              Area
-            </Button>
+      <Card className="max-w-2xl mx-auto">
+        <CardContent className="p-4">
+          {/* Camera View */}
+          <div className="relative aspect-[4/3] bg-black rounded-lg overflow-hidden mb-4">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <canvas
+              ref={canvasRef}
+              onClick={handleCanvasClick}
+              className="absolute inset-0 w-full h-full touch-none"
+            />
           </div>
 
-          <div className="flex gap-2">
-            <Button 
-              className="flex-1 bg-white/10 hover:bg-white/20"
-              onClick={() => setMeasuring(true)}
-              disabled={measuring}
-            >
-              <Move className="h-4 w-4 mr-2" />
-              Start Measuring
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleReset}
-              className="bg-white/10 hover:bg-white/20"
-            >
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {measuring && (
-            <p className="text-center text-white/70 text-sm">
-              Tap points on the screen to measure distances
-            </p>
-          )}
-
-          {distance && (
-            <div className="p-4 bg-white/10 rounded-lg border border-white/20">
-              <p className="text-center text-white font-medium">
-                {mode === 'distance' 
-                  ? `Distance: ${distance.toFixed(2)} meters`
-                  : `Area: ${(distance * distance).toFixed(2)} sq meters`
-                }
-              </p>
+          {/* Controls */}
+          <div className="space-y-4">
+            {/* Mode Selection */}
+            <div className="flex gap-2">
+              <Button 
+                variant={mode === 'distance' ? 'default' : 'outline'}
+                onClick={() => setMode('distance')}
+                className="flex-1"
+              >
+                <Ruler className="h-4 w-4 mr-2" />
+                Distance
+              </Button>
+              <Button 
+                variant={mode === 'area' ? 'default' : 'outline'}
+                onClick={() => setMode('area')}
+                className="flex-1"
+              >
+                <Maximize2 className="h-4 w-4 mr-2" />
+                Area
+              </Button>
             </div>
-          )}
-        </div>
-      </div>
+
+            {/* Measurement Controls */}
+            <div className="flex gap-2">
+              <Button 
+                className="flex-1"
+                onClick={() => setMeasuring(true)}
+                disabled={measuring}
+              >
+                <Move className="h-4 w-4 mr-2" />
+                Start Measuring
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleReset}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Calibration Button */}
+            {!calibrated && (
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={handleCalibrate}
+              >
+                <Camera className="h-4 w-4 mr-2" />
+                Calibrate Camera
+              </Button>
+            )}
+
+            {/* Measurement Results */}
+            {distance && (
+              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                <p className="text-center font-medium">
+                  {mode === 'distance' 
+                    ? `Distance: ${distance.toFixed(2)} meters`
+                    : `Area: ${(distance * distance).toFixed(2)} sq meters`
+                  }
+                </p>
+              </div>
+            )}
+
+            {/* Help Text */}
+            <p className="text-sm text-muted-foreground text-center">
+              {measuring 
+                ? "Tap points on the screen to measure between them" 
+                : "Click Start Measuring and calibrate the camera for accurate measurements"
+              }
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <BackButton />
     </div>
   );
 }
