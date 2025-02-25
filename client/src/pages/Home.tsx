@@ -30,6 +30,19 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Initial Logo Animation */}
+      <div className="absolute inset-0 flex items-center justify-center logo-animation">
+        <div className="text-6xl font-light tracking-wide">
+          <span className="logo-letter">A</span>
+          <span className="logo-letter">r</span>
+          <span className="logo-letter">c</span>
+          <span className="logo-letter">h</span>
+          <span className="logo-letter font-bold">K</span>
+          <span className="logo-letter font-bold">i</span>
+          <span className="logo-letter font-bold">t</span>
+        </div>
+      </div>
+
       {/* Animated background elements */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-0 animate-fade-in"
@@ -87,9 +100,9 @@ export default function Home() {
                 <Button
                   variant="outline"
                   className="w-full h-24 flex flex-col items-center justify-center gap-2 
-                           hover:bg-primary/5 hover:border-primary/30 transition-all
-                           hover:shadow-lg hover:-translate-y-0.5
-                           active:scale-95 touch-manipulation"
+                            hover:bg-primary/5 hover:border-primary/30 transition-all
+                            hover:shadow-lg hover:-translate-y-0.5
+                            active:scale-95 touch-manipulation"
                 >
                   <item.icon className="h-8 w-8" />
                   <span className="font-medium text-lg tracking-wide">{item.label}</span>

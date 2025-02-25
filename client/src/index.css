@@ -23,6 +23,36 @@
   background-size: 24px 24px, 24px 24px, 100% 100%;
 }
 
+@keyframes logo-appear {
+  0% { 
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  20% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% { 
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes letter-dissipate {
+  0% { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateY(-20px) rotate(10deg);
+    opacity: 0;
+  }
+}
+
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 0.5; }
@@ -55,14 +85,31 @@
   }
 }
 
+.logo-animation {
+  animation: logo-appear 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.logo-letter {
+  display: inline-block;
+  animation: letter-dissipate 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.logo-letter:nth-child(1) { animation-delay: 1.2s; }
+.logo-letter:nth-child(2) { animation-delay: 1.25s; }
+.logo-letter:nth-child(3) { animation-delay: 1.3s; }
+.logo-letter:nth-child(4) { animation-delay: 1.35s; }
+.logo-letter:nth-child(5) { animation-delay: 1.4s; }
+.logo-letter:nth-child(6) { animation-delay: 1.45s; }
+.logo-letter:nth-child(7) { animation-delay: 1.5s; }
+
 .animate-fade-in {
   animation: fade-in 1s ease-out forwards;
-  animation-delay: 0.2s;
+  animation-delay: 2s;
 }
 
 .animate-grid-appear {
   animation: grid-appear 1.5s ease-out forwards;
-  animation-delay: 0.5s;
+  animation-delay: 2.3s;
 }
 
 .animate-shape-appear {
@@ -71,7 +118,7 @@
 
 .animate-content-appear {
   animation: content-appear 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  animation-delay: 0.3s;
+  animation-delay: 2.5s;
 }
 
 @keyframes fadeInUp {
