@@ -10,7 +10,6 @@ import {
 import {
   Book,
   Search,
-  Download,
   FileText,
   GraduationCap,
   ExternalLink
@@ -222,54 +221,6 @@ export default function EBook() {
                               Visit
                             </Button>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </CardContent>
-        </Card>
-        {/* Original Course Content Section */}
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Book className="h-5 w-5" />
-              Course Content
-            </h2>
-            <Accordion type="single" collapsible className="w-full">
-              {subjects.map((subject, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="hover:no-underline">
-                    <div className="flex items-center gap-2">
-                      <subject.icon className="h-5 w-5" />
-                      <div className="text-left">
-                        <div>{subject.title}</div>
-                        <div className="text-sm text-muted-foreground font-normal">
-                          {subject.description}
-                        </div>
-                      </div>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-4 pt-2">
-                      {subject.chapters.map((chapter, chapterIndex) => (
-                        <div key={chapterIndex} className="border rounded-lg p-4">
-                          <h3 className="font-medium mb-2">{chapter.title}</h3>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            {chapter.content}
-                          </p>
-                          {chapter.keyPoints && (
-                            <div className="space-y-2">
-                              <h4 className="text-sm font-medium">Key Points:</h4>
-                              <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                                {chapter.keyPoints.map((point, pointIndex) => (
-                                  <li key={pointIndex}>{point}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
                         </div>
                       ))}
                     </div>
