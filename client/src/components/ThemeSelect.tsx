@@ -40,9 +40,6 @@ export default function ThemeSelect() {
     root.setAttribute('data-theme', theme.variant);
     root.setAttribute('data-radius', theme.radius.toString());
 
-    // Toggle dark mode class based on theme appearance
-    root.classList.toggle('dark', theme.appearance === 'dark');
-
     localStorage.setItem("theme", themeName);
     setCurrentTheme(themeName);
 
