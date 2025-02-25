@@ -1,11 +1,17 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import BackButton from "@/components/BackButton";
 import {
   Timer,
@@ -13,32 +19,58 @@ import {
   XCircle,
   AlertCircle,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  ListFilter
 } from "lucide-react";
-import type { Term } from "@shared/schema";
 
-interface Question {
+interface BaseQuestion {
   id: number;
   category: string;
   question: string;
+  explanation: string;
+  type: 'multiple-choice' | 'fill-in-blank' | 'true-false' | 'chronological';
+}
+
+interface MultipleChoiceQuestion extends BaseQuestion {
+  type: 'multiple-choice';
   options: string[];
   correctAnswer: string;
-  explanation: string;
 }
+
+interface FillInBlankQuestion extends BaseQuestion {
+  type: 'fill-in-blank';
+  correctKeywords: string[];
+}
+
+interface TrueFalseQuestion extends BaseQuestion {
+  type: 'true-false';
+  correctAnswer: boolean;
+}
+
+interface ChronologicalQuestion extends BaseQuestion {
+  type: 'chronological';
+  events: string[];
+  correctOrder: number[];
+}
+
+type Question = MultipleChoiceQuestion | FillInBlankQuestion | TrueFalseQuestion | ChronologicalQuestion;
 
 export default function Assessment() {
   const [score, setScore] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [timeLeft, setTimeLeft] = useState(3600); // 60 minutes
+  const [answers, setAnswers] = useState<Record<number, any>>({});
+  const [timeLeft, setTimeLeft] = useState(3600);
   const [isActive, setIsActive] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [questionCount, setQuestionCount] = useState(10);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(['multiple-choice']);
 
-  // Mock questions - in real app, these would come from an API
+  // Mock questions - in real app, these would be generated from Terms Index and E-Book content
   const mockQuestions: Question[] = [
     {
       id: 1,
+      type: 'multiple-choice',
       category: "Design Principles",
       question: "Which architectural principle emphasizes that the shape of a building should primarily be based on its intended function or purpose?",
       options: [
@@ -48,29 +80,53 @@ export default function Assessment() {
         "Truth to materials"
       ],
       correctAnswer: "Form follows function",
-      explanation: "Form follows function, coined by Louis Sullivan, is a principle that suggests the shape of a building or object should primarily be based on its intended function or purpose. This principle became a defining characteristic of modernist architecture."
+      explanation: "Form follows function, coined by Louis Sullivan, is a principle that suggests the shape of a building or object should primarily be based on its intended function or purpose."
     },
     {
       id: 2,
+      type: 'fill-in-blank',
       category: "Building Systems",
-      question: "What is the primary purpose of a building's HVAC system?",
-      options: [
-        "To maintain structural integrity",
-        "To control temperature, humidity, and air quality",
-        "To manage electrical distribution",
-        "To handle waste disposal"
-      ],
-      correctAnswer: "To control temperature, humidity, and air quality",
-      explanation: "HVAC (Heating, Ventilation, and Air Conditioning) systems are designed to maintain indoor environmental comfort by managing temperature, humidity, and air quality. This is crucial for occupant comfort and health."
+      question: "A _______ is a structural element used to span an opening and carry loads above it to the support on either side.",
+      correctKeywords: ["beam", "girder"],
+      explanation: "A beam is a horizontal structural element that primarily resists loads applied laterally to its axis."
     },
-    // Add more questions for different categories
+    {
+      id: 3,
+      type: 'true-false',
+      category: "History",
+      question: "The Gothic style of architecture originated in Renaissance Italy.",
+      correctAnswer: false,
+      explanation: "Gothic architecture actually originated in 12th-century France and spread throughout medieval Europe."
+    },
+    {
+      id: 4,
+      type: 'chronological',
+      category: "Architectural History",
+      question: "Arrange these architectural periods in chronological order:",
+      events: [
+        "Ancient Egyptian",
+        "Classical Greek",
+        "Roman Empire",
+        "Gothic",
+        "Renaissance"
+      ],
+      correctOrder: [0, 1, 2, 3, 4],
+      explanation: "The progression of architectural styles follows this historical timeline, each building upon and influencing the next."
+    }
   ];
 
   const categories = ["all", ...new Set(mockQuestions.map(q => q.category))];
+  const questionTypes = [
+    { value: 'multiple-choice', label: 'Multiple Choice' },
+    { value: 'fill-in-blank', label: 'Fill in the Blank' },
+    { value: 'true-false', label: 'True/False' },
+    { value: 'chronological', label: 'Chronological Order' }
+  ];
 
-  const filteredQuestions = selectedCategory === "all" 
-    ? mockQuestions 
-    : mockQuestions.filter(q => q.category === selectedCategory);
+  const filteredQuestions = mockQuestions
+    .filter(q => selectedCategory === "all" || q.category === selectedCategory)
+    .filter(q => selectedTypes.includes(q.type))
+    .slice(0, questionCount);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -99,13 +155,115 @@ export default function Assessment() {
   const handleSubmit = () => {
     if (!filteredQuestions.length) return;
 
-    const correct = Object.entries(answers).reduce((acc, [qIndex, answer]) => {
-      return acc + (answer === filteredQuestions[parseInt(qIndex)].correctAnswer ? 1 : 0);
+    const correct = filteredQuestions.reduce((acc, q, index) => {
+      const answer = answers[index];
+      let isCorrect = false;
+
+      switch (q.type) {
+        case 'multiple-choice':
+          isCorrect = answer === q.correctAnswer;
+          break;
+        case 'fill-in-blank':
+          isCorrect = q.correctKeywords.some(keyword => 
+            answer?.toLowerCase().includes(keyword.toLowerCase())
+          );
+          break;
+        case 'true-false':
+          isCorrect = answer === q.correctAnswer;
+          break;
+        case 'chronological':
+          isCorrect = JSON.stringify(answer) === JSON.stringify(q.correctOrder);
+          break;
+      }
+
+      return acc + (isCorrect ? 1 : 0);
     }, 0);
 
     setScore((correct / filteredQuestions.length) * 100);
     setIsActive(false);
     setShowExplanation(true);
+  };
+
+  const renderQuestion = (question: Question) => {
+    switch (question.type) {
+      case 'multiple-choice':
+        return (
+          <RadioGroup
+            value={answers[currentQuestion]}
+            onValueChange={(value) => {
+              setAnswers(prev => ({ ...prev, [currentQuestion]: value }));
+            }}
+          >
+            {question.options.map((option, index) => (
+              <div key={index} className="flex items-center space-x-2 mb-2">
+                <RadioGroupItem value={option} id={`option-${index}`} />
+                <Label htmlFor={`option-${index}`}>{option}</Label>
+              </div>
+            ))}
+          </RadioGroup>
+        );
+
+      case 'fill-in-blank':
+        return (
+          <Input
+            value={answers[currentQuestion] || ''}
+            onChange={(e) => {
+              setAnswers(prev => ({ ...prev, [currentQuestion]: e.target.value }));
+            }}
+            placeholder="Type your answer..."
+            className="mt-2"
+          />
+        );
+
+      case 'true-false':
+        return (
+          <RadioGroup
+            value={answers[currentQuestion]?.toString()}
+            onValueChange={(value) => {
+              setAnswers(prev => ({ ...prev, [currentQuestion]: value === 'true' }));
+            }}
+          >
+            <div className="flex items-center space-x-2 mb-2">
+              <RadioGroupItem value="true" id="true" />
+              <Label htmlFor="true">True</Label>
+            </div>
+            <div className="flex items-center space-x-2 mb-2">
+              <RadioGroupItem value="false" id="false" />
+              <Label htmlFor="false">False</Label>
+            </div>
+          </RadioGroup>
+        );
+
+      case 'chronological':
+        return (
+          <div className="space-y-2">
+            {question.events.map((event, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Select
+                  value={answers[currentQuestion]?.[index]?.toString()}
+                  onValueChange={(value) => {
+                    const newOrder = [...(answers[currentQuestion] || Array(question.events.length).fill(null))];
+                    newOrder[index] = parseInt(value);
+                    setAnswers(prev => ({ ...prev, [currentQuestion]: newOrder }));
+                  }}
+                >
+                  <SelectTrigger className="w-20">
+                    <SelectValue placeholder="#" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {question.events.map((_, i) => (
+                      <SelectItem key={i} value={i.toString()}>
+                        {i + 1}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span>{event}</span>
+              </div>
+            ))}
+          </div>
+        );
+    }
   };
 
   if (!isActive && score === null) {
@@ -117,6 +275,40 @@ export default function Assessment() {
           <Card>
             <CardContent className="pt-6">
               <div className="space-y-6">
+                <div>
+                  <h2 className="text-lg font-medium mb-2">Question Types</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {questionTypes.map(type => (
+                      <Button
+                        key={type.value}
+                        variant={selectedTypes.includes(type.value) ? "default" : "outline"}
+                        onClick={() => {
+                          setSelectedTypes(prev =>
+                            prev.includes(type.value)
+                              ? prev.filter(t => t !== type.value)
+                              : [...prev, type.value]
+                          );
+                        }}
+                        className="flex items-center gap-2"
+                      >
+                        <ListFilter className="h-4 w-4" />
+                        {type.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h2 className="text-lg font-medium mb-2">Number of Questions</h2>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={50}
+                    value={questionCount}
+                    onChange={(e) => setQuestionCount(parseInt(e.target.value) || 10)}
+                  />
+                </div>
+
                 <div>
                   <h2 className="text-lg font-medium mb-2">Select Category</h2>
                   <div className="flex flex-wrap gap-2">
@@ -138,11 +330,18 @@ export default function Assessment() {
                   <p className="text-muted-foreground">
                     • Duration: 60 minutes<br />
                     • Questions: {filteredQuestions.length}<br />
-                    • Category: {selectedCategory === "all" ? "All Categories" : selectedCategory}
+                    • Category: {selectedCategory === "all" ? "All Categories" : selectedCategory}<br />
+                    • Types: {selectedTypes.map(t => 
+                      questionTypes.find(qt => qt.value === t)?.label
+                    ).join(', ')}
                   </p>
                 </div>
 
-                <Button onClick={handleStart} className="w-full">
+                <Button 
+                  onClick={handleStart} 
+                  className="w-full"
+                  disabled={selectedTypes.length === 0 || filteredQuestions.length === 0}
+                >
                   Start Assessment
                 </Button>
               </div>
@@ -181,23 +380,13 @@ export default function Assessment() {
               <div className="space-y-6">
                 <div>
                   <div className="text-sm font-medium text-muted-foreground mb-2">
-                    {filteredQuestions[currentQuestion].category}
+                    {filteredQuestions[currentQuestion].category} • {
+                      questionTypes.find(t => t.value === filteredQuestions[currentQuestion].type)?.label
+                    }
                   </div>
                   <p className="text-lg mb-4">{filteredQuestions[currentQuestion].question}</p>
 
-                  <RadioGroup
-                    value={answers[currentQuestion]}
-                    onValueChange={(value) => {
-                      setAnswers(prev => ({ ...prev, [currentQuestion]: value }));
-                    }}
-                  >
-                    {filteredQuestions[currentQuestion].options.map((option, index) => (
-                      <div key={index} className="flex items-center space-x-2 mb-2">
-                        <RadioGroupItem value={option} id={`option-${index}`} />
-                        <Label htmlFor={`option-${index}`}>{option}</Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
+                  {renderQuestion(filteredQuestions[currentQuestion])}
                 </div>
 
                 <div className="flex justify-between">
@@ -247,7 +436,24 @@ export default function Assessment() {
               {showExplanation && (
                 <div className="space-y-6 mt-6">
                   {filteredQuestions.map((q, index) => {
-                    const isCorrect = answers[index] === q.correctAnswer;
+                    let isCorrect = false;
+                    switch (q.type) {
+                      case 'multiple-choice':
+                        isCorrect = answers[index] === q.correctAnswer;
+                        break;
+                      case 'fill-in-blank':
+                        isCorrect = q.correctKeywords.some(keyword => 
+                          answers[index]?.toLowerCase().includes(keyword.toLowerCase())
+                        );
+                        break;
+                      case 'true-false':
+                        isCorrect = answers[index] === q.correctAnswer;
+                        break;
+                      case 'chronological':
+                        isCorrect = JSON.stringify(answers[index]) === JSON.stringify(q.correctOrder);
+                        break;
+                    }
+
                     return (
                       <div key={q.id} className="border rounded-lg p-4">
                         <div className="flex items-start gap-2">
@@ -259,11 +465,21 @@ export default function Assessment() {
                           <div>
                             <p className="font-medium mb-2">{q.question}</p>
                             <p className="text-sm text-muted-foreground mb-2">
-                              Your answer: {answers[index]}
+                              Your answer: {
+                                q.type === 'chronological' 
+                                  ? answers[index]?.map((i: number) => q.events[i]).join(' → ')
+                                  : answers[index]?.toString()
+                              }
                             </p>
                             {!isCorrect && (
                               <p className="text-sm text-green-600 dark:text-green-400 mb-2">
-                                Correct answer: {q.correctAnswer}
+                                Correct answer: {
+                                  q.type === 'chronological'
+                                    ? q.correctOrder.map(i => q.events[i]).join(' → ')
+                                    : q.type === 'fill-in-blank'
+                                    ? q.correctKeywords.join(' or ')
+                                    : q.correctAnswer.toString()
+                                }
                               </p>
                             )}
                             <div className="text-sm bg-muted/50 p-3 rounded-lg">
