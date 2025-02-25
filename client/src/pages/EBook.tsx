@@ -44,7 +44,7 @@ interface Subject {
 
 const academicResources = [
   {
-    institution: "University of the Philippines",
+    institution: "University of the Philippines College of Architecture",
     resources: [
       {
         title: "Philippine Architecture: History and Theory",
@@ -52,7 +52,8 @@ const academicResources = [
         year: "2020",
         description: "Comprehensive study of Philippine architectural history, theory, and contemporary practice",
         type: "Textbook",
-        size: "12.5 MB"
+        size: "12.5 MB",
+        tags: ["History", "Theory"]
       },
       {
         title: "Tropical Architecture for the 21st Century",
@@ -60,7 +61,8 @@ const academicResources = [
         year: "2021",
         description: "Modern approaches to climate-responsive design in tropical regions",
         type: "Research Paper",
-        size: "8.2 MB"
+        size: "8.2 MB",
+        tags: ["Climate", "Sustainability"]
       },
       {
         title: "Urban Planning in Philippine Cities",
@@ -68,7 +70,35 @@ const academicResources = [
         year: "2019",
         description: "Analysis of urban development and planning strategies in major Philippine cities",
         type: "Case Study",
-        size: "15.3 MB"
+        size: "15.3 MB",
+        tags: ["Urban Planning"]
+      },
+      {
+        title: "Contemporary Philippine Architecture",
+        author: "UP College of Architecture Faculty",
+        year: "2023",
+        description: "Survey of modern architectural developments and trends in the Philippines",
+        type: "Digital Book",
+        size: "18.7 MB",
+        tags: ["Contemporary", "Practice"]
+      },
+      {
+        title: "Philippine Vernacular Architecture",
+        author: "Dr. Edson Cabalfin",
+        year: "2022",
+        description: "Study of traditional Filipino building techniques and cultural influences",
+        type: "Research Paper",
+        size: "9.5 MB",
+        tags: ["Heritage", "Traditional"]
+      },
+      {
+        title: "Sustainable Design in the Tropics",
+        author: "UP Environmental Planning Program",
+        year: "2023",
+        description: "Guidelines for sustainable architectural practices in tropical environments",
+        type: "Technical Guide",
+        size: "11.2 MB",
+        tags: ["Sustainability"]
       }
     ]
   },
@@ -76,12 +106,13 @@ const academicResources = [
     institution: "Other Academic Resources",
     resources: [
       {
-        title: "Philippine Green Building Standards",
+        title: "Philippine Green Building Code 2024",
         author: "PGBC",
-        year: "2023",
-        description: "Official guidelines for sustainable building practices in the Philippines",
+        year: "2024",
+        description: "Latest guidelines for sustainable building practices in the Philippines",
         type: "Technical Guide",
-        size: "10.1 MB"
+        size: "10.1 MB",
+        tags: ["Standards", "Sustainability"]
       },
       {
         title: "Traditional Filipino Architecture",
@@ -89,7 +120,35 @@ const academicResources = [
         year: "2022",
         description: "Documentation of vernacular architecture and building techniques",
         type: "Research Publication",
-        size: "9.8 MB"
+        size: "9.8 MB",
+        tags: ["Heritage"]
+      },
+      {
+        title: "ASEAN Green Building Guidelines",
+        author: "ASEAN Green Building Council",
+        year: "2023",
+        description: "Regional standards for sustainable architecture in Southeast Asia",
+        type: "Guidelines",
+        size: "7.5 MB",
+        tags: ["Standards", "Regional"]
+      },
+      {
+        title: "Philippine Construction Cost Standards",
+        author: "DPWH",
+        year: "2024",
+        description: "Updated construction cost guidelines and standards",
+        type: "Technical Document",
+        size: "5.2 MB",
+        tags: ["Construction", "Standards"]
+      },
+      {
+        title: "Earthquake Resistant Design in the Philippines",
+        author: "ASEP",
+        year: "2023",
+        description: "Structural design considerations for seismic zones",
+        type: "Technical Guide",
+        size: "12.3 MB",
+        tags: ["Structural", "Safety"]
       }
     ]
   }
@@ -103,35 +162,82 @@ const subjects: Subject[] = [
     chapters: [
       {
         title: "Design Principles",
-        content: `Drawing from Francis D.K. Ching's seminal work, this chapter explores the fundamental elements that govern architectural design. We examine how form, space, and order interact to create meaningful architecture. Understanding these principles is crucial for developing a strong foundation in architectural design.`,
+        content: `Drawing from Francis D.K. Ching's seminal work and Philippine architectural context, this chapter explores the fundamental elements that govern architectural design. We examine how form, space, and order interact to create meaningful architecture, with special emphasis on tropical design considerations and local cultural contexts.`,
         keyPoints: [
-          "Form follows function - Sullivan's principle and its modern interpretations",
-          "Unity through organizational principles - hierarchy, datum, rhythm",
-          "Balance in architectural composition - symmetrical and asymmetrical arrangements",
-          "Spatial relationships - nested, interlocked, and adjacent spaces",
-          "Scale and proportion - human scale, golden section, Le Corbusier's Modulor"
+          "Form follows function in Philippine contemporary architecture",
+          "Integration of indoor-outdoor spaces in tropical design",
+          "Cultural symbolism in architectural forms",
+          "Climate-responsive spatial organization",
+          "Scale and proportion in Philippine architecture"
         ]
       },
       {
         title: "Design Process",
-        content: `Based on contemporary architectural practice and theoretical frameworks, this chapter outlines the systematic approach to architectural design. From initial concept to final documentation, we explore the critical stages that transform ideas into buildable structures.`,
+        content: `Based on contemporary Philippine architectural practice and theoretical frameworks, this chapter outlines the systematic approach to architectural design. From initial concept to final documentation, we explore the critical stages that transform ideas into buildable structures while considering local building regulations and cultural contexts.`,
         keyPoints: [
-          "Pre-design and programming - client needs analysis and site evaluation",
-          "Conceptual design - form generation and spatial organization",
-          "Schematic design - preliminary plans and elevations",
-          "Design development - material selection and system integration",
-          "Construction documentation - technical drawings and specifications"
+          "Site analysis and tropical climate considerations",
+          "Client needs assessment in Philippine context",
+          "Local material integration and sustainability",
+          "Cultural and environmental impact studies",
+          "Building code compliance and documentation"
+        ]
+      }
+    ]
+  },
+  {
+    title: "History of Architecture",
+    icon: History,
+    description: "Evolution of Philippine and global architectural styles",
+    chapters: [
+      {
+        title: "Philippine Architecture",
+        content: "Comprehensive study of Philippine architectural development from pre-colonial to contemporary periods",
+        keyPoints: [
+          "Pre-colonial Filipino architecture",
+          "Spanish colonial influences",
+          "American period developments",
+          "Post-war modernization",
+          "Contemporary Filipino architecture"
         ]
       },
       {
-        title: "Theory and Criticism",
-        content: `Exploring architectural theory through the lens of critical thinkers like Kenneth Frampton and Robert Venturi, this chapter examines the intellectual foundations of architectural design and their impact on contemporary practice.`,
+        title: "Asian Architectural Heritage",
+        content: "Study of architectural traditions across Asia and their influence on Philippine design",
         keyPoints: [
-          "Critical regionalism - cultural context and local identity",
-          "Phenomenology in architecture - experiential design",
-          "Sustainability theories - ecological design principles",
-          "Post-modernism and deconstructivism - challenging modernist dogma",
-          "Contemporary theoretical frameworks - digital age architecture"
+          "Southeast Asian vernacular architecture",
+          "Chinese architectural influences",
+          "Islamic architectural elements",
+          "Japanese design principles",
+          "Modern Asian architecture"
+        ]
+      }
+    ]
+  },
+  {
+    title: "Environmental Design",
+    icon: Trees,
+    description: "Sustainable architecture and environmental systems in tropical contexts",
+    chapters: [
+      {
+        title: "Tropical Design Strategies",
+        content: `Based on Philippine climate conditions and environmental design principles, this chapter explores how buildings can respond to and work with tropical environments while maintaining comfort and efficiency.`,
+        keyPoints: [
+          "Natural ventilation in tropical climates",
+          "Solar shading techniques",
+          "Rainwater management systems",
+          "Passive cooling strategies",
+          "Local material applications"
+        ]
+      },
+      {
+        title: "Sustainable Systems",
+        content: `Drawing from Philippine Green Building Code and local sustainable practices, this chapter examines material selection and system integration for environmental performance in tropical contexts.`,
+        keyPoints: [
+          "Philippine green building standards",
+          "Local sustainable materials",
+          "Energy efficiency in tropical climates",
+          "Water conservation methods",
+          "Waste management systems"
         ]
       }
     ]
@@ -143,18 +249,18 @@ const subjects: Subject[] = [
     chapters: [
       {
         title: "Building Materials",
-        content: `Referenced from Ching's 'Building Construction Illustrated', this chapter provides a comprehensive understanding of construction materials, their properties, and applications. We explore traditional and innovative materials that shape contemporary architecture.`,
+        content: `Referenced from Ching's 'Building Construction Illustrated', this chapter provides a comprehensive understanding of construction materials, their properties, and applications. We explore traditional and innovative materials that shape contemporary architecture, with a focus on materials commonly used in the Philippines.`,
         keyPoints: [
           "Concrete systems - cast-in-place, precast, reinforcement methods",
           "Steel construction - structural systems and connection details",
-          "Wood and engineered wood products - sustainable timber solutions",
-          "Glass and glazing systems - performance and aesthetics",
-          "Emerging materials - composites, smart materials, nanomaterials"
+          "Bamboo and other local materials - sustainable timber solutions",
+          "Indigenous building techniques",
+          "Modern building materials for tropical climates"
         ]
       },
       {
         title: "Construction Methods",
-        content: `Based on current industry practices and construction management principles, this chapter examines various construction techniques and their impact on architectural design decisions.`,
+        content: `Based on current industry practices and construction management principles in the Philippines, this chapter examines various construction techniques and their impact on architectural design decisions.`,
         keyPoints: [
           "Foundation systems - deep and shallow foundations",
           "Structural frameworks - load paths and force distribution",
@@ -165,7 +271,7 @@ const subjects: Subject[] = [
       },
       {
         title: "Advanced Building Technologies",
-        content: `Drawing from contemporary research and practice, this chapter explores cutting-edge construction technologies and their integration into architectural design.`,
+        content: `Drawing from contemporary research and practice, this chapter explores cutting-edge construction technologies and their integration into architectural design.  We also consider the applicability of these technologies within the context of Philippine construction practices.`,
         keyPoints: [
           "Digital fabrication - 3D printing and robotic construction",
           "Prefabrication systems - modular and component-based construction",
@@ -177,86 +283,30 @@ const subjects: Subject[] = [
     ]
   },
   {
-    title: "History of Architecture",
-    icon: History,
-    description: "Evolution of architectural styles through the ages",
-    chapters: [
-      {
-        title: "Classical Architecture",
-        content: "Greek and Roman architectural principles and their influence...",
-        keyPoints: [
-          "Classical orders",
-          "Temple architecture",
-          "Roman engineering",
-          "Classical revival"
-        ]
-      },
-      {
-        title: "Modern Movement",
-        content: "Development of modern architecture in the 20th century...",
-        keyPoints: [
-          "International Style",
-          "Bauhaus movement",
-          "Modernist pioneers",
-          "Post-modernism"
-        ]
-      },
-    ]
-  },
-  {
     title: "Urban Planning",
     icon: Building,
     description: "Principles of city planning and urban design",
     chapters: [
       {
         title: "Urban Design Principles",
-        content: "Understanding the elements of successful urban spaces...",
+        content: "Understanding the elements of successful urban spaces, with a focus on the unique challenges and opportunities of Philippine urban environments.",
         keyPoints: [
-          "Street patterns",
-          "Public spaces",
-          "Mixed-use development",
-          "Transportation systems"
+          "Street patterns and urban form",
+          "Public spaces and community design",
+          "Mixed-use development and urban density",
+          "Sustainable transportation systems"
         ]
       },
       {
         title: "Sustainable Cities",
-        content: "Planning for environmental and social sustainability...",
+        content: "Planning for environmental and social sustainability in Philippine cities, considering the impact of climate change and rapid urbanization.",
         keyPoints: [
-          "Green infrastructure",
-          "Smart cities",
-          "Community planning",
-          "Urban ecology"
+          "Green infrastructure and urban ecology",
+          "Climate change adaptation and mitigation",
+          "Resilient urban planning",
+          "Community participation in urban development"
         ]
       },
-    ]
-  },
-  {
-    title: "Environmental Design",
-    icon: Trees,
-    description: "Principles of sustainable architecture and environmental systems",
-    chapters: [
-      {
-        title: "Climate Responsive Design",
-        content: `Based on environmental design principles from leading practitioners, this chapter explores how buildings can respond to and work with their climate context.`,
-        keyPoints: [
-          "Passive solar design strategies",
-          "Natural ventilation systems",
-          "Thermal mass utilization",
-          "Microclimate modification",
-          "Building orientation and form optimization"
-        ]
-      },
-      {
-        title: "Sustainable Materials and Systems",
-        content: `Drawing from LEED guidelines and sustainable building practices, this chapter examines material selection and system integration for environmental performance.`,
-        keyPoints: [
-          "Life cycle assessment methods",
-          "Renewable material sources",
-          "Energy efficient systems",
-          "Water conservation strategies",
-          "Waste reduction techniques"
-        ]
-      }
     ]
   },
   {
@@ -266,22 +316,22 @@ const subjects: Subject[] = [
     chapters: [
       {
         title: "HVAC Systems",
-        content: "Understanding heating, ventilation, and air conditioning...",
+        content: "Understanding heating, ventilation, and air conditioning systems adapted for tropical climates.",
         keyPoints: [
-          "System types",
-          "Load calculations",
-          "Energy efficiency",
-          "Control systems"
+          "System types for tropical climates",
+          "Load calculations for efficient design",
+          "Energy efficiency measures",
+          "Control systems for optimal performance"
         ]
       },
       {
         title: "Electrical Systems",
-        content: "Building electrical systems and lighting design...",
+        content: "Building electrical systems and lighting design considerations for Philippine contexts.",
         keyPoints: [
-          "Power distribution",
-          "Lighting design",
-          "Emergency systems",
-          "Smart building technology"
+          "Power distribution planning",
+          "Energy-efficient lighting solutions",
+          "Emergency systems and safety standards",
+          "Integration of smart building technology"
         ]
       },
     ]
@@ -293,22 +343,22 @@ const subjects: Subject[] = [
     chapters: [
       {
         title: "Project Management",
-        content: "Managing architectural projects from start to finish...",
+        content: "Managing architectural projects from start to finish within the Philippine professional context.",
         keyPoints: [
-          "Project planning",
-          "Team coordination",
-          "Budget management",
-          "Quality control"
+          "Project planning and scheduling",
+          "Team coordination and communication",
+          "Budget management and cost control",
+          "Quality control and risk management"
         ]
       },
       {
         title: "Legal Aspects",
-        content: "Understanding contracts, regulations, and professional liability...",
+        content: "Understanding contracts, regulations, and professional liability in Philippine architectural practice.",
         keyPoints: [
-          "Building codes",
-          "Contract documents",
-          "Professional ethics",
-          "Risk management"
+          "Philippine building codes and standards",
+          "Contract law and documentation",
+          "Professional ethics and licensing",
+          "Risk management and insurance"
         ]
       },
     ]
@@ -347,22 +397,22 @@ const subjects: Subject[] = [
     chapters: [
       {
         title: "Site Analysis",
-        content: "Methods and considerations for evaluating building sites...",
+        content: "Methods and considerations for evaluating building sites, with a focus on the unique characteristics of Philippine sites.",
         keyPoints: [
-          "Topography analysis",
-          "Environmental factors",
-          "Zoning regulations",
-          "Access and circulation"
+          "Topography analysis and site grading",
+          "Environmental factors and climate considerations",
+          "Zoning regulations and building codes",
+          "Access and circulation planning"
         ]
       },
       {
         title: "Landscape Integration",
-        content: "Integrating architecture with landscape design...",
+        content: "Integrating architecture with landscape design in Philippine contexts.",
         keyPoints: [
-          "Sustainable landscaping",
-          "Hardscape design",
-          "Water management",
-          "Native species selection"
+          "Sustainable landscaping practices",
+          "Hardscape design and materials",
+          "Water management systems",
+          "Selection of native plant species"
         ]
       },
     ]
@@ -374,22 +424,22 @@ const subjects: Subject[] = [
     chapters: [
       {
         title: "Space Planning",
-        content: "Understanding spatial organization and circulation...",
+        content: "Understanding spatial organization and circulation in interior spaces.",
         keyPoints: [
-          "Functional zoning",
-          "Traffic flow analysis",
-          "Program requirements",
-          "Spatial relationships"
+          "Functional zoning and space allocation",
+          "Traffic flow analysis and circulation",
+          "Program requirements and user needs",
+          "Spatial relationships and design considerations"
         ]
       },
       {
         title: "Materials and Finishes",
-        content: "Selection and application of interior materials...",
+        content: "Selection and application of interior materials, considering the climate and culture of the Philippines.",
         keyPoints: [
-          "Material properties",
-          "Durability factors",
-          "Aesthetic considerations",
-          "Sustainability criteria"
+          "Material properties and performance",
+          "Durability factors and maintenance",
+          "Aesthetic considerations and design trends",
+          "Sustainability criteria and environmental impact"
         ]
       },
     ]
