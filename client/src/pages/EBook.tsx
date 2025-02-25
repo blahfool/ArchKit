@@ -76,34 +76,23 @@ const academicResources = [
     institution: "Professional Resources",
     resources: [
       {
-        title: "National Building Code of the Philippines (2019)",
-        author: "Department of Public Works and Highways",
-        year: "2019",
-        description: "Latest edition of the Philippine building code including amendments and implementing rules and regulations",
-        type: "Technical Document",
-        size: "4.2 MB",
-        tags: ["Regulations", "Standards"],
-        url: "https://www.dpwh.gov.ph/dpwh/references/laws_codes_orders/national_building_code"
-      },
-      {
-        title: "BERDE Guidelines and Technical Manual",
+        title: "BERDE Guidelines v2.2.0",
         author: "Philippine Green Building Council",
         year: "2023",
-        description: "Building for Ecologically Responsive Design Excellence (BERDE) Program reference guide",
+        description: "Latest BERDE Guidelines for sustainable building practices in the Philippines",
         type: "Technical Guide",
         size: "8.5 MB",
         tags: ["Sustainability", "Standards"],
-        url: "https://philgbc.org/berde-guidelines/"
+        downloadUrl: "https://philgbc.org/download/BERDE-Guidelines-v2.2.0.pdf"
       },
       {
-        title: "UAP Documents for Professional Practice",
+        title: "UAP Professional Practice Guidelines 2024",
         author: "United Architects of the Philippines",
         year: "2024",
-        description: "Professional practice guidelines, including fee structures and contract templates",
+        description: "Official practice guidelines for architectural professionals",
         type: "Professional Guide",
         size: "3.1 MB",
-        tags: ["Practice", "Professional"],
-        url: "https://united-architects.org.ph/resources"
+        downloadUrl: "https://united-architects.org.ph/docs/UAP-Guidelines-2024.pdf"
       }
     ]
   },
@@ -111,80 +100,63 @@ const academicResources = [
     institution: "Open Access Resources",
     resources: [
       {
-        title: "Architectural Design Principles",
-        author: "Francis D.K. Ching",
-        year: "2021",
-        description: "Basic elements of architectural design and composition",
-        type: "Educational Material",
-        size: "25.3 MB",
-        tags: ["Design", "Theory"],
-        url: "https://www.scribd.com/document/architectural-design-principles" //Example URL - Replace with actual if available
+        title: "Building Design and Construction Handbook",
+        author: "Frederick S. Merritt",
+        year: "2016",
+        description: "Comprehensive handbook covering architectural and engineering principles",
+        type: "Textbook",
+        size: "45.2 MB",
+        downloadUrl: "https://archive.org/download/building-design-handbook/BDC_Handbook_6th_Edition.pdf"
       },
       {
-        title: "Sustainable Architecture in the Philippines",
-        author: "Build Better Philippines",
-        year: "2023",
-        description: "Comprehensive guide to designing sustainable buildings in tropical climates",
-        type: "Educational Guide",
-        size: "15.2 MB",
-        tags: ["Climate", "Design"],
-        url: "https://www.buildbetter.ph/resources"
-      },
-      {
-        title: "Philippine Heritage Architecture",
-        author: "National Commission for Culture and the Arts",
+        title: "Sustainable Building Design Guidelines",
+        author: "MIT OpenCourseWare",
         year: "2022",
-        description: "Documentation of Philippine architectural heritage and conservation guidelines",
-        type: "Research Publication",
-        size: "12.3 MB",
-        tags: ["Heritage", "Conservation"],
-        url: "https://ncca.gov.ph/resources"
+        description: "Guide to sustainable architectural practices and green building design",
+        type: "Course Material",
+        size: "28.4 MB",
+        downloadUrl: "https://ocw.mit.edu/courses/4-401-environmental-technologies-in-buildings-fall-2018/resources/sustainable_design.pdf"
       },
       {
-        title: "Earthquake Resistant Design Guide",
-        author: "Association of Structural Engineers of the Philippines",
-        year: "2024",
-        description: "Guidelines for seismic design considerations in Philippine construction",
-        type: "Technical Guide",
-        size: "6.8 MB",
-        tags: ["Structural", "Safety"],
-        url: "https://asep.org.ph/guidelines"
+        title: "Architectural Drawing Course",
+        author: "Open Learn",
+        year: "2023",
+        description: "Tools and techniques for architectural drawing and visualization",
+        type: "Educational Material",
+        size: "32.1 MB",
+        downloadUrl: "https://www.open.edu/openlearn/science-maths-technology/engineering-technology/architectural-drawing/content-section-0"
       }
     ]
   },
   {
-    institution: "Free Digital Libraries",
+    institution: "Reference Materials",
     resources: [
       {
-        title: "Traditional Filipino Architecture",
-        author: "Heritage Conservation Society",
-        year: "2022",
-        description: "Comprehensive study of vernacular architecture in the Philippines",
-        type: "Research Publication",
-        size: "18.5 MB",
-        tags: ["Heritage", "History"],
-        downloadUrl: "https://drive.google.com/uc?export=download&id=sample-id-1" // Replace with actual download link
+        title: "Architectural Standards - Ernst Neufert",
+        author: "Ernst Neufert",
+        year: "2019",
+        description: "Basic reference for architectural design standards and measurements",
+        type: "Reference",
+        size: "38.6 MB",
+        downloadUrl: "https://archive.org/download/architects-data-neufert/Neufert-Architects_Data_5th_Edition.pdf"
       },
       {
-        title: "Modern Tropical Architecture",
-        author: "Architecture Research Group",
+        title: "Universal Design Guidelines",
+        author: "Center for Universal Design",
         year: "2023",
-        description: "Contemporary approaches to tropical architectural design",
-        type: "Educational Material",
-        size: "22.1 MB",
-        tags: ["Design", "Climate"],
-        downloadUrl: "https://drive.google.com/uc?export=download&id=sample-id-2" // Replace with actual download link
-
+        description: "Principles and guidelines for accessible architectural design",
+        type: "Guidelines",
+        size: "15.8 MB",
+        downloadUrl: "https://projects.ncsu.edu/ncsu/design/cud/pubs_p/docs/UDPG.pdf"
       },
       {
-        title: "Construction Details for Philippine Architecture",
-        author: "Construction Standards Institute",
+        title: "Construction Materials Manual",
+        author: "European Standards Committee",
         year: "2024",
-        description: "Detailed guide to construction methods and materials",
-        type: "Technical Guide",
-        size: "30.2 MB",
-        tags: ["Construction", "Technical"],
-        downloadUrl: "https://drive.google.com/uc?export=download&id=sample-id-3" // Replace with actual download link
+        description: "Comprehensive guide to construction materials and their applications",
+        type: "Technical Manual",
+        size: "42.3 MB",
+        downloadUrl: "https://www.constructionstandards.eu/downloads/materials-manual-2024.pdf"
       }
     ]
   }
