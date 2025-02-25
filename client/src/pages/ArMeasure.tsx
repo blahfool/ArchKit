@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import BackButton from "@/components/BackButton";
-import { Camera, Ruler, Maximize2, Move, RotateCcw } from "lucide-react";
+import { Camera, Ruler, Maximize2, Move, RotateCcw, ArrowLeft } from "lucide-react";
 
 export default function ArMeasure() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -19,8 +18,8 @@ export default function ArMeasure() {
         const stream = await navigator.mediaDevices.getUserMedia({ 
           video: { 
             facingMode: "environment",
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
+            width: { ideal: window.innerWidth },
+            height: { ideal: window.innerHeight }
           } 
         });
         if (videoRef.current) {
@@ -87,7 +86,7 @@ export default function ArMeasure() {
 
       // Draw distance text
       ctx.fillStyle = '#00ff00';
-      ctx.font = '16px sans-serif';
+      ctx.font = '20px sans-serif';
       ctx.fillText(
         `${dist.toFixed(2)}m`,
         (prevPoint.x + x) / 2,
@@ -109,8 +108,8 @@ export default function ArMeasure() {
   const handleCalibrate = () => {
     setCalibrated(true);
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const ctx = canvas?.getContext('2d');
+    if (!ctx || !canvas) return;
 
     // Draw calibration guide
     ctx.strokeStyle = '#00ff00';
@@ -123,7 +122,7 @@ export default function ArMeasure() {
 
     // Draw calibration text
     ctx.fillStyle = '#00ff00';
-    ctx.font = '14px sans-serif';
+    ctx.font = '16px sans-serif';
     ctx.fillText('Place a reference object (e.g., A4 paper) here', canvas.width / 2 - 100, canvas.height / 2 - 20);
   };
 
@@ -138,35 +137,28 @@ export default function ArMeasure() {
   };
 
   return (
-    <div className="min-h-screen p-4 flex flex-col items-center">
-      <h1 className="text-3xl font-bold mb-8">AR Measurement</h1>
+    <div className="fixed inset-0 bg-black">
+      {/* Full screen camera view */}
+      <div className="relative w-full h-full">
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          className="w-full h-full object-cover"
+        />
+        <canvas
+          ref={canvasRef}
+          onClick={handleCanvasClick}
+          className="absolute top-0 left-0 w-full h-full cursor-crosshair"
+        />
 
-      <Card className="w-full max-w-md">
-        <CardContent className="pt-6">
-          <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              className="w-full h-full object-cover"
-            />
-            <canvas
-              ref={canvasRef}
-              onClick={handleCanvasClick}
-              className="absolute top-0 left-0 w-full h-full cursor-crosshair"
-            />
-            {measuring && (
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <div className="w-40 h-40 border-2 border-green-500 rounded-lg opacity-50" />
-                <div className="absolute top-1/2 left-1/2 w-4 h-4 border-2 border-green-500 transform -translate-x-1/2 -translate-y-1/2" />
-              </div>
-            )}
-          </div>
-
-          <div className="flex gap-2 mt-4">
+        {/* Measurement UI overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/50 backdrop-blur-sm">
+          <div className="flex gap-2 mb-4">
             <Button 
               variant={mode === 'distance' ? 'default' : 'outline'}
               onClick={() => setMode('distance')}
+              className="flex-1 bg-white/10 hover:bg-white/20"
             >
               <Ruler className="mr-2 h-4 w-4" />
               Distance
@@ -174,15 +166,16 @@ export default function ArMeasure() {
             <Button 
               variant={mode === 'area' ? 'default' : 'outline'}
               onClick={() => setMode('area')}
+              className="flex-1 bg-white/10 hover:bg-white/20"
             >
               <Maximize2 className="mr-2 h-4 w-4" />
               Area
             </Button>
           </div>
 
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2">
             <Button 
-              className="flex-1"
+              className="flex-1 bg-white/10 hover:bg-white/20"
               onClick={() => setMeasuring(true)}
               disabled={measuring}
             >
@@ -192,6 +185,7 @@ export default function ArMeasure() {
             <Button
               variant="outline"
               onClick={handleReset}
+              className="bg-white/10 hover:bg-white/20"
             >
               <RotateCcw className="h-4 w-4" />
             </Button>
@@ -200,7 +194,7 @@ export default function ArMeasure() {
           {!calibrated && (
             <Button 
               variant="outline" 
-              className="w-full mt-2"
+              className="w-full mt-2 bg-white/10 hover:bg-white/20"
               onClick={handleCalibrate}
             >
               <Camera className="mr-2 h-4 w-4" />
@@ -209,8 +203,8 @@ export default function ArMeasure() {
           )}
 
           {distance && (
-            <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
-              <p className="font-medium text-center">
+            <div className="mt-4 p-4 bg-white/10 rounded-lg border border-white/20">
+              <p className="text-center text-white font-medium">
                 {mode === 'distance' 
                   ? `Distance: ${distance.toFixed(2)} meters`
                   : `Area: ${(distance * distance).toFixed(2)} sq meters`
@@ -219,16 +213,26 @@ export default function ArMeasure() {
             </div>
           )}
 
-          <p className="mt-4 text-sm text-muted-foreground text-center">
+          <p className="mt-4 text-sm text-white/70 text-center">
             {measuring 
-              ? "Click points on the screen to measure between them" 
-              : "Click Start Measuring and calibrate the camera for accurate measurements"
+              ? "Tap points on the screen to measure between them" 
+              : "Tap Start Measuring and calibrate the camera for accurate measurements"
             }
           </p>
-        </CardContent>
-      </Card>
+        </div>
 
-      <BackButton />
+        {/* Back button in top-left corner */}
+        <div className="absolute top-4 left-4">
+          <Button
+            variant="secondary"
+            onClick={() => window.history.back()}
+            className="bg-black/50 hover:bg-black/70 backdrop-blur-sm"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
