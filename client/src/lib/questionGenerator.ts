@@ -5,26 +5,50 @@ interface QuestionTemplate {
   generate: (term: Term) => Question;
 }
 
-interface Question {
+interface BaseQuestion {
   id: number;
   type: string;
   category: string;
   question: string;
-  options?: string[];
-  correctAnswer?: string | boolean | number;
-  correctKeywords?: string[];
-  events?: string[];
-  correctOrder?: number[];
-  formula?: string;
-  tolerance?: number;
-  unit?: string;
   explanation: string;
 }
+
+interface MultipleChoiceQuestion extends BaseQuestion {
+  type: 'multiple-choice';
+  options: string[];
+  correctAnswer: string;
+}
+
+interface TrueFalseQuestion extends BaseQuestion {
+  type: 'true-false';
+  correctAnswer: boolean;
+}
+
+interface FillInBlankQuestion extends BaseQuestion {
+  type: 'fill-in-blank';
+  correctKeywords: string[];
+}
+
+interface ChronologicalQuestion extends BaseQuestion {
+  type: 'chronological';
+  events: string[];
+  correctOrder: number[];
+}
+
+interface CalculationQuestion extends BaseQuestion {
+  type: 'calculation';
+  formula: string;
+  correctAnswer: number;
+  tolerance: number;
+  unit: string;
+}
+
+type Question = MultipleChoiceQuestion | TrueFalseQuestion | FillInBlankQuestion | ChronologicalQuestion | CalculationQuestion;
 
 const templates: QuestionTemplate[] = [
   {
     type: 'multiple-choice',
-    generate: (term: Term) => {
+    generate: (term: Term): MultipleChoiceQuestion => {
       const otherOptions = [
         `Not related to ${term.category}`,
         `Opposite of ${term.term}`,
@@ -44,7 +68,7 @@ const templates: QuestionTemplate[] = [
   },
   {
     type: 'true-false',
-    generate: (term: Term) => ({
+    generate: (term: Term): TrueFalseQuestion => ({
       id: Date.now(),
       type: 'true-false',
       category: term.category,
@@ -55,7 +79,7 @@ const templates: QuestionTemplate[] = [
   },
   {
     type: 'fill-in-blank',
-    generate: (term: Term) => ({
+    generate: (term: Term): FillInBlankQuestion => ({
       id: Date.now(),
       type: 'fill-in-blank',
       category: term.category,
@@ -66,8 +90,7 @@ const templates: QuestionTemplate[] = [
   },
   {
     type: 'calculation',
-    generate: (term: Term) => {
-      // List of architectural calculations
+    generate: (term: Term): CalculationQuestion => {
       const calculations = [
         {
           question: "Calculate the floor area ratio (FAR) for a building with total floor area of 25,000 sq ft on a lot of 10,000 sq ft.",
@@ -99,7 +122,6 @@ const templates: QuestionTemplate[] = [
         }
       ];
 
-      // Pick a random calculation
       const calc = calculations[Math.floor(Math.random() * calculations.length)];
 
       return {
@@ -118,28 +140,23 @@ const templates: QuestionTemplate[] = [
 ];
 
 export function generateQuestions(terms: Term[], count: number, category: string, type: string): Question[] {
-  // Filter terms by category if specified
   const availableTerms = category === "all" 
     ? terms 
     : terms.filter(term => term.category === category);
 
-  // Get the template for the requested question type
   const template = templates.find(t => t.type === type);
   if (!template || availableTerms.length === 0) return [];
 
-  // Generate questions
   const questions: Question[] = [];
   const usedTerms = new Set<number>();
 
   while (questions.length < count && usedTerms.size < availableTerms.length) {
-    // For calculation type, we don't need to track used terms
     if (type === 'calculation') {
-      questions.push(template.generate(availableTerms[0]));
+      questions.push(template.generate(availableTerms[0]) as Question);
       if (questions.length >= count) break;
       continue;
     }
 
-    // For other types, pick a random unused term
     let availableIndices = availableTerms
       .map((_, index) => index)
       .filter(index => !usedTerms.has(index));
@@ -150,7 +167,7 @@ export function generateQuestions(terms: Term[], count: number, category: string
     usedTerms.add(randomIndex);
 
     const term = availableTerms[randomIndex];
-    questions.push(template.generate(term));
+    questions.push(template.generate(term) as Question);
   }
 
   return questions;
