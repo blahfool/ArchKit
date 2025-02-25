@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,7 @@ export default function ArMeasure() {
   const [calibrated, setCalibrated] = useState(false);
   const [mode, setMode] = useState<'distance'|'area'>('distance');
   const [points, setPoints] = useState<{x: number, y: number}[]>([]);
-  
+
   useEffect(() => {
     const startCamera = async () => {
       try {
@@ -40,59 +39,92 @@ export default function ArMeasure() {
     };
   }, []);
 
+  const calculateDistance = (point1: {x: number, y: number}, point2: {x: number, y: number}) => {
+    const dx = point2.x - point1.x;
+    const dy = point2.y - point1.y;
+    const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+
+    // Convert pixel distance to meters using calibration factor
+    const calibrationFactor = calibrated ? 0.01 : 0.015; // meters per pixel
+    return pixelDistance * calibrationFactor;
+  };
+
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!measuring) return;
-    
+
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
-    setPoints(prev => [...prev, {x, y}]);
-    
+
+    const newPoints = [...points, {x, y}];
+    setPoints(newPoints);
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
+
+    // Draw point
     ctx.fillStyle = '#00ff00';
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, 2 * Math.PI);
     ctx.fill();
-    
+
+    // Draw line between points
     if (points.length > 0) {
+      const prevPoint = points[points.length - 1];
       ctx.strokeStyle = '#00ff00';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(points[points.length - 1].x, points[points.length - 1].y);
+      ctx.moveTo(prevPoint.x, prevPoint.y);
       ctx.lineTo(x, y);
       ctx.stroke();
-    }
-  };
 
-  const handleMeasure = () => {
-    setMeasuring(true);
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    setPoints([]);
-    
-    // Simulated AR measurement with improved accuracy
-    if (mode === 'distance') {
-      setTimeout(() => {
-        const simulatedDistance = (Math.random() * 3 + 2) * (calibrated ? 1 : 1.2);
-        setDistance(simulatedDistance);
-        setMeasuring(false);
-      }, 1500);
+      // Calculate and display distance
+      const dist = calculateDistance(prevPoint, {x, y});
+      setDistance(dist);
+
+      // Draw distance text
+      ctx.fillStyle = '#00ff00';
+      ctx.font = '16px sans-serif';
+      ctx.fillText(
+        `${dist.toFixed(2)}m`,
+        (prevPoint.x + x) / 2,
+        (prevPoint.y + y) / 2 - 10
+      );
+    }
+
+    // If in area mode and we have enough points, close the shape
+    if (mode === 'area' && newPoints.length > 2) {
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(newPoints[0].x, newPoints[0].y);
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
   };
 
   const handleCalibrate = () => {
     setCalibrated(true);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Draw calibration guide
+    ctx.strokeStyle = '#00ff00';
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2 - 50, canvas.height / 2);
+    ctx.lineTo(canvas.width / 2 + 50, canvas.height / 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Draw calibration text
+    ctx.fillStyle = '#00ff00';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('Place a reference object (e.g., A4 paper) here', canvas.width / 2 - 100, canvas.height / 2 - 20);
   };
 
   const handleReset = () => {
@@ -108,7 +140,7 @@ export default function ArMeasure() {
   return (
     <div className="min-h-screen p-4 flex flex-col items-center">
       <h1 className="text-3xl font-bold mb-8">AR Measurement</h1>
-      
+
       <Card className="w-full max-w-md">
         <CardContent className="pt-6">
           <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
@@ -151,17 +183,11 @@ export default function ArMeasure() {
           <div className="flex gap-2 mt-4">
             <Button 
               className="flex-1"
-              onClick={handleMeasure}
+              onClick={() => setMeasuring(true)}
               disabled={measuring}
             >
-              {measuring ? (
-                "Measuring..."
-              ) : (
-                <>
-                  <Move className="mr-2 h-4 w-4" />
-                  Start Measuring
-                </>
-              )}
+              <Move className="mr-2 h-4 w-4" />
+              Start Measuring
             </Button>
             <Button
               variant="outline"
@@ -177,23 +203,27 @@ export default function ArMeasure() {
               className="w-full mt-2"
               onClick={handleCalibrate}
             >
+              <Camera className="mr-2 h-4 w-4" />
               Calibrate Camera
             </Button>
           )}
 
           {distance && (
-            <div className="mt-4 p-4 bg-primary/10 rounded-lg text-center">
-              <p className="font-medium">
+            <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
+              <p className="font-medium text-center">
                 {mode === 'distance' 
-                  ? `Measured Distance: ${distance.toFixed(2)} meters`
-                  : `Measured Area: ${(distance * distance).toFixed(2)} sq meters`
+                  ? `Distance: ${distance.toFixed(2)} meters`
+                  : `Area: ${(distance * distance).toFixed(2)} sq meters`
                 }
               </p>
             </div>
           )}
 
           <p className="mt-4 text-sm text-muted-foreground text-center">
-            {measuring ? "Tap points to measure between them" : "Click Start Measuring to begin"}
+            {measuring 
+              ? "Click points on the screen to measure between them" 
+              : "Click Start Measuring and calibrate the camera for accurate measurements"
+            }
           </p>
         </CardContent>
       </Card>
