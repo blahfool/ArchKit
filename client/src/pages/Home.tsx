@@ -116,14 +116,16 @@ export default function Home() {
     <div className="min-h-screen flex flex-col items-center justify-start p-4 relative overflow-hidden">
       {showAnimation && (
         <div className="absolute inset-0 flex items-center justify-center logo-animation">
-          <div className="text-6xl font-light tracking-wide bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
-            <span className="logo-letter">A</span>
-            <span className="logo-letter">r</span>
-            <span className="logo-letter">c</span>
-            <span className="logo-letter">h</span>
-            <span className="logo-letter font-bold">K</span>
-            <span className="logo-letter font-bold">i</span>
-            <span className="logo-letter font-bold">t</span>
+          <div className="text-6xl font-light tracking-wide dark:text-opacity-90 dark:drop-shadow-lg">
+            <span className="bg-gradient-to-r from-primary via-primary/80 to-primary dark:from-white dark:via-white/90 dark:to-white/80 bg-clip-text text-transparent">
+              <span className="logo-letter">A</span>
+              <span className="logo-letter">r</span>
+              <span className="logo-letter">c</span>
+              <span className="logo-letter">h</span>
+              <span className="logo-letter font-bold">K</span>
+              <span className="logo-letter font-bold">i</span>
+              <span className="logo-letter font-bold">t</span>
+            </span>
           </div>
         </div>
       )}
@@ -157,7 +159,7 @@ export default function Home() {
 
       <div className={`w-full max-w-4xl mx-auto text-center pt-12 pb-8 ${showAnimation ? 'opacity-0 animate-content-appear' : 'opacity-100'}`}>
         <h1 className="text-5xl sm:text-6xl font-light mb-4 tracking-tight">
-          <span className="bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-primary via-primary/80 to-primary dark:from-white dark:via-white/90 dark:to-white/80 bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-lg">
             <span className="font-light">Arch</span>
             <span className="font-bold">Kit</span>
           </span>
