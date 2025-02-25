@@ -20,31 +20,15 @@ import { useToast } from "@/hooks/use-toast";
 
 const academicResources = [
   {
-    institution: "Open Access Resources",
+    institution: "NCARB Resources",
     resources: [
       {
-        title: "Building Design and Construction Handbook, 6th Edition",
-        author: "Frederick Merritt & Jonathan Ricketts",
-        year: "2024",
-        description: "Comprehensive handbook covering architectural design, construction methods, and building systems",
-        type: "Reference",
-        url: "https://archive.org/details/building-construction-handbook-6th-edition"
-      },
-      {
-        title: "Architectural Design Standards - Time Saver Standards",
-        author: "Donald Watson",
-        year: "2023",
-        description: "Essential reference for architectural design data and standards",
-        type: "Reference",
-        url: "https://www.academia.edu/44951101/Time_Saver_Standards_for_Architectural_Design_Data"
-      },
-      {
-        title: "Architecture Exam Prep by NCARB",
+        title: "NCARB Official Study Resources",
         author: "NCARB",
         year: "2024",
-        description: "Official study guides and practice questions for architecture licensing exams",
+        description: "Comprehensive collection of official study materials, practice exams, and guidelines for architecture licensing exams",
         type: "Study Material",
-        url: "https://www.ncarb.org/study"
+        url: "https://www.ncarb.org/data-resources/all/study-resources"
       }
     ]
   },
@@ -58,22 +42,6 @@ const academicResources = [
         description: "Complete architecture course materials including lectures, assignments, and readings",
         type: "Course Material",
         url: "https://ocw.mit.edu/courses/architecture/"
-      },
-      {
-        title: "edX - Environmental Technologies in Buildings",
-        author: "ETH Zurich",
-        year: "2024",
-        description: "Free course on sustainable building technologies and environmental design",
-        type: "Course Material",
-        url: "https://www.edx.org/learn/environmental-science/eth-zurich-environmental-technologies-in-buildings"
-      },
-      {
-        title: "Coursera - Construction Management Specialization",
-        author: "Columbia University",
-        year: "2024",
-        description: "Free course series covering construction management principles",
-        type: "Course Material",
-        url: "https://www.coursera.org/specializations/construction-management"
       }
     ]
   },
