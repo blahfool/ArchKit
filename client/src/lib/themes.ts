@@ -8,7 +8,7 @@ export const architecturalThemes: Record<string, Theme> = {
     appearance: "system",
     radius: 0.5,
     colors: {
-      background: "hsl(0 0% 100%)",
+      background: "hsl(220 20% 97%)",
       foreground: "hsl(220 40% 20%)",
       muted: "hsl(220 20% 94%)",
       accent: "hsl(220 40% 40%)",

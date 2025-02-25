@@ -2,15 +2,15 @@ import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  Calculator, 
-  BookOpen, 
-  Ruler, 
-  Book, 
-  Info, 
-  LineChart, 
-  Briefcase, 
-  FileCode, 
+import {
+  Calculator,
+  BookOpen,
+  Ruler,
+  Book,
+  Info,
+  LineChart,
+  Briefcase,
+  FileCode,
   PenSquare,
   ClipboardList,
   ChevronRight
@@ -29,57 +29,57 @@ export default function Home() {
   }, []);
 
   const menuItems = [
-    { 
-      icon: Calculator, 
-      label: "Calculator", 
+    {
+      icon: Calculator,
+      label: "Calculator",
       href: "/calculator",
       description: "Essential architectural calculations and formulas"
     },
-    { 
-      icon: BookOpen, 
-      label: "Terms Index", 
+    {
+      icon: BookOpen,
+      label: "Terms Index",
       href: "/terms",
       description: "Comprehensive architectural terminology guide"
     },
-    { 
-      icon: Ruler, 
-      label: "AR Measure", 
+    {
+      icon: Ruler,
+      label: "AR Measure",
       href: "/ar",
       description: "Augmented reality measurement tools"
     },
-    { 
-      icon: ClipboardList, 
-      label: "Assessment", 
+    {
+      icon: ClipboardList,
+      label: "Assessment",
       href: "/exam",
       description: "Test your architectural knowledge"
     },
-    { 
-      icon: LineChart, 
-      label: "Progress", 
+    {
+      icon: LineChart,
+      label: "Progress",
       href: "/progress",
       description: "Track your learning journey"
     },
-    { 
-      icon: Book, 
-      label: "E-Book", 
+    {
+      icon: Book,
+      label: "E-Book",
       href: "/ebook",
       description: "Digital architectural resources"
     },
-    { 
-      icon: PenSquare, 
-      label: "Portfolio Builder", 
+    {
+      icon: PenSquare,
+      label: "Portfolio Builder",
       href: "/portfolio",
       description: "Create and showcase your work"
     },
-    { 
-      icon: FileCode, 
-      label: "Building Codes", 
+    {
+      icon: FileCode,
+      label: "Building Codes",
       href: "/codes",
       description: "Access building regulations and standards"
     },
-    { 
-      icon: Briefcase, 
-      label: "Professional Tools", 
+    {
+      icon: Briefcase,
+      label: "Professional Tools",
       href: "/professional",
       description: "Resources for practicing architects"
     }
@@ -90,7 +90,7 @@ export default function Home() {
       {/* Initial Logo Animation */}
       {showAnimation && (
         <div className="absolute inset-0 flex items-center justify-center logo-animation">
-          <div className="text-6xl font-light tracking-wide">
+          <div className="text-6xl font-light tracking-wide text-primary">
             <span className="logo-letter">A</span>
             <span className="logo-letter">r</span>
             <span className="logo-letter">c</span>
@@ -103,28 +103,28 @@ export default function Home() {
       )}
 
       {/* Background Elements */}
-      <div 
+      <div
         className={`absolute inset-0 pointer-events-none ${showAnimation ? 'opacity-0 animate-fade-in' : 'opacity-50'}`}
         style={{
           background: `
             linear-gradient(45deg, 
-              rgba(229, 231, 235, 0.05) 25%, 
+              rgba(var(--primary), 0.05) 25%, 
               transparent 25%,
               transparent 75%,
-              rgba(229, 231, 235, 0.05) 75%,
-              rgba(229, 231, 235, 0.05)
+              rgba(var(--primary), 0.05) 75%,
+              rgba(var(--primary), 0.05)
             )
           `,
           backgroundSize: '60px 60px',
         }}
       />
 
-      <div 
+      <div
         className={`absolute inset-0 ${showAnimation ? 'opacity-0 animate-grid-appear' : 'opacity-[0.03]'} pointer-events-none`}
         style={{
           backgroundImage: `
-            linear-gradient(to right, var(--primary) 1px, transparent 1px),
-            linear-gradient(to bottom, var(--primary) 1px, transparent 1px)
+            linear-gradient(to right, hsl(var(--primary)) 1px, transparent 1px),
+            linear-gradient(to bottom, hsl(var(--primary)) 1px, transparent 1px)
           `,
           backgroundSize: '20px 20px'
         }}
@@ -132,8 +132,9 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className={`w-full max-w-4xl mx-auto text-center pt-12 pb-8 ${showAnimation ? 'opacity-0 animate-content-appear' : 'opacity-100'}`}>
-        <h1 className="text-5xl sm:text-6xl font-light mb-4 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
-          Arch<span className="font-bold">Kit</span>
+        <h1 className="text-5xl sm:text-6xl font-light mb-4 tracking-tight">
+          <span className="text-primary">Arch</span>
+          <span className="font-bold text-primary">Kit</span>
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-lg mx-auto">
           Your complete toolkit for architecture studies and professional practice
@@ -143,9 +144,9 @@ export default function Home() {
       {/* Features Grid */}
       <div className={`w-full max-w-4xl mx-auto ${showAnimation ? 'opacity-0 animate-content-appear' : 'opacity-100'}`}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
-          {menuItems.map((item, index) => (
-            <Link 
-              key={item.href} 
+          {menuItems.map((item) => (
+            <Link
+              key={item.href}
               href={item.href}
               className="group"
             >
@@ -167,8 +168,8 @@ export default function Home() {
 
         {/* About Link */}
         <Link href="/about" className="block mt-6">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="w-full flex items-center justify-center gap-2 py-6"
           >
             <Info className="h-5 w-5" />

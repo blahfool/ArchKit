@@ -17,13 +17,20 @@ export default function ThemeSelect() {
     const theme = architecturalThemes[themeName];
     if (!theme) return;
 
-    // Update theme.json values through CSS variables
-    document.documentElement.style.setProperty("--background", theme.colors.background);
-    document.documentElement.style.setProperty("--foreground", theme.colors.foreground);
-    document.documentElement.style.setProperty("--muted", theme.colors.muted);
-    document.documentElement.style.setProperty("--accent", theme.colors.accent);
-    document.documentElement.style.setProperty("--primary", theme.primary);
-    document.documentElement.style.setProperty("--radius", `${theme.radius}rem`);
+    // Update theme CSS variables
+    const root = document.documentElement;
+    const { colors } = theme;
+
+    root.style.setProperty("--background", colors.background);
+    root.style.setProperty("--foreground", colors.foreground);
+    root.style.setProperty("--muted", colors.muted);
+    root.style.setProperty("--accent", colors.accent);
+    root.style.setProperty("--primary", theme.primary);
+    root.style.setProperty("--radius", `${theme.radius}rem`);
+
+    // Update theme.json values through data attributes
+    root.setAttribute('data-theme', theme.variant);
+    root.setAttribute('data-radius', theme.radius.toString());
 
     localStorage.setItem("theme", themeName);
     setCurrentTheme(themeName);
