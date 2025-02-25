@@ -19,11 +19,15 @@ import {
   Lightbulb,
   Briefcase,
   Book,
-  Search
+  Search,
+  Download,
+  FileText,
+  GraduationCap
 } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import StudyNotes from "@/components/StudyNotes";
+import { useToast } from "@/hooks/use-toast";
 
 interface Chapter {
   title: string;
@@ -37,6 +41,59 @@ interface Subject {
   description: string;
   chapters: Chapter[];
 }
+
+const academicResources = [
+  {
+    institution: "University of the Philippines",
+    resources: [
+      {
+        title: "Philippine Architecture: History and Theory",
+        author: "Gerard Lico",
+        year: "2020",
+        description: "Comprehensive study of Philippine architectural history, theory, and contemporary practice",
+        type: "Textbook",
+        size: "12.5 MB"
+      },
+      {
+        title: "Tropical Architecture for the 21st Century",
+        author: "UP College of Architecture",
+        year: "2021",
+        description: "Modern approaches to climate-responsive design in tropical regions",
+        type: "Research Paper",
+        size: "8.2 MB"
+      },
+      {
+        title: "Urban Planning in Philippine Cities",
+        author: "Paulo Alcazaren",
+        year: "2019",
+        description: "Analysis of urban development and planning strategies in major Philippine cities",
+        type: "Case Study",
+        size: "15.3 MB"
+      }
+    ]
+  },
+  {
+    institution: "Other Academic Resources",
+    resources: [
+      {
+        title: "Philippine Green Building Standards",
+        author: "PGBC",
+        year: "2023",
+        description: "Official guidelines for sustainable building practices in the Philippines",
+        type: "Technical Guide",
+        size: "10.1 MB"
+      },
+      {
+        title: "Traditional Filipino Architecture",
+        author: "Heritage Conservation Society",
+        year: "2022",
+        description: "Documentation of vernacular architecture and building techniques",
+        type: "Research Publication",
+        size: "9.8 MB"
+      }
+    ]
+  }
+];
 
 const subjects: Subject[] = [
   {
@@ -343,6 +400,7 @@ export default function EBook() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [studyNotesOpen, setStudyNotesOpen] = useState(false);
+  const { toast } = useToast();
 
   const filteredSubjects = subjects.filter(subject =>
     subject.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -351,6 +409,20 @@ export default function EBook() {
       chapter.content.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
+
+  const filteredResources = academicResources.flatMap(institution =>
+    institution.resources.filter(resource =>
+      resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.description.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
+  const handleDownload = (resource: any) => {
+    toast({
+      title: `Downloading ${resource.title}`,
+      description: `This resource will be available for download in the next update.`
+    });
+  };
 
   return (
     <div className="min-h-screen p-4 pb-20">
@@ -364,14 +436,76 @@ export default function EBook() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             className="pl-9"
-            placeholder="Search subjects or topics..."
+            placeholder="Search subjects, topics, or resources..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
+        {/* Academic Resources Section */}
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <GraduationCap className="h-5 w-5" />
+              Academic Resources
+            </h2>
+            <Accordion type="single" collapsible className="w-full">
+              {academicResources.map((institution, index) => (
+                <AccordionItem key={index} value={`academic-${index}`}>
+                  <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      <div className="text-left">
+                        <div>{institution.institution}</div>
+                        <div className="text-sm text-muted-foreground font-normal">
+                          {institution.resources.length} resources available
+                        </div>
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-4 pt-2">
+                      {institution.resources.map((resource, resourceIndex) => (
+                        <div key={resourceIndex} className="border rounded-lg p-4">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="font-medium mb-1">{resource.title}</h3>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                {resource.description}
+                              </p>
+                              <div className="text-sm text-muted-foreground">
+                                <span className="inline-block mr-4">Author: {resource.author}</span>
+                                <span className="inline-block mr-4">Year: {resource.year}</span>
+                                <span className="inline-block">Size: {resource.size}</span>
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="ml-4"
+                              onClick={() => handleDownload(resource)}
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Download
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </CardContent>
+        </Card>
+
+        {/* Original Course Content Section */}
         <Card>
           <CardContent className="p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <Book className="h-5 w-5" />
+              Course Content
+            </h2>
             <Accordion type="single" collapsible className="w-full">
               {filteredSubjects.map((subject, index) => (
                 <AccordionItem key={index} value={`item-${index}`}>
