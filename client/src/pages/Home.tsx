@@ -1,16 +1,30 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calculator, BookOpen, Ruler, PenTool, Info, LineChart, Book } from "lucide-react";
+import { 
+  Calculator, 
+  BookOpen, 
+  Ruler, 
+  Book, 
+  Info, 
+  LineChart, 
+  Briefcase, 
+  FileCode, 
+  PenSquare,
+  ClipboardList
+} from "lucide-react";
 
 export default function Home() {
   const menuItems = [
     { icon: Calculator, label: "Calculator", href: "/calculator" },
     { icon: BookOpen, label: "Terms Index", href: "/terms" },
     { icon: Ruler, label: "AR Measure", href: "/ar" },
-    { icon: PenTool, label: "Exam Generator", href: "/exam" },
+    { icon: ClipboardList, label: "Assessment", href: "/exam" },
     { icon: LineChart, label: "Progress", href: "/progress" },
     { icon: Book, label: "E-Book", href: "/ebook" },
+    { icon: PenSquare, label: "Portfolio Builder", href: "/portfolio" },
+    { icon: FileCode, label: "Building Codes", href: "/codes" },
+    { icon: Briefcase, label: "Professional Tools", href: "/professional" },
     { icon: Info, label: "About", href: "/about" },
   ];
 

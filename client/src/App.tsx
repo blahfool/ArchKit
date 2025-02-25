@@ -10,9 +10,12 @@ import Home from "@/pages/Home";
 import Calculator from "@/pages/Calculator";
 import TermsIndex from "@/pages/TermsIndex";
 import ArMeasure from "@/pages/ArMeasure";
-import ExamGenerator from "@/pages/ExamGenerator";
+import Assessment from "@/pages/Assessment";
 import Progress from "@/pages/Progress";
 import EBook from "@/pages/EBook";
+import Portfolio from "@/pages/Portfolio";
+import BuildingCodes from "@/pages/BuildingCodes";
+import ProfessionalTools from "@/pages/ProfessionalTools";
 import About from "@/pages/About";
 import NotFound from "@/pages/not-found";
 
@@ -38,9 +41,12 @@ function Router() {
         <Route path="/calculator" component={Calculator} />
         <Route path="/terms" component={TermsIndex} />
         <Route path="/ar" component={ArMeasure} />
-        <Route path="/exam" component={ExamGenerator} />
+        <Route path="/exam" component={Assessment} />
         <Route path="/progress" component={Progress} />
         <Route path="/ebook" component={EBook} />
+        <Route path="/portfolio" component={Portfolio} />
+        <Route path="/codes" component={BuildingCodes} />
+        <Route path="/professional" component={ProfessionalTools} />
         <Route path="/about" component={About} />
         <Route component={NotFound} />
       </Switch>
