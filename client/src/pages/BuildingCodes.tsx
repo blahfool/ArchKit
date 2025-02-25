@@ -8,17 +8,153 @@ import {
   Book, 
   CheckSquare, 
   Globe,
-  ArrowRight
+  ArrowRight,
+  AlertTriangle,
+  Shield,
+  Building,
+  Flame
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useToast } from "@/hooks/use-toast";
+
+interface CodeSection {
+  id: string;
+  title: string;
+  description: string;
+  requirements: string[];
+  references: string[];
+}
 
 export default function BuildingCodes() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSection, setSelectedSection] = useState<CodeSection | null>(null);
+  const { toast } = useToast();
+
+  // Mock building code sections
+  const codeSections: Record<string, CodeSection[]> = {
+    "Building Planning and Design": [
+      {
+        id: "occ-1",
+        title: "Occupancy Classification",
+        description: "Guidelines for determining building occupancy types and related requirements",
+        requirements: [
+          "Assembly (A-1 to A-5)",
+          "Business (B)",
+          "Educational (E)",
+          "Factory (F-1, F-2)",
+          "High Hazard (H-1 to H-5)",
+          "Institutional (I-1 to I-4)",
+          "Mercantile (M)",
+          "Residential (R-1 to R-4)",
+          "Storage (S-1, S-2)",
+          "Utility (U)"
+        ],
+        references: ["IBC Chapter 3", "NFPA 101 Chapter 6"]
+      },
+      {
+        id: "egress-1",
+        title: "Means of Egress",
+        description: "Requirements for safe building evacuation and emergency exits",
+        requirements: [
+          "Minimum number of exits",
+          "Exit access travel distance",
+          "Common path of travel",
+          "Exit discharge",
+          "Emergency lighting",
+          "Exit signs"
+        ],
+        references: ["IBC Chapter 10", "NFPA 101 Chapter 7"]
+      },
+      {
+        id: "access-1",
+        title: "Accessibility Requirements",
+        description: "Standards for accessible design and accommodations",
+        requirements: [
+          "Accessible routes",
+          "Ramps and elevators",
+          "Door clearances",
+          "Bathroom facilities",
+          "Parking spaces"
+        ],
+        references: ["ADA Standards", "ICC A117.1"]
+      }
+    ],
+    "Structural Provisions": [
+      {
+        id: "struct-1",
+        title: "Structural Design Requirements",
+        description: "Basic requirements for structural systems and load calculations",
+        requirements: [
+          "Dead loads",
+          "Live loads",
+          "Wind loads",
+          "Seismic loads",
+          "Load combinations"
+        ],
+        references: ["IBC Chapter 16", "ASCE 7"]
+      },
+      {
+        id: "found-1",
+        title: "Foundation Systems",
+        description: "Requirements for building foundation design and construction",
+        requirements: [
+          "Soil investigation",
+          "Footing design",
+          "Foundation walls",
+          "Waterproofing",
+          "Drainage"
+        ],
+        references: ["IBC Chapter 18", "ASCE 7 Chapter 12"]
+      }
+    ],
+    "Fire Safety": [
+      {
+        id: "fire-1",
+        title: "Fire-Resistance Requirements",
+        description: "Standards for fire-resistant construction and materials",
+        requirements: [
+          "Fire-resistance ratings",
+          "Protected assemblies",
+          "Opening protectives",
+          "Penetration firestopping",
+          "Fire walls and barriers"
+        ],
+        references: ["IBC Chapter 7", "NFPA 251"]
+      },
+      {
+        id: "fire-2",
+        title: "Fire Protection Systems",
+        description: "Requirements for fire suppression and detection systems",
+        requirements: [
+          "Sprinkler systems",
+          "Fire alarm systems",
+          "Smoke control",
+          "Standpipes",
+          "Fire extinguishers"
+        ],
+        references: ["IBC Chapter 9", "NFPA 13"]
+      }
+    ]
+  };
+
+  const runComplianceCheck = () => {
+    toast({
+      title: "Compliance Check Started",
+      description: "Automated compliance checking will be available in the next update."
+    });
+  };
 
   return (
     <div className="min-h-screen p-4 pb-20">
@@ -46,7 +182,7 @@ export default function BuildingCodes() {
                 </div>
               </Button>
 
-              <Button variant="outline" className="h-auto py-4 px-6">
+              <Button variant="outline" className="h-auto py-4 px-6" onClick={runComplianceCheck}>
                 <CheckSquare className="h-5 w-5 mr-3" />
                 <div className="text-left">
                   <div className="font-medium">Compliance Check</div>
@@ -64,65 +200,86 @@ export default function BuildingCodes() {
             </div>
 
             <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-1">
-                <AccordionTrigger>Building Planning and Design</AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-2">
-                    <Button variant="ghost" className="w-full justify-start">
-                      <ArrowRight className="h-4 w-4 mr-2" />
-                      Occupancy Classification
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <ArrowRight className="h-4 w-4 mr-2" />
-                      Means of Egress
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <ArrowRight className="h-4 w-4 mr-2" />
-                      Accessibility Requirements
-                    </Button>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+              {Object.entries(codeSections).map(([category, sections], index) => {
+                const filteredSections = sections.filter(section =>
+                  section.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  section.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  section.requirements.some(req => req.toLowerCase().includes(searchTerm.toLowerCase()))
+                );
 
-              <AccordionItem value="item-2">
-                <AccordionTrigger>Structural Provisions</AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-2">
-                    <Button variant="ghost" className="w-full justify-start">
-                      <ArrowRight className="h-4 w-4 mr-2" />
-                      Structural Design Requirements
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <ArrowRight className="h-4 w-4 mr-2" />
-                      Foundation Systems
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <ArrowRight className="h-4 w-4 mr-2" />
-                      Seismic Design Criteria
-                    </Button>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+                if (searchTerm && filteredSections.length === 0) return null;
 
-              <AccordionItem value="item-3">
-                <AccordionTrigger>Fire Safety</AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-2">
-                    <Button variant="ghost" className="w-full justify-start">
-                      <ArrowRight className="h-4 w-4 mr-2" />
-                      Fire-Resistance Requirements
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <ArrowRight className="h-4 w-4 mr-2" />
-                      Fire Protection Systems
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <ArrowRight className="h-4 w-4 mr-2" />
-                      Emergency Systems
-                    </Button>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+                return (
+                  <AccordionItem key={index} value={`item-${index}`}>
+                    <AccordionTrigger>
+                      <div className="flex items-center gap-2">
+                        {category === "Building Planning and Design" && <Building className="h-5 w-5" />}
+                        {category === "Structural Provisions" && <Shield className="h-5 w-5" />}
+                        {category === "Fire Safety" && <Flame className="h-5 w-5" />}
+                        <span>{category}</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2">
+                        {(searchTerm ? filteredSections : sections).map((section) => (
+                          <Dialog key={section.id}>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                className="w-full justify-start"
+                                onClick={() => setSelectedSection(section)}
+                              >
+                                <ArrowRight className="h-4 w-4 mr-2" />
+                                {section.title}
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>{section.title}</DialogTitle>
+                              </DialogHeader>
+                              <div className="mt-4 space-y-4">
+                                <p className="text-muted-foreground">
+                                  {section.description}
+                                </p>
+
+                                <div>
+                                  <h3 className="font-medium mb-2">Requirements:</h3>
+                                  <ul className="list-disc pl-5 space-y-1">
+                                    {section.requirements.map((req, idx) => (
+                                      <li key={idx} className="text-sm text-muted-foreground">
+                                        {req}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+
+                                <div>
+                                  <h3 className="font-medium mb-2">References:</h3>
+                                  <ul className="list-disc pl-5 space-y-1">
+                                    {section.references.map((ref, idx) => (
+                                      <li key={idx} className="text-sm text-muted-foreground">
+                                        {ref}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+
+                                <div className="bg-muted/50 p-3 rounded-lg flex items-start gap-2">
+                                  <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5" />
+                                  <div className="text-sm">
+                                    <span className="font-medium">Important Note:</span>
+                                    <p>Always verify requirements with local jurisdiction and current code versions.</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
             </Accordion>
           </CardContent>
         </Card>

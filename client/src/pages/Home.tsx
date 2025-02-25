@@ -29,10 +29,10 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative">
-      {/* Brick gradient background */}
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated background elements */}
       <div 
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none opacity-0 animate-fade-in"
         style={{
           background: `
             linear-gradient(45deg, 
@@ -44,13 +44,12 @@ export default function Home() {
             )
           `,
           backgroundSize: '60px 60px',
-          opacity: 0.4
         }}
       />
 
-      {/* Blueprint grid overlay */}
+      {/* Blueprint grid with animation */}
       <div 
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        className="absolute inset-0 opacity-0 animate-grid-appear pointer-events-none"
         style={{
           backgroundImage: `
             linear-gradient(to right, var(--primary) 1px, transparent 1px),
@@ -60,7 +59,16 @@ export default function Home() {
         }}
       />
 
-      <Card className="w-full max-w-lg bg-background/60 backdrop-blur border-primary/20">
+      {/* Geometric shapes */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-10 left-10 w-40 h-40 border border-primary/20 rounded-full opacity-0 animate-shape-appear" />
+        <div className="absolute bottom-20 right-20 w-60 h-60 border border-primary/10 rotate-45 opacity-0 animate-shape-appear" 
+          style={{ animationDelay: '0.2s' }} />
+        <div className="absolute top-1/2 left-1/4 w-20 h-20 border border-primary/30 opacity-0 animate-shape-appear"
+          style={{ animationDelay: '0.4s' }} />
+      </div>
+
+      <Card className="w-full max-w-lg bg-background/60 backdrop-blur border-primary/20 opacity-0 animate-content-appear">
         <CardContent className="pt-8 pb-6">
           <h1 className="text-5xl font-light text-center mb-2 tracking-tight">
             Arch<span className="font-bold">Kit</span>
