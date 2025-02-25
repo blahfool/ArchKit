@@ -14,8 +14,16 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, '../shared'),
     },
   },
-  server: {
-    host: '0.0.0.0',
-    port: 3000,
-  },
+  base: './', // Make all asset paths relative
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'wouter'],
+        }
+      }
+    }
+  }
 });

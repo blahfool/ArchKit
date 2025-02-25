@@ -4,19 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>ArchKit - Architecture Student's Toolkit</title>
-    <meta name="description" content="Essential tools for architecture students - calculations, terms, and AR measurements" />
+    <meta name="description" content="Essential tools for architecture students - calculations, terms, and study materials" />
 
     <!-- PWA Support -->
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="./manifest.json" />
     <meta name="theme-color" content="hsl(220 40% 20%)" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <!-- Icons -->
-    <link rel="icon" type="image/png" href="/icons/icon-192x192.png" />
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-    <meta name="msapplication-TileImage" content="/icons/icon-512x512.png" />
+    <link rel="icon" type="image/png" href="./icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" href="./icons/icon-192x192.png" />
+    <meta name="msapplication-TileImage" content="./icons/icon-512x512.png" />
     <meta name="msapplication-TileColor" content="hsl(220 40% 20%)" />
 
   </head>
@@ -28,12 +28,8 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', async () => {
           try {
-            // Use the current origin for PWA paths
-            const origin = window.location.origin;
-            const swPath = `${origin}/service-worker.js`;
-
-            const registration = await navigator.serviceWorker.register(swPath, {
-              scope: '/',
+            const registration = await navigator.serviceWorker.register('./service-worker.js', {
+              scope: './',
               updateViaCache: 'none' // Never use cached service worker
             });
 

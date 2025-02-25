@@ -1,30 +1,28 @@
-const CACHE_NAME = 'archkit-cache-v3';
+const CACHE_NAME = 'archkit-cache-v4';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/src/main.tsx',
-  '/src/index.css',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
+  './',
+  './index.html',
+  './manifest.json',
+  './src/main.tsx',
+  './src/index.css',
+  './icons/icon-192x192.png',
+  './icons/icon-512x512.png',
   // Add all routes that need to work offline
-  '/calculator',
-  '/terms',
-  '/ar',
-  '/exam',
-  '/progress',
-  '/ebook',
-  '/portfolio',
-  '/codes',
-  '/professional',
-  '/about'
+  './calculator',
+  './terms',
+  './exam',
+  './ebook',
+  './portfolio',
+  './codes',
+  './professional',
+  './about'
 ];
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE.map(path => new URL(path, self.location.origin).href));
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
   self.skipWaiting();
@@ -42,7 +40,6 @@ self.addEventListener('activate', (event) => {
         })
       );
     }).then(() => {
-      // Take control of all clients immediately
       return clients.claim();
     })
   );
@@ -57,15 +54,18 @@ self.addEventListener('fetch', (event) => {
           return response; // Return cached response immediately
         }
 
-        // If not in cache, try network
-        return fetch(event.request)
+        // Clone the request because it can only be used once
+        const fetchRequest = event.request.clone();
+
+        // Try network
+        return fetch(fetchRequest)
           .then(response => {
-            // Don't cache if not a success response
+            // Check if we received a valid response
             if (!response || response.status !== 200) {
               return response;
             }
 
-            // Clone the response as it can only be consumed once
+            // Clone the response because it can only be used once
             const responseToCache = response.clone();
 
             // Add to cache for future offline access
@@ -78,7 +78,7 @@ self.addEventListener('fetch', (event) => {
           })
           .catch(() => {
             // If both cache and network fail, return a fallback
-            return new Response('Offline: Content not available', {
+            return new Response('You are offline. Some content may not be available.', {
               status: 503,
               statusText: 'Service Unavailable',
               headers: new Headers({

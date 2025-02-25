@@ -2,20 +2,20 @@
   "name": "ArchKit - Architecture Student's Toolkit",
   "short_name": "ArchKit",
   "description": "Complete toolkit for architecture students and professionals with study resources, portfolio builder, and assessment tools",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "hsl(220 20% 97%)",
   "theme_color": "hsl(220 40% 20%)",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "./icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "./icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -25,12 +25,12 @@
   "shortcuts": [
     {
       "name": "Take Assessment",
-      "url": "/exam",
+      "url": "./exam",
       "description": "Start an architecture assessment"
     },
     {
       "name": "View Terms",
-      "url": "/terms",
+      "url": "./terms",
       "description": "Browse architecture terms and definitions"
     }
   ],
@@ -41,7 +41,7 @@
   "offline_enabled": true,
   "screenshots": [
     {
-      "src": "/screenshots/home.png",
+      "src": "./screenshots/home.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
