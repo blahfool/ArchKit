@@ -28,6 +28,7 @@ import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import StudyNotes from "@/components/StudyNotes";
 import { useToast } from "@/hooks/use-toast";
+import { saveAs } from 'file-saver';
 
 interface Chapter {
   title: string;
@@ -446,6 +447,29 @@ const subjects: Subject[] = [
   }
 ];
 
+const handleDownload = (resource: any) => {
+  const content = `
+Title: ${resource.title}
+Author: ${resource.author}
+Year: ${resource.year}
+Description: ${resource.description}
+
+This is a placeholder PDF content for ${resource.title}.
+The actual content will be available in the next update.
+
+For more information, please contact:
+University of the Philippines College of Architecture
+`;
+
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  saveAs(blob, `${resource.title.toLowerCase().replace(/\s+/g, '_')}.txt`);
+
+  toast({
+    title: `Downloading ${resource.title}`,
+    description: `A placeholder file has been downloaded. The full document will be available in the next update.`
+  });
+};
+
 export default function EBook() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
@@ -467,12 +491,6 @@ export default function EBook() {
     )
   );
 
-  const handleDownload = (resource: any) => {
-    toast({
-      title: `Downloading ${resource.title}`,
-      description: `This resource will be available for download in the next update.`
-    });
-  };
 
   return (
     <div className="min-h-screen p-4 pb-20">

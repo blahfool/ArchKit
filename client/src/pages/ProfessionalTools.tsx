@@ -27,6 +27,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { saveAs } from 'file-saver';
 
 interface Task {
   id: string;
@@ -44,6 +45,154 @@ interface TimelineEvent {
   endDate: string;
   phase: string;
 }
+
+const generateContractTemplate = () => {
+  const template = `
+STANDARD ARCHITECTURAL SERVICES AGREEMENT
+
+This Agreement is made on [DATE] between:
+
+CLIENT:
+[Client Name]
+[Address]
+[Contact Information]
+
+ARCHITECT:
+[Architect Name]
+[PRC License Number]
+[UAP Member Number]
+[Address]
+[Contact Information]
+
+1. SCOPE OF SERVICES
+   The Architect shall provide the following services:
+   □ Schematic Design
+   □ Design Development
+   □ Construction Documents
+   □ Bidding Assistance
+   □ Construction Administration
+
+2. PROJECT DESCRIPTION
+   Project Name: 
+   Location:
+   Type of Project:
+   Estimated Floor Area:
+   Estimated Project Cost:
+
+3. COMPENSATION
+   Professional Fee: [Amount]
+   Payment Schedule:
+   • Schematic Design: 20%
+   • Design Development: 30%
+   • Construction Documents: 30%
+   • Construction Administration: 20%
+
+4. PROJECT TIMELINE
+   Estimated Start Date:
+   Estimated Completion Date:
+
+5. TERMS AND CONDITIONS
+   [Standard terms as per UAP guidelines]
+
+Signatures:
+
+_________________    _________________
+Client              Architect
+Date:              Date:
+`;
+  return new Blob([template], { type: 'text/plain;charset=utf-8' });
+};
+
+const generateSpecificationTemplate = () => {
+  const template = `
+ARCHITECTURAL SPECIFICATIONS
+
+Project: [Project Name]
+Location: [Project Location]
+Architect: [Architect Name]
+Date: [Date]
+
+DIVISION 1 - GENERAL REQUIREMENTS
+
+1.1 WORK INCLUDED
+    A. Scope of Work
+    B. Project Requirements
+    C. Quality Assurance
+
+1.2 SUBMITTALS
+    A. Shop Drawings
+    B. Product Data
+    C. Samples
+
+DIVISION 2 - SITE WORK
+
+2.1 SITE PREPARATION
+    A. Clearing and Grubbing
+    B. Earthwork
+    C. Grading
+
+DIVISION 3 - CONCRETE
+
+3.1 CAST-IN-PLACE CONCRETE
+    A. Materials
+    B. Mix Design
+    C. Placement
+    D. Finishing
+
+[Continue with other divisions...]
+`;
+  return new Blob([template], { type: 'text/plain;charset=utf-8' });
+};
+
+const generateClientFormTemplate = () => {
+  const template = `
+CLIENT REQUIREMENTS FORM
+
+Project Information:
+□ New Construction
+□ Renovation
+□ Interior Design
+□ Other: __________
+
+1. CLIENT DETAILS
+   Name:
+   Contact Number:
+   Email:
+   Address:
+
+2. PROJECT REQUIREMENTS
+   Intended Use:
+   Estimated Budget:
+   Desired Timeline:
+   Special Requirements:
+
+3. SPACE REQUIREMENTS
+   Total Floor Area:
+   Number of Rooms:
+   Special Facilities:
+
+4. DESIGN PREFERENCES
+   Style Preference:
+   □ Modern
+   □ Traditional
+   □ Contemporary
+   □ Filipino
+   □ Other: __________
+
+5. SUSTAINABILITY GOALS
+   □ BERDE Certification
+   □ LEED Certification
+   □ Energy Efficiency
+   □ Other: __________
+
+6. ADDITIONAL NOTES
+   [Space for additional requirements]
+
+Submitted by: _________________
+Date: _________________
+`;
+  return new Blob([template], { type: 'text/plain;charset=utf-8' });
+};
 
 export default function ProfessionalTools() {
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
@@ -330,9 +479,11 @@ export default function ProfessionalTools() {
                     <div className="space-y-3">
                       <Button variant="outline" className="w-full justify-start"
                         onClick={() => {
+                          const blob = generateContractTemplate();
+                          saveAs(blob, 'contract_template.txt');
                           toast({
-                            title: "Template Generated",
-                            description: "Contract template has been downloaded."
+                            title: "Template Downloaded",
+                            description: "Contract template has been downloaded to your device."
                           });
                         }}
                       >
@@ -341,9 +492,11 @@ export default function ProfessionalTools() {
                       </Button>
                       <Button variant="outline" className="w-full justify-start"
                         onClick={() => {
+                          const blob = generateSpecificationTemplate();
+                          saveAs(blob, 'specifications_template.txt');
                           toast({
-                            title: "Template Generated",
-                            description: "Specification template has been downloaded."
+                            title: "Template Downloaded",
+                            description: "Specification template has been downloaded to your device."
                           });
                         }}
                       >
@@ -352,9 +505,11 @@ export default function ProfessionalTools() {
                       </Button>
                       <Button variant="outline" className="w-full justify-start"
                         onClick={() => {
+                          const blob = generateClientFormTemplate();
+                          saveAs(blob, 'client_form_template.txt');
                           toast({
-                            title: "Template Generated",
-                            description: "Client form template has been downloaded."
+                            title: "Template Downloaded",
+                            description: "Client form template has been downloaded to your device."
                           });
                         }}
                       >
