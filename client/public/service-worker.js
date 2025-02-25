@@ -13,10 +13,9 @@ const ASSETS_TO_CACHE = [
 const DATA_CACHE_NAME = 'archkit-data-v2';
 const API_URLS = ['/api/terms', '/api/formulas'];
 
-// Helper function to get full URL including Replit's environment
+// Helper function to get full URL including origin
 function getFullUrl(path) {
-  const port = self.location.port ? `:${self.location.port}` : '';
-  return `${self.location.protocol}//${self.location.hostname}${port}${path}`;
+  return new URL(path, self.location.origin).href;
 }
 
 // Install event - cache static assets

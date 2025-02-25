@@ -28,8 +28,9 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', async () => {
           try {
-            const port = window.location.port ? `:${window.location.port}` : '';
-            const swPath = `${window.location.protocol}//${window.location.hostname}${port}/service-worker.js`;
+            // Use the current origin for PWA paths
+            const origin = window.location.origin;
+            const swPath = `${origin}/service-worker.js`;
 
             const registration = await navigator.serviceWorker.register(swPath, {
               scope: '/',
