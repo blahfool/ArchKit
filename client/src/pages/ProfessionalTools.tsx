@@ -25,6 +25,7 @@ import {
   Plus,
   Trash2
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Task {
   id: string;
@@ -364,7 +365,7 @@ export default function ProfessionalTools() {
                 </Card>
               </div>
 
-              {/* Cost Estimation */}
+              {/* Cost Estimation Tools */}
               <Card>
                 <CardContent className="pt-6">
                   <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -372,39 +373,149 @@ export default function ProfessionalTools() {
                     Cost Estimation Tools
                   </h2>
                   <div className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start"
-                      onClick={() => {
-                        toast({
-                          title: "Calculator Opened",
-                          description: "Project cost calculator will be available in the next update."
-                        });
-                      }}
-                    >
-                      <CalcIcon className="h-4 w-4 mr-2" />
-                      Project Cost Calculator
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start"
-                      onClick={() => {
-                        toast({
-                          title: "Database Accessed",
-                          description: "Material cost database will be available in the next update."
-                        });
-                      }}
-                    >
-                      <FileSpreadsheet className="h-4 w-4 mr-2" />
-                      Material Cost Database
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start"
-                      onClick={() => {
-                        toast({
-                          title: "Generator Started",
-                          description: "Fee proposal generator will be available in the next update."
-                        });
-                      }}
-                    >
-                      <CheckSquare className="h-4 w-4 mr-2" />
-                      Fee Proposal Generator
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full justify-start">
+                          <CalcIcon className="h-4 w-4 mr-2" />
+                          Project Cost Calculator
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                          <DialogTitle>Project Cost Calculator</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 pt-4">
+                          <div>
+                            <Label>Project Type</Label>
+                            <Select>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select project type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="residential">Residential</SelectItem>
+                                <SelectItem value="commercial">Commercial</SelectItem>
+                                <SelectItem value="industrial">Industrial</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label>Floor Area (sq ft)</Label>
+                            <Input type="number" placeholder="Enter floor area" />
+                          </div>
+                          <div>
+                            <Label>Quality Grade</Label>
+                            <Select>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select quality grade" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="luxury">Luxury</SelectItem>
+                                <SelectItem value="high">High End</SelectItem>
+                                <SelectItem value="medium">Medium</SelectItem>
+                                <SelectItem value="standard">Standard</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <Button className="w-full" onClick={() => {
+                            toast({
+                              title: "Cost Estimate Generated",
+                              description: "Advanced cost calculation will be available in the next update."
+                            });
+                          }}>
+                            Calculate Cost
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full justify-start">
+                          <FileSpreadsheet className="h-4 w-4 mr-2" />
+                          Material Cost Database
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-3xl">
+                        <DialogHeader>
+                          <DialogTitle>Material Cost Database</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 pt-4">
+                          <Input placeholder="Search materials..." />
+                          <div className="border rounded-lg divide-y">
+                            <div className="p-3 flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">Concrete (per cubic yard)</div>
+                                <div className="text-sm text-muted-foreground">Standard mix, 4000 PSI</div>
+                              </div>
+                              <div className="font-medium">$125.00</div>
+                            </div>
+                            <div className="p-3 flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">Steel Reinforcement (per ton)</div>
+                                <div className="text-sm text-muted-foreground">Grade 60</div>
+                              </div>
+                              <div className="font-medium">$1,200.00</div>
+                            </div>
+                            <div className="p-3 flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">Lumber (per board foot)</div>
+                                <div className="text-sm text-muted-foreground">Construction grade</div>
+                              </div>
+                              <div className="font-medium">$3.50</div>
+                            </div>
+                          </div>
+                          <Button className="w-full" onClick={() => {
+                            toast({
+                              title: "Material Database",
+                              description: "Complete material database will be available in the next update."
+                            });
+                          }}>
+                            Download Full Database
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full justify-start">
+                          <CheckSquare className="h-4 w-4 mr-2" />
+                          Fee Proposal Generator
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Fee Proposal Generator</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 pt-4">
+                          <div>
+                            <Label>Project Value</Label>
+                            <Input type="number" placeholder="Enter project value" />
+                          </div>
+                          <div>
+                            <Label>Service Scope</Label>
+                            <Select>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select service scope" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="full">Full Service</SelectItem>
+                                <SelectItem value="design">Design Only</SelectItem>
+                                <SelectItem value="supervision">Supervision Only</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <Button className="w-full" onClick={() => {
+                            toast({
+                              title: "Proposal Generated",
+                              description: "Advanced fee proposal generator will be available in the next update."
+                            });
+                          }}>
+                            Generate Proposal
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </CardContent>
               </Card>
@@ -414,37 +525,173 @@ export default function ProfessionalTools() {
                 <CardContent className="pt-6">
                   <h2 className="text-lg font-semibold mb-4">Professional Resources</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
-                    <Button variant="outline" className="h-auto py-4 px-6">
-                      <FileText className="h-5 w-5 mr-3" />
-                      <div className="text-left">
-                        <div className="font-medium">Practice Guidelines</div>
-                        <div className="text-sm text-muted-foreground">Standard procedures</div>
-                      </div>
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="h-auto py-4 px-6">
+                          <FileText className="h-5 w-5 mr-3" />
+                          <div className="text-left">
+                            <div className="font-medium">Practice Guidelines</div>
+                            <div className="text-sm text-muted-foreground">Standard procedures</div>
+                          </div>
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Practice Guidelines</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 pt-4">
+                          <div className="space-y-2">
+                            {[
+                              'Project Management Procedures',
+                              'Quality Control Guidelines',
+                              'Client Communication Protocol',
+                              'Document Control Systems'
+                            ].map(guide => (
+                              <Button
+                                key={guide}
+                                variant="outline"
+                                className="w-full justify-start h-auto py-3"
+                                onClick={() => {
+                                  toast({
+                                    title: guide,
+                                    description: "This guide will be available in the next update."
+                                  });
+                                }}
+                              >
+                                <FileText className="h-4 w-4 mr-2" />
+                                {guide}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
 
-                    <Button variant="outline" className="h-auto py-4 px-6">
-                      <Users className="h-5 w-5 mr-3" />
-                      <div className="text-left">
-                        <div className="font-medium">Client Relations</div>
-                        <div className="text-sm text-muted-foreground">Communication guides</div>
-                      </div>
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="h-auto py-4 px-6">
+                          <Users className="h-5 w-5 mr-3" />
+                          <div className="text-left">
+                            <div className="font-medium">Client Relations</div>
+                            <div className="text-sm text-muted-foreground">Communication guides</div>
+                          </div>
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Client Relations Resources</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 pt-4">
+                          <div className="space-y-2">
+                            {[
+                              'Client Meeting Templates',
+                              'Presentation Guidelines',
+                              'Communication Best Practices',
+                              'Client Feedback Forms'
+                            ].map(resource => (
+                              <Button
+                                key={resource}
+                                variant="outline"
+                                className="w-full justify-start h-auto py-3"
+                                onClick={() => {
+                                  toast({
+                                    title: resource,
+                                    description: "This resource will be available in the next update."
+                                  });
+                                }}
+                              >
+                                <FileText className="h-4 w-4 mr-2" />
+                                {resource}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
 
-                    <Button variant="outline" className="h-auto py-4 px-6">
-                      <CalcIcon className="h-5 w-5 mr-3" />
-                      <div className="text-left">
-                        <div className="font-medium">Financial Tools</div>
-                        <div className="text-sm text-muted-foreground">Budgeting resources</div>
-                      </div>
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="h-auto py-4 px-6">
+                          <CalcIcon className="h-5 w-5 mr-3" />
+                          <div className="text-left">
+                            <div className="font-medium">Financial Tools</div>
+                            <div className="text-sm text-muted-foreground">Budgeting resources</div>
+                          </div>
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Financial Management Tools</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 pt-4">
+                          <div className="space-y-2">
+                            {[
+                              'Project Budget Templates',
+                              'Cash Flow Forecasting',
+                              'Fee Calculation Guides',
+                              'Financial Report Templates'
+                            ].map(tool => (
+                              <Button
+                                key={tool}
+                                variant="outline"
+                                className="w-full justify-start h-auto py-3"
+                                onClick={() => {
+                                  toast({
+                                    title: tool,
+                                    description: "This tool will be available in the next update."
+                                  });
+                                }}
+                              >
+                                <FileText className="h-4 w-4 mr-2" />
+                                {tool}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
 
-                    <Button variant="outline" className="h-auto py-4 px-6">
-                      <CheckSquare className="h-5 w-5 mr-3" />
-                      <div className="text-left">
-                        <div className="font-medium">Quality Control</div>
-                        <div className="text-sm text-muted-foreground">Review checklists</div>
-                      </div>
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="h-auto py-4 px-6">
+                          <CheckSquare className="h-5 w-5 mr-3" />
+                          <div className="text-left">
+                            <div className="font-medium">Quality Control</div>
+                            <div className="text-sm text-muted-foreground">Review checklists</div>
+                          </div>
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Quality Control Resources</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 pt-4">
+                          <div className="space-y-2">
+                            {[
+                              'Design Review Checklist',
+                              'Construction Document Review',
+                              'Site Inspection Forms',
+                              'Quality Assurance Guidelines'
+                            ].map(resource => (
+                              <Button
+                                key={resource}
+                                variant="outline"
+                                className="w-full justify-start h-auto py-3"
+                                onClick={() => {
+                                  toast({
+                                    title: resource,
+                                    description: "This resource will be available in the next update."
+                                  });
+                                }}
+                              >
+                                <FileText className="h-4 w-4 mr-2" />
+                                {resource}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </CardContent>
               </Card>

@@ -3,16 +3,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
-import { 
-  Search, 
-  Book, 
-  CheckSquare, 
+import {
+  Search,
+  Book,
+  CheckSquare,
   Globe,
   ArrowRight,
   AlertTriangle,
   Shield,
   Building,
-  Flame
+  Flame,
+  Download
 } from "lucide-react";
 import {
   Dialog,
@@ -156,6 +157,53 @@ export default function BuildingCodes() {
     });
   };
 
+  const generateCodeSummary = (section: CodeSection) => {
+    // In a real app, this would generate a PDF
+    const content = `
+# ${section.title}
+${section.description}
+
+## Requirements
+${section.requirements.map(req => `- ${req}`).join('\n')}
+
+## References
+${section.references.map(ref => `- ${ref}`).join('\n')}
+    `;
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${section.title.toLowerCase().replace(/\s+/g, '-')}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Summary Generated",
+      description: "Code summary has been downloaded successfully."
+    });
+  };
+
+  const regions = [
+    { id: 'california', name: 'California' },
+    { id: 'new-york', name: 'New York' },
+    { id: 'texas', name: 'Texas' },
+    { id: 'florida', name: 'Florida' }
+  ];
+
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [isComplianceOpen, setIsComplianceOpen] = useState(false);
+  const [isRegionalOpen, setIsRegionalOpen] = useState(false);
+
+  const handleRegionalGuide = (region: string) => {
+    toast({
+      title: `${region} Building Codes`,
+      description: "Regional building codes will be available in the next update."
+    });
+  };
+
   return (
     <div className="min-h-screen p-4 pb-20">
       <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Building Code Navigator</h1>
@@ -174,29 +222,110 @@ export default function BuildingCodes() {
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4 mb-6">
-              <Button variant="outline" className="h-auto py-4 px-6">
-                <Book className="h-5 w-5 mr-3" />
-                <div className="text-left">
-                  <div className="font-medium">Code Library</div>
-                  <div className="text-sm text-muted-foreground">Browse all codes</div>
-                </div>
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="h-auto py-4 px-6">
+                    <Book className="h-5 w-5 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">Code Library</div>
+                      <div className="text-sm text-muted-foreground">Browse all codes</div>
+                    </div>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl">
+                  <DialogHeader>
+                    <DialogTitle>Code Library</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    {Object.entries(codeSections).map(([category, sections]) => (
+                      <div key={category}>
+                        <h3 className="font-medium mb-2">{category}</h3>
+                        <div className="space-y-2">
+                          {sections.map(section => (
+                            <Card key={section.id}>
+                              <CardContent className="p-4">
+                                <div className="flex justify-between items-start mb-2">
+                                  <h4 className="font-medium">{section.title}</h4>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => generateCodeSummary(section)}
+                                  >
+                                    <Download className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                <p className="text-sm text-muted-foreground mb-2">
+                                  {section.description}
+                                </p>
+                                <div className="text-sm">
+                                  <strong>References:</strong> {section.references.join(', ')}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
 
-              <Button variant="outline" className="h-auto py-4 px-6" onClick={runComplianceCheck}>
-                <CheckSquare className="h-5 w-5 mr-3" />
-                <div className="text-left">
-                  <div className="font-medium">Compliance Check</div>
-                  <div className="text-sm text-muted-foreground">Verify requirements</div>
-                </div>
-              </Button>
+              <Dialog open={isComplianceOpen} onOpenChange={setIsComplianceOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="h-auto py-4 px-6" onClick={runComplianceCheck}>
+                    <CheckSquare className="h-5 w-5 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">Compliance Check</div>
+                      <div className="text-sm text-muted-foreground">Verify requirements</div>
+                    </div>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Compliance Checker</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <p className="text-muted-foreground">
+                      Select building type and requirements to check compliance
+                    </p>
+                    {/* Add compliance checker form here in next iteration */}
+                  </div>
+                </DialogContent>
+              </Dialog>
 
-              <Button variant="outline" className="h-auto py-4 px-6">
-                <Globe className="h-5 w-5 mr-3" />
-                <div className="text-left">
-                  <div className="font-medium">Regional Guides</div>
-                  <div className="text-sm text-muted-foreground">Local regulations</div>
-                </div>
-              </Button>
+              <Dialog open={isRegionalOpen} onOpenChange={setIsRegionalOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="h-auto py-4 px-6">
+                    <Globe className="h-5 w-5 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">Regional Guides</div>
+                      <div className="text-sm text-muted-foreground">Local regulations</div>
+                    </div>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Regional Building Codes</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 pt-4">
+                    {regions.map(region => (
+                      <Button
+                        key={region.id}
+                        variant="outline"
+                        className="justify-start h-auto py-4"
+                        onClick={() => handleRegionalGuide(region.name)}
+                      >
+                        <div className="text-left">
+                          <div className="font-medium">{region.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            View local building codes and regulations
+                          </div>
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             <Accordion type="single" collapsible className="w-full">
