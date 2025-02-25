@@ -9,10 +9,8 @@ interface OfflineDB {
   terms: Term[];
   formulas: Formula[];
   quizScores: { score: number; total: number; timestamp: string }[];
-  studyTime: { duration: number; timestamp: string }[];
   settings: { key: string; value: any }[];
-  assessmentQuestions: { questions: Question[]; timestamp: string; type: string; }[];
-  customTerms: (Term & { isCustom: boolean; createdAt: string })[]; // Updated type for custom terms
+  customTerms: (Term & { isCustom: boolean; createdAt: string })[]; 
 }
 
 class OfflineStorageError extends Error {
@@ -59,9 +57,7 @@ export async function initDB(): Promise<IDBDatabase> {
           { name: 'terms', keyPath: 'id' },
           { name: 'formulas', keyPath: 'id' },
           { name: 'quizScores', keyPath: 'timestamp' },
-          { name: 'studyTime', keyPath: 'timestamp' },
           { name: 'settings', keyPath: 'key' },
-          { name: 'assessmentQuestions', keyPath: 'timestamp' },
           { name: 'customTerms', keyPath: 'id', autoIncrement: true }
         ];
 
@@ -139,28 +135,6 @@ export async function deleteCustomTerm(id: number): Promise<void> {
       request.onerror = () => reject(new OfflineStorageError('Failed to delete term', request.error));
     });
   }, 'Failed to delete custom term');
-}
-
-export async function saveAssessmentQuestions(questions: Question[], type: string): Promise<void> {
-  return withErrorHandling(async () => {
-    await saveToStore('assessmentQuestions', {
-      questions,
-      type,
-      timestamp: new Date().toISOString()
-    });
-  }, 'Failed to save assessment questions');
-}
-
-export async function getLatestAssessmentQuestions(type: string): Promise<Question[] | null> {
-  return withErrorHandling(async () => {
-    const questions = await getAllFromStore<{questions: Question[], timestamp: string, type: string}>('assessmentQuestions');
-    const typeQuestions = questions.filter(q => q.type === type);
-    if (typeQuestions.length === 0) return null;
-
-    return typeQuestions.reduce((prev, current) => 
-      prev.timestamp > current.timestamp ? prev : current
-    ).questions;
-  }, 'Failed to retrieve assessment questions');
 }
 
 export async function syncFromServer(): Promise<boolean> {
@@ -259,26 +233,4 @@ export async function saveCalibrationData(calibrationFactor: number): Promise<vo
 export async function getCalibrationData(): Promise<number | null> {
   const data = await getFromStore<{value: number}>('settings', 'arCalibration');
   return data ? data.value : null;
-}
-
-// Add this function after other export functions
-export async function addStudyTime(duration: number): Promise<void> {
-  return withErrorHandling(async () => {
-    const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction('studyTime', 'readwrite');
-      const store = transaction.objectStore('studyTime');
-      const record = { duration, timestamp: new Date().toISOString() };
-      const request = store.add(record);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(new OfflineStorageError('Failed to add study time', request.error));
-    });
-  }, 'Failed to add study time');
-}
-
-export async function getTotalStudyTime(): Promise<number> {
-  return withErrorHandling(async () => {
-    const records = await getAllFromStore<{ duration: number }>('studyTime');
-    return records.reduce((total, record) => total + record.duration, 0);
-  }, 'Failed to get total study time');
 }
