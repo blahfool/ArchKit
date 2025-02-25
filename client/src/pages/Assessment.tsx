@@ -20,8 +20,13 @@ import {
   AlertCircle,
   ChevronRight,
   ChevronLeft,
-  ListFilter
+  ListFilter,
+  Loader2
 } from "lucide-react";
+import { generateQuestions } from "@/lib/questionGenerator";
+import { fallbackTerms } from "@shared/schema";
+import type { Term } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
 
 interface BaseQuestion {
   id: number;
@@ -55,156 +60,6 @@ interface ChronologicalQuestion extends BaseQuestion {
 
 type Question = MultipleChoiceQuestion | FillInBlankQuestion | TrueFalseQuestion | ChronologicalQuestion;
 
-// Mock questions - extensive set covering various architectural topics
-const mockQuestions: Question[] = [
-  // Design Principles and Theory
-  {
-    id: 1,
-    type: 'multiple-choice',
-    category: "Design Principles",
-    question: "Which architectural principle emphasizes that the shape of a building should primarily be based on its intended function or purpose?",
-    options: [
-      "Form follows function",
-      "Less is more",
-      "Unity in diversity",
-      "Truth to materials"
-    ],
-    correctAnswer: "Form follows function",
-    explanation: "Form follows function, coined by Louis Sullivan, is a principle that suggests the shape of a building or object should primarily be based on its intended function or purpose."
-  },
-  {
-    id: 2,
-    type: 'multiple-choice',
-    category: "Design Principles",
-    question: "In tropical architecture, which design element is most crucial for natural ventilation?",
-    options: [
-      "Cross ventilation with properly placed openings",
-      "Solid concrete walls",
-      "Small windows",
-      "Low ceilings"
-    ],
-    correctAnswer: "Cross ventilation with properly placed openings",
-    explanation: "Cross ventilation is essential in tropical architecture to maintain air flow and reduce heat buildup, achieved through strategic placement of openings."
-  },
-  // Construction Technology
-  {
-    id: 3,
-    type: 'multiple-choice',
-    category: "Construction Technology",
-    question: "What is the primary advantage of using post-tensioned concrete in construction?",
-    options: [
-      "Increased span capabilities with reduced structural depth",
-      "Lower initial cost",
-      "Simpler construction process",
-      "Reduced construction time"
-    ],
-    correctAnswer: "Increased span capabilities with reduced structural depth",
-    explanation: "Post-tensioning allows for longer spans with thinner structural elements, making it ideal for buildings requiring large column-free spaces."
-  },
-  // Environmental Design
-  {
-    id: 4,
-    type: 'true-false',
-    category: "Environmental Design",
-    question: "Green walls only provide aesthetic benefits and do not contribute to building energy efficiency.",
-    correctAnswer: false,
-    explanation: "Green walls provide multiple benefits including thermal insulation, reducing heat gain, improving air quality, and managing stormwater, in addition to aesthetic value."
-  },
-  // Professional Practice
-  {
-    id: 5,
-    type: 'multiple-choice',
-    category: "Professional Practice",
-    question: "Under Philippine law, what is the minimum professional experience required before an architect can apply for registration as an Environmental Planner?",
-    options: [
-      "2 years",
-      "3 years",
-      "5 years",
-      "7 years"
-    ],
-    correctAnswer: "2 years",
-    explanation: "According to Philippine regulations, architects need a minimum of 2 years of professional experience before being eligible for Environmental Planner registration."
-  },
-  // Building Systems
-  {
-    id: 6,
-    type: 'fill-in-blank',
-    category: "Building Systems",
-    question: "A _______ is a mechanical system that removes excess moisture from the air to maintain comfortable indoor humidity levels.",
-    correctKeywords: ["dehumidifier", "dehumidification system"],
-    explanation: "Dehumidifiers are crucial in tropical climates to maintain indoor comfort and prevent mold growth by controlling humidity levels."
-  },
-  // Urban Planning
-  {
-    id: 7,
-    type: 'multiple-choice',
-    category: "Urban Planning",
-    question: "Which urban planning concept promotes the development of self-contained communities with mixed land uses within walking distance?",
-    options: [
-      "Transit-oriented development",
-      "Suburban sprawl",
-      "Industrial zoning",
-      "Commercial strip development"
-    ],
-    correctAnswer: "Transit-oriented development",
-    explanation: "Transit-oriented development focuses on creating walkable communities with mixed uses centered around public transportation hubs."
-  },
-  // Structural Design
-  {
-    id: 8,
-    type: 'multiple-choice',
-    category: "Structural Design",
-    question: "In seismic design, what is the primary purpose of a base isolation system?",
-    options: [
-      "To separate the building from ground motion during earthquakes",
-      "To increase building weight",
-      "To reduce construction costs",
-      "To improve aesthetic appearance"
-    ],
-    correctAnswer: "To separate the building from ground motion during earthquakes",
-    explanation: "Base isolation systems protect buildings during earthquakes by decoupling the structure from ground motion, reducing seismic forces transmitted to the building."
-  },
-  // Materials and Methods
-  {
-    id: 9,
-    type: 'true-false',
-    category: "Materials",
-    question: "Bamboo used in construction must always be treated with preservatives to ensure durability.",
-    correctAnswer: true,
-    explanation: "Untreated bamboo is susceptible to insect attack and decay. Proper treatment with preservatives is essential for durability in construction applications."
-  },
-  // Building Codes
-  {
-    id: 10,
-    type: 'multiple-choice',
-    category: "Building Codes",
-    question: "According to the National Building Code of the Philippines, what is the minimum width requirement for a main stairway in a public building?",
-    options: [
-      "1.20 meters",
-      "1.50 meters",
-      "0.90 meters",
-      "2.00 meters"
-    ],
-    correctAnswer: "1.20 meters",
-    explanation: "The National Building Code requires a minimum width of 1.20 meters for main stairways in public buildings to ensure safe egress during emergencies."
-  },
-  // Heritage Conservation
-  {
-    id: 11,
-    type: 'chronological',
-    category: "Heritage Conservation",
-    question: "Arrange these steps in the correct order for heritage building restoration:",
-    events: [
-      "Documentation and assessment",
-      "Historical research",
-      "Conservation plan development",
-      "Implementation of restoration work",
-      "Post-restoration monitoring"
-    ],
-    correctOrder: [1, 0, 2, 3, 4],
-    explanation: "Proper heritage restoration follows a systematic process starting with historical research, followed by documentation, planning, implementation, and monitoring."
-  }
-];
 
 export default function Assessment() {
   const [score, setScore] = useState<number | null>(null);
@@ -216,8 +71,27 @@ export default function Assessment() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [questionCount, setQuestionCount] = useState(10);
   const [selectedTypes, setSelectedTypes] = useState<string[]>(['multiple-choice']);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const { data: apiTerms } = useQuery<Term[]>({ 
+    queryKey: ["/api/terms"]
+  });
 
-  const categories = ["all", ...new Set(mockQuestions.map(q => q.category))];
+  const categories = [
+    "all",
+    "Design Principles",
+    "Construction Technology",
+    "Environmental Design",
+    "Professional Practice",
+    "Building Systems",
+    "Urban Planning",
+    "Structural Design",
+    "Materials",
+    "Building Codes",
+    "Heritage Conservation"
+  ];
+
   const questionTypes = [
     { value: 'multiple-choice', label: 'Multiple Choice' },
     { value: 'fill-in-blank', label: 'Fill in the Blank' },
@@ -225,10 +99,49 @@ export default function Assessment() {
     { value: 'chronological', label: 'Chronological Order' }
   ];
 
-  const filteredQuestions = mockQuestions
-    .filter(q => selectedCategory === "all" || q.category === selectedCategory)
-    .filter(q => selectedTypes.includes(q.type))
-    .slice(0, questionCount);
+  const handleStart = async () => {
+    setIsLoading(true);
+    try {
+      const terms = apiTerms 
+        ? [...apiTerms, ...fallbackTerms.map((t, i) => ({ ...t, id: 1000 + i }))]
+        : fallbackTerms.map((t, i) => ({ ...t, id: 1000 + i }));
+
+      let generatedQuestions: Question[] = [];
+      for (const type of selectedTypes) {
+        const typeQuestions = generateQuestions(
+          terms,
+          Math.floor(questionCount / selectedTypes.length),
+          selectedCategory,
+          type
+        );
+        generatedQuestions = [...generatedQuestions, ...typeQuestions];
+      }
+
+      if (generatedQuestions.length > 0) {
+        setQuestions(generatedQuestions);
+        setIsActive(true);
+        setScore(null);
+        setAnswers({});
+        setCurrentQuestion(0);
+        setTimeLeft(3600);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to generate questions. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error starting assessment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start assessment. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -246,18 +159,10 @@ export default function Assessment() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleStart = () => {
-    setIsActive(true);
-    setScore(null);
-    setAnswers({});
-    setCurrentQuestion(0);
-    setTimeLeft(3600);
-  };
-
   const handleSubmit = () => {
-    if (!filteredQuestions.length) return;
+    if (!questions.length) return;
 
-    const correct = filteredQuestions.reduce((acc, q, index) => {
+    const correct = questions.reduce((acc, q, index) => {
       const answer = answers[index];
       let isCorrect = false;
 
@@ -281,7 +186,7 @@ export default function Assessment() {
       return acc + (isCorrect ? 1 : 0);
     }, 0);
 
-    setScore((correct / filteredQuestions.length) * 100);
+    setScore((correct / questions.length) * 100);
     setIsActive(false);
     setShowExplanation(true);
   };
@@ -438,7 +343,7 @@ export default function Assessment() {
                   <h2 className="text-lg font-medium mb-2">Exam Details</h2>
                   <p className="text-muted-foreground">
                     • Duration: 60 minutes<br />
-                    • Questions: {filteredQuestions.length}<br />
+                    • Questions: {questions.length}<br />
                     • Category: {selectedCategory === "all" ? "All Categories" : selectedCategory}<br />
                     • Types: {selectedTypes.map(t =>
                       questionTypes.find(qt => qt.value === t)?.label
@@ -449,9 +354,16 @@ export default function Assessment() {
                 <Button
                   onClick={handleStart}
                   className="w-full"
-                  disabled={selectedTypes.length === 0 || filteredQuestions.length === 0}
+                  disabled={selectedTypes.length === 0 || isLoading}
                 >
-                  Start Assessment
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating Questions...
+                    </>
+                  ) : (
+                    'Start Assessment'
+                  )}
                 </Button>
               </div>
             </CardContent>
@@ -476,10 +388,10 @@ export default function Assessment() {
                 <span className="font-medium">{formatTime(timeLeft)}</span>
               </div>
               <div className="text-sm text-muted-foreground">
-                Question {currentQuestion + 1} of {filteredQuestions.length}
+                Question {currentQuestion + 1} of {questions.length}
               </div>
             </div>
-            <Progress value={(currentQuestion + 1) / filteredQuestions.length * 100} className="mb-4" />
+            <Progress value={(currentQuestion + 1) / questions.length * 100} className="mb-4" />
           </CardContent>
         </Card>
 
@@ -489,13 +401,13 @@ export default function Assessment() {
               <div className="space-y-6">
                 <div>
                   <div className="text-sm font-medium text-muted-foreground mb-2">
-                    {filteredQuestions[currentQuestion].category} • {
-                      questionTypes.find(t => t.value === filteredQuestions[currentQuestion].type)?.label
+                    {questions[currentQuestion].category} • {
+                      questionTypes.find(t => t.value === questions[currentQuestion].type)?.label
                     }
                   </div>
-                  <p className="text-lg mb-4">{filteredQuestions[currentQuestion].question}</p>
+                  <p className="text-lg mb-4">{questions[currentQuestion].question}</p>
 
-                  {renderQuestion(filteredQuestions[currentQuestion])}
+                  {renderQuestion(questions[currentQuestion])}
                 </div>
 
                 <div className="flex justify-between">
@@ -509,10 +421,10 @@ export default function Assessment() {
                     Previous
                   </Button>
 
-                  {currentQuestion === filteredQuestions.length - 1 ? (
+                  {currentQuestion === questions.length - 1 ? (
                     <Button
                       onClick={handleSubmit}
-                      disabled={Object.keys(answers).length !== filteredQuestions.length}
+                      disabled={Object.keys(answers).length !== questions.length}
                       className="flex items-center"
                     >
                       Submit
@@ -520,7 +432,7 @@ export default function Assessment() {
                     </Button>
                   ) : (
                     <Button
-                      onClick={() => setCurrentQuestion(prev => Math.min(filteredQuestions.length - 1, prev + 1))}
+                      onClick={() => setCurrentQuestion(prev => Math.min(questions.length - 1, prev + 1))}
                       className="flex items-center"
                     >
                       Next
@@ -544,7 +456,7 @@ export default function Assessment() {
 
               {showExplanation && (
                 <div className="space-y-6 mt-6">
-                  {filteredQuestions.map((q, index) => {
+                  {questions.map((q, index) => {
                     let isCorrect = false;
                     switch (q.type) {
                       case 'multiple-choice':
