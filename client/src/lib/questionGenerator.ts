@@ -24,46 +24,6 @@ type Question = MultipleChoiceQuestion | TrueFalseQuestion;
 // Cache for storing fetched questions
 let questionCache: Question[] = [];
 
-// Function to fetch questions from online source
-async function fetchQuestions(amount: number = 50): Promise<Question[]> {
-  try {
-    // Fetch both multiple choice and true/false questions
-    const [mcResponse, tfResponse] = await Promise.all([
-      fetch(`https://api.opentdb.com/api.php?amount=${amount}&category=24&type=multiple`),
-      fetch(`https://api.opentdb.com/api.php?amount=${amount}&category=24&type=boolean`)
-    ]);
-
-    const [mcData, tfData] = await Promise.all([
-      mcResponse.json(),
-      tfResponse.json()
-    ]);
-
-    const mcQuestions: MultipleChoiceQuestion[] = mcData.results.map((q: any, index: number) => ({
-      id: Date.now() + index,
-      type: 'multiple-choice',
-      category: 'Architecture & Engineering',
-      question: decodeHTMLEntities(q.question),
-      options: [q.correct_answer, ...q.incorrect_answers].map(decodeHTMLEntities).sort(() => Math.random() - 0.5),
-      correctAnswer: decodeHTMLEntities(q.correct_answer),
-      explanation: generateExplanation(q.correct_answer, q.category)
-    }));
-
-    const tfQuestions: TrueFalseQuestion[] = tfData.results.map((q: any, index: number) => ({
-      id: Date.now() + index + 1000,
-      type: 'true-false',
-      category: 'Architecture & Engineering',
-      question: decodeHTMLEntities(q.question),
-      correctAnswer: q.correct_answer === "True",
-      explanation: generateExplanation(q.correct_answer, q.category)
-    }));
-
-    return [...mcQuestions, ...tfQuestions];
-  } catch (error) {
-    console.error('Failed to fetch online questions:', error);
-    return [];
-  }
-}
-
 // Helper function to decode HTML entities
 function decodeHTMLEntities(text: string): string {
   const textarea = document.createElement('textarea');
@@ -74,32 +34,119 @@ function decodeHTMLEntities(text: string): string {
 // Generate detailed explanations for answers
 function generateExplanation(answer: string, category: string): string {
   const explanations = [
-    "This concept is fundamental to architectural design principles.",
-    "Understanding this helps in making informed design decisions.",
-    "This is a key consideration in sustainable architecture.",
-    "This relates to structural integrity and building safety.",
-    "This principle affects both aesthetics and functionality.",
-    "This is crucial for meeting building codes and regulations."
+    "This principle is fundamental to architectural design and planning.",
+    "Understanding this concept is crucial for structural integrity.",
+    "This knowledge is essential for sustainable architecture practices.",
+    "This relates directly to building safety and regulations.",
+    "This concept influences both form and function in design.",
+    "This is a key consideration in modern architectural practices.",
+    "This principle affects spatial organization and flow.",
+    "This element is critical for environmental design considerations."
   ];
 
-  return `The correct answer is ${answer}. ${explanations[Math.floor(Math.random() * explanations.length)]} This type of question often appears in professional architecture examinations.`;
+  return `The correct answer is ${answer}. ${explanations[Math.floor(Math.random() * explanations.length)]} This topic frequently appears in architectural examinations and professional practice.`;
+}
+
+// Function to fetch questions with retries
+async function fetchQuestionsWithRetry(amount: number, retries = 3): Promise<any[]> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const [mcResponse, tfResponse] = await Promise.all([
+        fetch(`https://api.opentdb.com/api.php?amount=${Math.ceil(amount/2)}&category=24&type=multiple`),
+        fetch(`https://api.opentdb.com/api.php?amount=${Math.floor(amount/2)}&category=24&type=boolean`)
+      ]);
+
+      if (!mcResponse.ok || !tfResponse.ok) {
+        throw new Error('Failed to fetch questions');
+      }
+
+      const [mcData, tfData] = await Promise.all([
+        mcResponse.json(),
+        tfResponse.json()
+      ]);
+
+      return [...mcData.results, ...tfData.results];
+    } catch (error) {
+      console.error(`Attempt ${i + 1} failed:`, error);
+      if (i === retries - 1) throw error;
+      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
+    }
+  }
+  return [];
+}
+
+// Function to fetch questions from online source
+async function fetchQuestions(requestedCount: number): Promise<Question[]> {
+  try {
+    // Fetch extra questions to ensure we meet the requested count
+    const results = await fetchQuestionsWithRetry(requestedCount * 1.5);
+
+    const questions: Question[] = [];
+
+    for (const q of results) {
+      const question = decodeHTMLEntities(q.question);
+      const isMultipleChoice = q.type === 'multiple';
+
+      if (isMultipleChoice) {
+        const options = [q.correct_answer, ...q.incorrect_answers]
+          .map(decodeHTMLEntities)
+          .sort(() => Math.random() - 0.5);
+
+        questions.push({
+          id: Date.now() + questions.length,
+          type: 'multiple-choice',
+          category: 'Architecture & Engineering',
+          question,
+          options,
+          correctAnswer: decodeHTMLEntities(q.correct_answer),
+          explanation: generateExplanation(decodeHTMLEntities(q.correct_answer), q.category)
+        });
+      } else {
+        questions.push({
+          id: Date.now() + questions.length,
+          type: 'true-false',
+          category: 'Architecture & Engineering',
+          question,
+          correctAnswer: q.correct_answer === "True",
+          explanation: generateExplanation(q.correct_answer, q.category)
+        });
+      }
+
+      // Stop if we have enough questions
+      if (questions.length >= requestedCount) {
+        break;
+      }
+    }
+
+    return questions;
+  } catch (error) {
+    console.error('Failed to fetch questions:', error);
+    return [];
+  }
 }
 
 // Function to get questions, either from cache or fetch new ones
 async function getQuestions(count: number): Promise<Question[]> {
-  if (questionCache.length < count) {
-    try {
-      const newQuestions = await fetchQuestions();
-      questionCache = [...questionCache, ...newQuestions];
-    } catch (error) {
-      console.error('Error fetching questions:', error);
+  try {
+    const newQuestions = await fetchQuestions(count);
+    if (newQuestions.length >= count) {
+      return newQuestions.slice(0, count);
     }
-  }
 
-  // Shuffle and return requested number of questions
-  return questionCache
-    .sort(() => Math.random() - 0.5)
-    .slice(0, count);
+    // If we couldn't get enough new questions, combine with cache
+    const combinedQuestions = [...newQuestions, ...questionCache];
+    questionCache = combinedQuestions; // Update cache with new questions
+
+    return combinedQuestions
+      .sort(() => Math.random() - 0.5)
+      .slice(0, count);
+  } catch (error) {
+    console.error('Error getting questions:', error);
+    // Fallback to cache if available
+    return questionCache
+      .sort(() => Math.random() - 0.5)
+      .slice(0, count);
+  }
 }
 
 export async function generateQuestions(terms: Term[], count: number, category: string, type: string): Promise<Question[]> {

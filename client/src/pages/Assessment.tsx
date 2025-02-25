@@ -100,13 +100,13 @@ export default function Assessment() {
     setIsLoading(true);
     try {
       const generatedQuestions = await generateQuestions(
-        [],  // We don't need terms for online questions
+        [],  // We don't need terms anymore
         questionCount,
         "all",
         "all"  // Get both multiple-choice and true/false questions
       );
 
-      if (generatedQuestions.length > 0) {
+      if (generatedQuestions.length === questionCount) {
         setQuestions(generatedQuestions);
         setIsActive(true);
         setScore(null);
@@ -116,7 +116,7 @@ export default function Assessment() {
       } else {
         toast({
           title: "Error",
-          description: "Failed to generate questions. Please try again.",
+          description: `Could only generate ${generatedQuestions.length} questions. Please try again or adjust the question count.`,
           variant: "destructive"
         });
       }
@@ -124,7 +124,7 @@ export default function Assessment() {
       console.error('Error starting assessment:', error);
       toast({
         title: "Error",
-        description: "Failed to start assessment. Please try again.",
+        description: "Failed to generate questions. Please check your internet connection and try again.",
         variant: "destructive"
       });
     } finally {
