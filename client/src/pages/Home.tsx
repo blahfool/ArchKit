@@ -159,12 +159,12 @@ export default function Home() {
 
       <div className={`w-full max-w-4xl mx-auto text-center pt-12 pb-8 ${showAnimation ? 'opacity-0 animate-content-appear' : 'opacity-100'}`}>
         <h1 className="text-5xl sm:text-6xl font-light mb-4 tracking-tight">
-          <span className="bg-gradient-to-r from-primary via-primary/80 to-primary dark:from-white dark:via-white/90 dark:to-white/80 bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-lg">
+          <span className="bg-gradient-to-r from-primary via-primary/80 to-primary dark:from-white dark:via-blue-200 dark:to-blue-100 bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
             <span className="font-light">Arch</span>
             <span className="font-bold">Kit</span>
           </span>
         </h1>
-        <p className="text-lg sm:text-xl text-muted-foreground mb-4 max-w-lg mx-auto">
+        <p className="text-lg sm:text-xl text-muted-foreground mb-4 max-w-lg mx-auto dark:text-gray-300">
           Your complete toolkit for architecture studies and professional practice
         </p>
         {canShare && (
