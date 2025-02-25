@@ -46,25 +46,37 @@ const subjects: Subject[] = [
     chapters: [
       {
         title: "Design Principles",
-        content: "Learn about form, function, space, and order in architectural design...",
+        content: `Drawing from Francis D.K. Ching's seminal work, this chapter explores the fundamental elements that govern architectural design. We examine how form, space, and order interact to create meaningful architecture. Understanding these principles is crucial for developing a strong foundation in architectural design.`,
         keyPoints: [
-          "Form follows function",
-          "Unity in design",
-          "Balance and proportion",
-          "Spatial relationships"
+          "Form follows function - Sullivan's principle and its modern interpretations",
+          "Unity through organizational principles - hierarchy, datum, rhythm",
+          "Balance in architectural composition - symmetrical and asymmetrical arrangements",
+          "Spatial relationships - nested, interlocked, and adjacent spaces",
+          "Scale and proportion - human scale, golden section, Le Corbusier's Modulor"
         ]
       },
       {
         title: "Design Process",
-        content: "Understanding the stages of architectural design from concept to completion...",
+        content: `Based on contemporary architectural practice and theoretical frameworks, this chapter outlines the systematic approach to architectural design. From initial concept to final documentation, we explore the critical stages that transform ideas into buildable structures.`,
         keyPoints: [
-          "Site analysis",
-          "Programming",
-          "Schematic design",
-          "Design development",
-          "Construction documents"
+          "Pre-design and programming - client needs analysis and site evaluation",
+          "Conceptual design - form generation and spatial organization",
+          "Schematic design - preliminary plans and elevations",
+          "Design development - material selection and system integration",
+          "Construction documentation - technical drawings and specifications"
         ]
       },
+      {
+        title: "Theory and Criticism",
+        content: `Exploring architectural theory through the lens of critical thinkers like Kenneth Frampton and Robert Venturi, this chapter examines the intellectual foundations of architectural design and their impact on contemporary practice.`,
+        keyPoints: [
+          "Critical regionalism - cultural context and local identity",
+          "Phenomenology in architecture - experiential design",
+          "Sustainability theories - ecological design principles",
+          "Post-modernism and deconstructivism - challenging modernist dogma",
+          "Contemporary theoretical frameworks - digital age architecture"
+        ]
+      }
     ]
   },
   {
@@ -74,24 +86,37 @@ const subjects: Subject[] = [
     chapters: [
       {
         title: "Building Materials",
-        content: "Comprehensive guide to construction materials and their applications...",
+        content: `Referenced from Ching's 'Building Construction Illustrated', this chapter provides a comprehensive understanding of construction materials, their properties, and applications. We explore traditional and innovative materials that shape contemporary architecture.`,
         keyPoints: [
-          "Concrete and masonry",
-          "Steel and metals",
-          "Wood and timber",
-          "Glass and glazing"
+          "Concrete systems - cast-in-place, precast, reinforcement methods",
+          "Steel construction - structural systems and connection details",
+          "Wood and engineered wood products - sustainable timber solutions",
+          "Glass and glazing systems - performance and aesthetics",
+          "Emerging materials - composites, smart materials, nanomaterials"
         ]
       },
       {
         title: "Construction Methods",
-        content: "Modern and traditional construction techniques explained...",
+        content: `Based on current industry practices and construction management principles, this chapter examines various construction techniques and their impact on architectural design decisions.`,
         keyPoints: [
-          "Foundation systems",
-          "Structural systems",
-          "Building envelope",
-          "Construction sequencing"
+          "Foundation systems - deep and shallow foundations",
+          "Structural frameworks - load paths and force distribution",
+          "Building envelope design - weatherproofing and thermal performance",
+          "Construction sequencing - critical path planning",
+          "Quality control methods - testing and inspection protocols"
         ]
       },
+      {
+        title: "Advanced Building Technologies",
+        content: `Drawing from contemporary research and practice, this chapter explores cutting-edge construction technologies and their integration into architectural design.`,
+        keyPoints: [
+          "Digital fabrication - 3D printing and robotic construction",
+          "Prefabrication systems - modular and component-based construction",
+          "Smart building technologies - IoT integration",
+          "High-performance building systems - energy optimization",
+          "Construction automation - emerging tools and methods"
+        ]
+      }
     ]
   },
   {
@@ -149,30 +174,32 @@ const subjects: Subject[] = [
     ]
   },
   {
-    title: "Sustainable Design",
+    title: "Environmental Design",
     icon: Trees,
-    description: "Environmental strategies and green building practices",
+    description: "Principles of sustainable architecture and environmental systems",
     chapters: [
       {
-        title: "Sustainable Principles",
-        content: "Core concepts of sustainable architecture and design...",
+        title: "Climate Responsive Design",
+        content: `Based on environmental design principles from leading practitioners, this chapter explores how buildings can respond to and work with their climate context.`,
         keyPoints: [
-          "Energy efficiency",
-          "Water conservation",
-          "Material selection",
-          "Indoor air quality"
+          "Passive solar design strategies",
+          "Natural ventilation systems",
+          "Thermal mass utilization",
+          "Microclimate modification",
+          "Building orientation and form optimization"
         ]
       },
       {
-        title: "Green Building Systems",
-        content: "Integration of sustainable systems in buildings...",
+        title: "Sustainable Materials and Systems",
+        content: `Drawing from LEED guidelines and sustainable building practices, this chapter examines material selection and system integration for environmental performance.`,
         keyPoints: [
-          "Solar design",
-          "Natural ventilation",
-          "Renewable energy",
-          "Waste management"
+          "Life cycle assessment methods",
+          "Renewable material sources",
+          "Energy efficient systems",
+          "Water conservation strategies",
+          "Waste reduction techniques"
         ]
-      },
+      }
     ]
   },
   {

@@ -36,13 +36,61 @@ innovations, we'll explore how this field has shaped the built environment.
 
 ${chapter.keyPoints ? `
 Learning Objectives and Key Concepts:
-${chapter.keyPoints.map((point, index) => `
-${index + 1}. ${point}
-   • Historical Development: Trace the evolution of ${point.toLowerCase()} through different architectural periods
-   • Contemporary Applications: Modern interpretations and technological innovations
-   • Technical Considerations: Practical implementation guidelines and best practices
-   • Case Studies: Real-world examples demonstrating successful applications
-   • Future Perspectives: Emerging trends and potential developments`).join('\n\n')}
+${chapter.keyPoints.map((point, index) => {
+  let concepts;
+  switch (point.toLowerCase()) {
+    case "form follows function":
+      concepts = `
+   • Spatial efficiency: Understanding how building form supports its intended use
+   • Structural integrity: Relationship between design aesthetics and structural requirements
+   • User experience: Impact of form on occupant comfort and functionality
+   • Environmental response: How building form adapts to climate and context`;
+      break;
+    case "unity in design":
+      concepts = `
+   • Visual harmony: Creating cohesive architectural compositions
+   • Material continuity: Consistent use of materials and finishes
+   • Rhythmic elements: Repetition and pattern in architectural design
+   • Contextual integration: Blending with surrounding environment`;
+      break;
+    case "balance and proportion":
+      concepts = `
+   • Golden ratio: Application of mathematical proportions in design
+   • Symmetrical balance: Traditional approaches to architectural harmony
+   • Asymmetrical balance: Modern interpretations of equilibrium
+   • Scale relationships: Human-centric design proportions`;
+      break;
+    case "spatial relationships":
+      concepts = `
+   • Circulation patterns: Movement flow through spaces
+   • Hierarchy: Organizing spaces by importance and function
+   • Transition zones: Connecting different functional areas
+   • Visual connections: Sight lines and spatial continuity`;
+      break;
+    case "site analysis":
+      concepts = `
+   • Topographical studies: Understanding terrain and elevation
+   • Environmental factors: Climate, sunlight, and wind patterns
+   • Infrastructure assessment: Existing utilities and services
+   • Regulatory constraints: Zoning and building codes`;
+      break;
+    case "programming":
+      concepts = `
+   • Space requirements: Determining functional needs
+   • User analysis: Understanding occupant behaviors
+   • Adjacency studies: Optimal arrangement of spaces
+   • Growth projections: Future expansion considerations`;
+      break;
+    default:
+      concepts = `
+   • Historical Development: Evolution through different periods
+   • Contemporary Applications: Modern interpretations and innovations
+   • Technical Considerations: Implementation guidelines
+   • Future Perspectives: Emerging trends and developments`;
+  }
+  return `
+${index + 1}. ${point}${concepts}`;
+}).join('\n\n')}
 
 Practical Applications:
 Understanding how these concepts translate into real-world scenarios is crucial for architectural practice.
