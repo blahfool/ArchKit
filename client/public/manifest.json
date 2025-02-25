@@ -4,8 +4,8 @@
   "description": "Complete toolkit for architecture students and professionals with study resources, portfolio builder, and assessment tools",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "hsl(220 20% 97%)",
+  "theme_color": "hsl(220 40% 20%)",
   "orientation": "portrait-primary",
   "icons": [
     {

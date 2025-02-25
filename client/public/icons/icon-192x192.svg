@@ -1,12 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4F46E5"/>
-      <stop offset="100%" style="stop-color:#2563EB"/>
+      <stop offset="0%" style="stop-color:hsl(220 40% 20%)"/>
+      <stop offset="100%" style="stop-color:hsl(220 40% 40%)"/>
+    </linearGradient>
+    <linearGradient id="text" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#f0f0f0"/>
     </linearGradient>
   </defs>
+
+  <!-- Background -->
   <rect width="192" height="192" rx="48" fill="url(#bg)"/>
-  <path d="M40 152V56l56-32 56 32v96l-56 32z" fill="none" stroke="white" stroke-width="8"/>
-  <path d="M96 24v128M40 56l112 0M40 152l112 0" stroke="white" stroke-width="4"/>
-  <text x="96" y="104" font-family="Arial" font-size="28" font-weight="bold" text-anchor="middle" fill="white">ArchKit</text>
+
+  <!-- Architectural elements -->
+  <path d="M40 152V56l56-32 56 32v96l-56 32z" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="8"/>
+  <path d="M96 24v128M40 56l112 0M40 152l112 0" stroke="rgba(255,255,255,0.1)" stroke-width="4"/>
+
+  <!-- Text with architectural feel -->
+  <g transform="translate(96,96)">
+    <text 
+      x="0" 
+      y="0" 
+      font-family="system-ui, -apple-system, sans-serif" 
+      font-size="42" 
+      text-anchor="middle" 
+      fill="url(#text)"
+    >
+      <tspan x="0" y="10" font-weight="300">Arch</tspan>
+      <tspan x="0" y="10" dx="64" font-weight="600">Kit</tspan>
+    </text>
+  </g>
 </svg>
