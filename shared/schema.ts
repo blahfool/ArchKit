@@ -263,6 +263,81 @@ export const fallbackTerms = [
     term: "Zoning Requirements",
     definition: "Local regulations controlling land use, building height, setbacks, and density in specific areas.",
     category: "Urban Planning"
+  },
+  {
+    term: "Cantilever",
+    definition: "A structural element that projects horizontally beyond its vertical support, supported on only one end. Common in modern architecture for creating dramatic overhangs and balconies.",
+    category: "Structural Systems"
+  },
+  {
+    term: "Biophilic Design",
+    definition: "An architectural approach that seeks to connect building occupants with nature, incorporating natural materials, vegetation, natural light, and views of nature into the built environment.",
+    category: "Design Principles"
+  },
+  {
+    term: "Parametric Design",
+    definition: "A design process based on algorithmic thinking, using parameters and rules to define the relationship between design intent and design response.",
+    category: "Digital Tools"
+  },
+  {
+    term: "Building Commissioning",
+    definition: "A systematic process of verifying that building systems are installed, calibrated, and perform according to design intent and owner's operational needs.",
+    category: "Building Systems"
+  },
+  {
+    term: "Acoustical Design",
+    definition: "The science and art of managing sound within buildings, including sound isolation, room acoustics, and mechanical system noise control.",
+    category: "Environmental Design"
+  },
+  {
+    term: "Building Envelope Commissioning",
+    definition: "Process of testing and verifying the performance of exterior wall systems, including air barriers, waterproofing, and thermal performance.",
+    category: "Building Systems"
+  },
+  {
+    term: "Net Zero Energy Building",
+    definition: "A building that produces as much energy as it consumes over the course of a year, typically through a combination of energy efficiency and renewable energy production.",
+    category: "Sustainability"
+  },
+  {
+    term: "Space Syntax",
+    definition: "A set of theories and techniques for analyzing spatial configurations and understanding how spatial layout affects human behavior and movement patterns.",
+    category: "Design Theory"
+  },
+  {
+    term: "Building Typology",
+    definition: "The systematic classification of buildings based on common characteristics, including form, function, construction method, and historical period.",
+    category: "Architectural Theory"
+  },
+  {
+    term: "Design Development",
+    definition: "Phase of architectural design process where initial concepts are refined, including detailed drawings, material selections, and system specifications.",
+    category: "Professional Practice"
+  },
+  {
+    term: "Thermal Mass",
+    definition: "Materials with high heat capacity used to stabilize temperature fluctuations in buildings by absorbing and releasing heat slowly.",
+    category: "Environmental Design"
+  },
+  {
+    term: "Program Analysis",
+    definition: "Systematic evaluation of client requirements, spatial needs, functional relationships, and operational parameters to inform architectural design.",
+    category: "Design Process"
+  },
+  {
+    term: "Building Performance Simulation",
+    definition: "Computer-based modeling to predict and optimize building performance aspects including energy use, daylighting, and thermal comfort.",
+    category: "Digital Tools"
+  },
+  {
+    term: "Integrated Project Delivery",
+    definition: "Collaborative project delivery approach integrating people, systems, and practices into a process that optimizes project results.",
+    category: "Professional Practice"
+  },
+  {
+    term: "Passive House",
+    definition: "Ultra-low energy building standard requiring minimal heating/cooling, achieved through superinsulation, airtightness, and heat recovery ventilation.",
+    category: "Sustainability"
   }
 ];
 

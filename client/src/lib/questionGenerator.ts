@@ -21,139 +21,109 @@ interface TrueFalseQuestion extends BaseQuestion {
 
 type Question = MultipleChoiceQuestion | TrueFalseQuestion;
 
-// Cache for storing fetched questions
-let questionCache: Question[] = [];
+function generateMultipleChoiceQuestion(term: Term, allTerms: Term[]): MultipleChoiceQuestion {
+  // Find related terms in the same category for more challenging options
+  const relatedTerms = allTerms.filter(t => 
+    t.category === term.category && t.id !== term.id
+  );
 
-// Helper function to decode HTML entities
-function decodeHTMLEntities(text: string): string {
-  const textarea = document.createElement('textarea');
-  textarea.innerHTML = text;
-  return textarea.value;
-}
-
-// Generate detailed explanations for answers
-function generateExplanation(answer: string, category: string): string {
-  const explanations = [
-    "This principle is fundamental to architectural design and planning.",
-    "Understanding this concept is crucial for structural integrity.",
-    "This knowledge is essential for sustainable architecture practices.",
-    "This relates directly to building safety and regulations.",
-    "This concept influences both form and function in design.",
-    "This is a key consideration in modern architectural practices."
+  // Question templates for variety
+  const questionTemplates = [
+    `Which of the following best describes ${term.term}?`,
+    `In architectural design, what is the primary function of ${term.term}?`,
+    `How is ${term.term} typically implemented in architectural practice?`,
+    `What is the key characteristic of ${term.term}?`
   ];
 
-  return `The correct answer is ${answer}. ${explanations[Math.floor(Math.random() * explanations.length)]} This topic frequently appears in architectural examinations and professional practice.`;
+  // Create plausible but incorrect options
+  const incorrectOptions = relatedTerms
+    .map(t => t.definition)
+    .filter(def => def !== term.definition)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3);
+
+  return {
+    id: Date.now(),
+    type: 'multiple-choice',
+    category: term.category,
+    question: questionTemplates[Math.floor(Math.random() * questionTemplates.length)],
+    options: [term.definition, ...incorrectOptions].sort(() => Math.random() - 0.5),
+    correctAnswer: term.definition,
+    explanation: `${term.term} is ${term.definition}. This concept is important in ${term.category.toLowerCase()}.`
+  };
 }
 
-// Function to fetch questions with retries
-async function fetchQuestionsWithRetry(amount: number, retries = 3): Promise<any[]> {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const [mcResponse, tfResponse] = await Promise.all([
-        fetch(`https://api.opentdb.com/api.php?amount=${Math.ceil(amount/2)}&category=24&type=multiple`),
-        fetch(`https://api.opentdb.com/api.php?amount=${Math.floor(amount/2)}&category=24&type=boolean`)
-      ]);
-
-      if (!mcResponse.ok || !tfResponse.ok) {
-        throw new Error('Failed to fetch questions');
-      }
-
-      const [mcData, tfData] = await Promise.all([
-        mcResponse.json(),
-        tfResponse.json()
-      ]);
-
-      return [...mcData.results, ...tfData.results];
-    } catch (error) {
-      console.error(`Attempt ${i + 1} failed:`, error);
-      if (i === retries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
+function generateTrueFalseQuestion(term: Term, allTerms: Term[]): TrueFalseQuestion {
+  // Generate true/false statements about the term
+  const trueFalseTemplates = [
+    { 
+      statement: term.definition,
+      isTrue: true
+    },
+    { 
+      statement: `${term.term} is primarily used for ${allTerms.find(t => t.category !== term.category)?.definition.toLowerCase() || 'a different purpose entirely'}`,
+      isTrue: false
+    },
+    {
+      statement: `${term.term} is a key concept in ${term.category}`,
+      isTrue: true
     }
-  }
-  return [];
-}
+  ];
 
-// Function to fetch questions from online source
-async function fetchQuestions(requestedCount: number): Promise<Question[]> {
-  try {
-    const questions: Question[] = [];
-    let attempts = 0;
-    const maxAttempts = 3;
+  const selectedTemplate = trueFalseTemplates[Math.floor(Math.random() * trueFalseTemplates.length)];
 
-    while (questions.length < requestedCount && attempts < maxAttempts) {
-      const results = await fetchQuestionsWithRetry(requestedCount * 2);
-      console.log(`Fetched ${results.length} questions from API`);
-
-      for (const q of results) {
-        const question = decodeHTMLEntities(q.question);
-        const isMultipleChoice = q.type === 'multiple';
-
-        if (isMultipleChoice) {
-          const options = [q.correct_answer, ...q.incorrect_answers]
-            .map(decodeHTMLEntities)
-            .sort(() => Math.random() - 0.5);
-
-          questions.push({
-            id: Date.now() + questions.length,
-            type: 'multiple-choice',
-            category: 'Architecture & Engineering',
-            question,
-            options,
-            correctAnswer: decodeHTMLEntities(q.correct_answer),
-            explanation: generateExplanation(decodeHTMLEntities(q.correct_answer), q.category)
-          });
-        } else {
-          questions.push({
-            id: Date.now() + questions.length,
-            type: 'true-false',
-            category: 'Architecture & Engineering',
-            question,
-            correctAnswer: q.correct_answer === "True",
-            explanation: generateExplanation(q.correct_answer, q.category)
-          });
-        }
-
-        if (questions.length >= requestedCount) {
-          break;
-        }
-      }
-
-      attempts++;
-    }
-
-    console.log(`Generated ${questions.length} questions total`);
-    return questions;
-  } catch (error) {
-    console.error('Failed to fetch questions:', error);
-    return [];
-  }
+  return {
+    id: Date.now(),
+    type: 'true-false',
+    category: term.category,
+    question: `True or False: ${selectedTemplate.statement}`,
+    correctAnswer: selectedTemplate.isTrue,
+    explanation: selectedTemplate.isTrue 
+      ? `This statement is correct. ${term.term} ${term.definition}`
+      : `This statement is false. ${term.term} actually ${term.definition}`
+  };
 }
 
 export async function generateQuestions(terms: Term[], count: number, category: string, type: string): Promise<Question[]> {
   try {
-    const newQuestions = await fetchQuestions(count);
-    if (newQuestions.length >= count) {
-      return newQuestions.slice(0, count);
+    const availableTerms = category === "all" 
+      ? terms 
+      : terms.filter(term => term.category === category);
+
+    if (availableTerms.length === 0) {
+      throw new Error('No terms available for question generation');
     }
 
-    // If we couldn't get enough new questions, combine with cache
-    const combinedQuestions = [...newQuestions, ...questionCache];
-    questionCache = combinedQuestions; // Update cache with new questions
+    const questions: Question[] = [];
+    const usedTerms = new Set<number>();
 
-    const finalQuestions = combinedQuestions
-      .sort(() => Math.random() - 0.5)
-      .slice(0, count);
+    while (questions.length < count && usedTerms.size < availableTerms.length) {
+      // Get random unused term
+      const availableIndices = availableTerms
+        .map((_, index) => index)
+        .filter(index => !usedTerms.has(index));
 
-    console.log(`Returning ${finalQuestions.length} questions`);
-    return finalQuestions;
+      if (availableIndices.length === 0) break;
+
+      const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+      usedTerms.add(randomIndex);
+      const term = availableTerms[randomIndex];
+
+      // Generate either multiple choice or true/false question
+      const questionType = type === 'all'
+        ? Math.random() > 0.5 ? 'multiple-choice' : 'true-false'
+        : type;
+
+      if (questionType === 'multiple-choice') {
+        questions.push(generateMultipleChoiceQuestion(term, availableTerms));
+      } else {
+        questions.push(generateTrueFalseQuestion(term, availableTerms));
+      }
+    }
+
+    return questions.slice(0, count);
   } catch (error) {
-    console.error('Error getting questions:', error);
-    // Fallback to cache if available
-    const cachedQuestions = questionCache
-      .sort(() => Math.random() - 0.5)
-      .slice(0, count);
-
-    console.log(`Returning ${cachedQuestions.length} cached questions`);
-    return cachedQuestions;
+    console.error('Error generating questions:', error);
+    return [];
   }
 }
