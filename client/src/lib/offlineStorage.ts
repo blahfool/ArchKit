@@ -11,7 +11,7 @@ interface OfflineDB {
   studyTime: { duration: number; timestamp: string }[];
   settings: { key: string; value: any }[];
   assessmentQuestions: { questions: Question[]; timestamp: string; type: string; }[];
-  customTerms: Term[]; // New store for user-added terms
+  customTerms: (Term & { isCustom: boolean; createdAt: string })[]; // Updated type for custom terms
 }
 
 export async function initDB(): Promise<IDBDatabase> {

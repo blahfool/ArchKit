@@ -11,10 +11,15 @@ import { fallbackTerms } from "@shared/schema";
 import { getCustomTerms, deleteCustomTerm } from "@/lib/offlineStorage";
 import { useToast } from "@/hooks/use-toast";
 
+interface CustomTerm extends Term {
+  isCustom: boolean;
+  createdAt: string;
+}
+
 export default function TermsIndex() {
   const [search, setSearch] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-  const [customTerms, setCustomTerms] = useState<Term[]>([]);
+  const [customTerms, setCustomTerms] = useState<CustomTerm[]>([]);
   const { toast } = useToast();
 
   const { data: apiTerms } = useQuery<Term[]>({ 
@@ -25,7 +30,7 @@ export default function TermsIndex() {
     // Load custom terms from IndexedDB
     const loadCustomTerms = async () => {
       const terms = await getCustomTerms();
-      setCustomTerms(terms);
+      setCustomTerms(terms as CustomTerm[]);
     };
     loadCustomTerms();
   }, []);
