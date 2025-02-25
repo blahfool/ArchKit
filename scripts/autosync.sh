@@ -11,21 +11,22 @@ log_message() {
 # Ensure we're in the repository root
 cd "$(dirname "$0")/.." || exit 1
 
-# Configure git if not already done
-if [ -z "$(git config --global user.email)" ]; then
-  git config --global user.email "${REPL_OWNER}@users.noreply.github.com"
-  git config --global user.name "${REPL_OWNER}"
+# Configure git locally (without --global flag)
+if [ -z "$(git config user.email)" ]; then
+  git config user.email "${REPL_OWNER}@users.noreply.github.com"
+  git config user.name "${REPL_OWNER}"
+  log_message "Configured local git user settings"
 fi
 
 # Main sync function
 sync_changes() {
   log_message "Starting sync process..."
-  
+
   # Check if there are changes to commit
   if git status --porcelain | grep -q '^'; then
     git add --all
     git commit -m "Auto-sync: Changes from Replit [skip ci]"
-    
+
     if git push origin main; then
       log_message "Successfully pushed changes to GitHub"
     else
