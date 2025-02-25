@@ -44,64 +44,6 @@ const academicResources = [
         url: "https://ocw.mit.edu/courses/architecture/"
       }
     ]
-  },
-  {
-    institution: "Exam Preparation Resources",
-    resources: [
-      {
-        title: "Architecture Registration Exam (ARE) Study Materials",
-        author: "AIA",
-        year: "2024",
-        description: "Free study materials and practice questions from the American Institute of Architects",
-        type: "Study Material",
-        url: "https://www.aia.org/pages/11831-are-resources"
-      },
-      {
-        title: "Young Architect - ARE Exam Prep",
-        author: "Michael Riscica",
-        year: "2024",
-        description: "Free blog posts and study guides for architecture licensing exams",
-        type: "Study Material",
-        url: "https://youngarchitect.com/are-blog/"
-      },
-      {
-        title: "Building Code Illustrated Guide",
-        author: "Francis D.K. Ching",
-        year: "2024",
-        description: "Visual guide to understanding building codes and regulations",
-        type: "Reference",
-        url: "https://archive.org/details/building-codes-illustrated"
-      }
-    ]
-  },
-  {
-    institution: "Professional Practice Resources",
-    resources: [
-      {
-        title: "Architect's Handbook of Professional Practice",
-        author: "AIA",
-        year: "2024",
-        description: "Comprehensive guide to architectural professional practice",
-        type: "Reference",
-        url: "https://archive.org/details/architects-handbook-professional-practice"
-      },
-      {
-        title: "Construction Specifications Writing Guide",
-        author: "CSI",
-        year: "2024",
-        description: "Guide to writing construction specifications and contract documents",
-        type: "Reference",
-        url: "https://www.csinet.org/learning-education"
-      },
-      {
-        title: "Architecture Drawing Course",
-        author: "OpenLearn",
-        year: "2024",
-        description: "Free course materials for architectural drawing and visualization",
-        type: "Course Material",
-        url: "https://www.open.edu/openlearn/science-maths-technology/engineering-technology/architectural-drawing"
-      }
-    ]
   }
 ];
 
