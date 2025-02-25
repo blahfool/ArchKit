@@ -13,11 +13,14 @@ import {
   FileCode,
   PenSquare,
   ClipboardList,
-  ChevronRight
+  ChevronRight,
+  Share2
 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 export default function Home() {
   const [showAnimation, setShowAnimation] = useState(true);
+  const [canShare, setCanShare] = useState(false);
 
   useEffect(() => {
     const hasAnimationPlayed = sessionStorage.getItem('animationPlayed');
@@ -26,7 +29,31 @@ export default function Home() {
     } else {
       sessionStorage.setItem('animationPlayed', 'true');
     }
+
+    setCanShare(navigator.share !== undefined);
   }, []);
+
+  const handleShare = async () => {
+    try {
+      await navigator.share({
+        title: 'ArchKit - Architecture Student\'s Toolkit',
+        text: 'Check out ArchKit, a comprehensive toolkit for architecture students and professionals!',
+        url: window.location.href
+      });
+      toast({
+        title: "Success",
+        description: "Thanks for sharing ArchKit!",
+      });
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        toast({
+          title: "Error",
+          description: "Failed to share. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
 
   const menuItems = [
     {
@@ -87,7 +114,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start p-4 relative overflow-hidden">
-      {/* Initial Logo Animation */}
       {showAnimation && (
         <div className="absolute inset-0 flex items-center justify-center logo-animation">
           <div className="text-6xl font-light tracking-wide text-primary">
@@ -102,7 +128,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Background Elements */}
       <div
         className={`absolute inset-0 pointer-events-none ${showAnimation ? 'opacity-0 animate-fade-in' : 'opacity-50'}`}
         style={{
@@ -130,18 +155,26 @@ export default function Home() {
         }}
       />
 
-      {/* Hero Section */}
       <div className={`w-full max-w-4xl mx-auto text-center pt-12 pb-8 ${showAnimation ? 'opacity-0 animate-content-appear' : 'opacity-100'}`}>
         <h1 className="text-5xl sm:text-6xl font-light mb-4 tracking-tight">
           <span className="text-primary">Arch</span>
           <span className="font-bold text-primary">Kit</span>
         </h1>
-        <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-lg mx-auto">
+        <p className="text-lg sm:text-xl text-muted-foreground mb-4 max-w-lg mx-auto">
           Your complete toolkit for architecture studies and professional practice
         </p>
+        {canShare && (
+          <Button
+            onClick={handleShare}
+            variant="outline"
+            className="gap-2 hover:bg-primary/5"
+          >
+            <Share2 className="h-4 w-4" />
+            Share ArchKit
+          </Button>
+        )}
       </div>
 
-      {/* Features Grid */}
       <div className={`w-full max-w-4xl mx-auto ${showAnimation ? 'opacity-0 animate-content-appear' : 'opacity-100'}`}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
           {menuItems.map((item) => (
@@ -166,7 +199,6 @@ export default function Home() {
           ))}
         </div>
 
-        {/* About Link */}
         <Link href="/about" className="block mt-6">
           <Button
             variant="ghost"
