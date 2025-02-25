@@ -5,16 +5,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BackButton from "@/components/BackButton";
 import type { Term } from "@shared/schema";
+import { fallbackTerms } from "@shared/schema";
 
 export default function TermsIndex() {
   const [search, setSearch] = useState("");
-  const { data: terms } = useQuery<Term[]>({ 
+  const { data: apiTerms } = useQuery<Term[]>({ 
     queryKey: ["/api/terms"]
   });
 
-  const categories = terms ? [...new Set(terms.map(term => term.category))] : [];
+  // Combine API terms with fallback terms
+  const terms = apiTerms 
+    ? [...apiTerms, ...fallbackTerms.map((t, i) => ({ ...t, id: 1000 + i }))]
+    : fallbackTerms.map((t, i) => ({ ...t, id: 1000 + i }));
 
-  const filteredTerms = terms?.filter(term => 
+  const categories = [...new Set(terms.map(term => term.category))].sort();
+
+  const filteredTerms = terms.filter(term => 
     term.term.toLowerCase().includes(search.toLowerCase()) ||
     term.definition.toLowerCase().includes(search.toLowerCase())
   );
@@ -50,7 +56,8 @@ export default function TermsIndex() {
             <TabsContent key={category} value={category}>
               <div className="space-y-3 sm:space-y-4">
                 {filteredTerms
-                  ?.filter(term => term.category === category)
+                  .filter(term => term.category === category)
+                  .sort((a, b) => a.term.localeCompare(b.term))
                   .map(term => (
                     <Card key={term.id}>
                       <CardContent className="p-3 sm:p-4 md:p-6">
