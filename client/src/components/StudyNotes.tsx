@@ -32,7 +32,7 @@ export default function StudyNotes({ open, onOpenChange, chapter }: StudyNotesPr
         outlined in this chapter form the foundation of architectural understanding.
         Students should pay special attention to the relationships between different
         concepts and their practical applications.
-        
+
         Key Considerations:
         • Understanding the historical context
         • Modern applications and innovations
@@ -46,7 +46,7 @@ export default function StudyNotes({ open, onOpenChange, chapter }: StudyNotesPr
         Let's examine real-world examples that demonstrate the principles of
         ${chapter.title} in action. These case studies provide valuable insights
         into how theoretical concepts are applied in practice.
-        
+
         Example Projects:
         1. Contemporary implementations
         2. Historical significance
@@ -80,7 +80,7 @@ export default function StudyNotes({ open, onOpenChange, chapter }: StudyNotesPr
                 <h2 className="text-2xl font-semibold mb-4">
                   {pages[currentPage - 1].title}
                 </h2>
-                
+
                 <div className="whitespace-pre-wrap">
                   {pages[currentPage - 1].content}
                 </div>
