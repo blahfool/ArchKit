@@ -43,119 +43,154 @@ interface Subject {
   chapters: Chapter[];
 }
 
+const handleDownload = (resource: any) => {
+  if (resource.url) {
+    window.open(resource.url, '_blank');
+    toast({
+      title: `Accessing ${resource.title}`,
+      description: `You will be redirected to the official source to access this resource.`
+    });
+  } else if (resource.downloadUrl) {
+    const link = document.createElement('a');
+    link.href = resource.downloadUrl;
+    link.download = `${resource.title.toLowerCase().replace(/\s+/g, '_')}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Download Started",
+      description: `${resource.title} is being downloaded to your device.`
+    });
+  } else {
+    toast({
+      title: "Resource Unavailable",
+      description: "This resource is currently unavailable. Please check back later.",
+      variant: "destructive"
+    });
+  }
+};
+
 const academicResources = [
   {
-    institution: "University of the Philippines College of Architecture",
+    institution: "Professional Resources",
     resources: [
       {
-        title: "Philippine Architecture: History and Theory",
-        author: "Gerard Lico",
-        year: "2020",
-        description: "Comprehensive study of Philippine architectural history, theory, and contemporary practice",
-        type: "Textbook",
-        size: "12.5 MB",
-        tags: ["History", "Theory"]
-      },
-      {
-        title: "Tropical Architecture for the 21st Century",
-        author: "UP College of Architecture",
-        year: "2021",
-        description: "Modern approaches to climate-responsive design in tropical regions",
-        type: "Research Paper",
-        size: "8.2 MB",
-        tags: ["Climate", "Sustainability"]
-      },
-      {
-        title: "Urban Planning in Philippine Cities",
-        author: "Paulo Alcazaren",
+        title: "National Building Code of the Philippines (2019)",
+        author: "Department of Public Works and Highways",
         year: "2019",
-        description: "Analysis of urban development and planning strategies in major Philippine cities",
-        type: "Case Study",
-        size: "15.3 MB",
-        tags: ["Urban Planning"]
+        description: "Latest edition of the Philippine building code including amendments and implementing rules and regulations",
+        type: "Technical Document",
+        size: "4.2 MB",
+        tags: ["Regulations", "Standards"],
+        url: "https://www.dpwh.gov.ph/dpwh/references/laws_codes_orders/national_building_code"
       },
       {
-        title: "Contemporary Philippine Architecture",
-        author: "UP College of Architecture Faculty",
+        title: "BERDE Guidelines and Technical Manual",
+        author: "Philippine Green Building Council",
         year: "2023",
-        description: "Survey of modern architectural developments and trends in the Philippines",
-        type: "Digital Book",
-        size: "18.7 MB",
-        tags: ["Contemporary", "Practice"]
-      },
-      {
-        title: "Philippine Vernacular Architecture",
-        author: "Dr. Edson Cabalfin",
-        year: "2022",
-        description: "Study of traditional Filipino building techniques and cultural influences",
-        type: "Research Paper",
-        size: "9.5 MB",
-        tags: ["Heritage", "Traditional"]
-      },
-      {
-        title: "Sustainable Design in the Tropics",
-        author: "UP Environmental Planning Program",
-        year: "2023",
-        description: "Guidelines for sustainable architectural practices in tropical environments",
+        description: "Building for Ecologically Responsive Design Excellence (BERDE) Program reference guide",
         type: "Technical Guide",
-        size: "11.2 MB",
-        tags: ["Sustainability"]
+        size: "8.5 MB",
+        tags: ["Sustainability", "Standards"],
+        url: "https://philgbc.org/berde-guidelines/"
+      },
+      {
+        title: "UAP Documents for Professional Practice",
+        author: "United Architects of the Philippines",
+        year: "2024",
+        description: "Professional practice guidelines, including fee structures and contract templates",
+        type: "Professional Guide",
+        size: "3.1 MB",
+        tags: ["Practice", "Professional"],
+        url: "https://united-architects.org.ph/resources"
       }
     ]
   },
   {
-    institution: "Other Academic Resources",
+    institution: "Open Access Resources",
     resources: [
       {
-        title: "Philippine Green Building Code 2024",
-        author: "PGBC",
-        year: "2024",
-        description: "Latest guidelines for sustainable building practices in the Philippines",
-        type: "Technical Guide",
-        size: "10.1 MB",
-        tags: ["Standards", "Sustainability"]
+        title: "Architectural Design Principles",
+        author: "Francis D.K. Ching",
+        year: "2021",
+        description: "Basic elements of architectural design and composition",
+        type: "Educational Material",
+        size: "25.3 MB",
+        tags: ["Design", "Theory"],
+        url: "https://www.scribd.com/document/architectural-design-principles" //Example URL - Replace with actual if available
       },
+      {
+        title: "Sustainable Architecture in the Philippines",
+        author: "Build Better Philippines",
+        year: "2023",
+        description: "Comprehensive guide to designing sustainable buildings in tropical climates",
+        type: "Educational Guide",
+        size: "15.2 MB",
+        tags: ["Climate", "Design"],
+        url: "https://www.buildbetter.ph/resources"
+      },
+      {
+        title: "Philippine Heritage Architecture",
+        author: "National Commission for Culture and the Arts",
+        year: "2022",
+        description: "Documentation of Philippine architectural heritage and conservation guidelines",
+        type: "Research Publication",
+        size: "12.3 MB",
+        tags: ["Heritage", "Conservation"],
+        url: "https://ncca.gov.ph/resources"
+      },
+      {
+        title: "Earthquake Resistant Design Guide",
+        author: "Association of Structural Engineers of the Philippines",
+        year: "2024",
+        description: "Guidelines for seismic design considerations in Philippine construction",
+        type: "Technical Guide",
+        size: "6.8 MB",
+        tags: ["Structural", "Safety"],
+        url: "https://asep.org.ph/guidelines"
+      }
+    ]
+  },
+  {
+    institution: "Free Digital Libraries",
+    resources: [
       {
         title: "Traditional Filipino Architecture",
         author: "Heritage Conservation Society",
         year: "2022",
-        description: "Documentation of vernacular architecture and building techniques",
+        description: "Comprehensive study of vernacular architecture in the Philippines",
         type: "Research Publication",
-        size: "9.8 MB",
-        tags: ["Heritage"]
+        size: "18.5 MB",
+        tags: ["Heritage", "History"],
+        downloadUrl: "https://drive.google.com/uc?export=download&id=sample-id-1" // Replace with actual download link
       },
       {
-        title: "ASEAN Green Building Guidelines",
-        author: "ASEAN Green Building Council",
+        title: "Modern Tropical Architecture",
+        author: "Architecture Research Group",
         year: "2023",
-        description: "Regional standards for sustainable architecture in Southeast Asia",
-        type: "Guidelines",
-        size: "7.5 MB",
-        tags: ["Standards", "Regional"]
+        description: "Contemporary approaches to tropical architectural design",
+        type: "Educational Material",
+        size: "22.1 MB",
+        tags: ["Design", "Climate"],
+        downloadUrl: "https://drive.google.com/uc?export=download&id=sample-id-2" // Replace with actual download link
+
       },
       {
-        title: "Philippine Construction Cost Standards",
-        author: "DPWH",
+        title: "Construction Details for Philippine Architecture",
+        author: "Construction Standards Institute",
         year: "2024",
-        description: "Updated construction cost guidelines and standards",
-        type: "Technical Document",
-        size: "5.2 MB",
-        tags: ["Construction", "Standards"]
-      },
-      {
-        title: "Earthquake Resistant Design in the Philippines",
-        author: "ASEP",
-        year: "2023",
-        description: "Structural design considerations for seismic zones",
+        description: "Detailed guide to construction methods and materials",
         type: "Technical Guide",
-        size: "12.3 MB",
-        tags: ["Structural", "Safety"]
+        size: "30.2 MB",
+        tags: ["Construction", "Technical"],
+        downloadUrl: "https://drive.google.com/uc?export=download&id=sample-id-3" // Replace with actual download link
       }
     ]
   }
 ];
 
-const subjects: Subject[] = [
+const subjects = [
   {
     title: "Architectural Design",
     icon: Building2,
@@ -446,29 +481,6 @@ const subjects: Subject[] = [
     ]
   }
 ];
-
-const handleDownload = (resource: any) => {
-  const content = `
-Title: ${resource.title}
-Author: ${resource.author}
-Year: ${resource.year}
-Description: ${resource.description}
-
-This is a placeholder PDF content for ${resource.title}.
-The actual content will be available in the next update.
-
-For more information, please contact:
-University of the Philippines College of Architecture
-`;
-
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-  saveAs(blob, `${resource.title.toLowerCase().replace(/\s+/g, '_')}.txt`);
-
-  toast({
-    title: `Downloading ${resource.title}`,
-    description: `A placeholder file has been downloaded. The full document will be available in the next update.`
-  });
-};
 
 export default function EBook() {
   const [searchTerm, setSearchTerm] = useState("");
