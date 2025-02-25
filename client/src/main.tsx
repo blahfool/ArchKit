@@ -3,8 +3,12 @@ import { StrictMode } from "react";
 import App from "./App";
 import "./index.css";
 
-// Create root with strict mode for better development experience
-createRoot(document.getElementById("root")!).render(
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error("Failed to find the root element");
+
+const root = createRoot(rootElement);
+
+root.render(
   <StrictMode>
     <App />
   </StrictMode>
