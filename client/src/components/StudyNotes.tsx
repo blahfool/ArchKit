@@ -11,47 +11,85 @@ interface StudyNotesProps {
     title: string;
     content: string;
     keyPoints?: string[];
-    studyNotes?: string[];
   };
 }
 
 export default function StudyNotes({ open, onOpenChange, chapter }: StudyNotesProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Mock content for demonstration
+  // Generate detailed content for each page
   const pages = [
     {
       title: "Introduction",
-      content: chapter.content,
-      keyPoints: chapter.keyPoints,
+      content: `
+${chapter.content}
+
+Detailed Overview:
+This section provides a comprehensive introduction to ${chapter.title.toLowerCase()}. We'll explore 
+the fundamental concepts, historical context, and modern applications of these principles in 
+contemporary architecture.
+
+${chapter.keyPoints ? `
+Key Learning Objectives:
+${chapter.keyPoints.map((point, index) => `${index + 1}. ${point}
+   • Detailed understanding of ${point.toLowerCase()}
+   • Practical applications in modern architecture
+   • Case studies and historical examples`).join('\n\n')}` : ''}
+      `,
     },
     {
-      title: "Detailed Notes",
+      title: "Core Concepts",
       content: `
-        Here we dive deeper into ${chapter.title}. The principles and practices
-        outlined in this chapter form the foundation of architectural understanding.
-        Students should pay special attention to the relationships between different
-        concepts and their practical applications.
+Understanding ${chapter.title}
 
-        Key Considerations:
-        • Understanding the historical context
-        • Modern applications and innovations
-        • Integration with other architectural elements
-        • Practical implementation guidelines
+Theoretical Framework:
+1. Historical Development
+   • Origins and evolution
+   • Key influential figures
+   • Major paradigm shifts
+
+2. Modern Applications
+   • Contemporary interpretations
+   • Technological integration
+   • Sustainable approaches
+
+3. Design Principles
+   • Spatial relationships
+   • Form and function
+   • Material considerations
+   • Environmental impact
+
+4. Implementation Strategies
+   • Planning and preparation
+   • Execution methodology
+   • Quality control measures
+   • Performance evaluation
       `,
     },
     {
       title: "Case Studies",
       content: `
-        Let's examine real-world examples that demonstrate the principles of
-        ${chapter.title} in action. These case studies provide valuable insights
-        into how theoretical concepts are applied in practice.
+Real-World Applications of ${chapter.title}
 
-        Example Projects:
-        1. Contemporary implementations
-        2. Historical significance
-        3. Innovation in design
-        4. Sustainability considerations
+Example Projects:
+
+1. Modern Implementation
+   • Project: Contemporary Urban Development
+   • Location: Various global cities
+   • Key Features: Integration of modern technology with traditional principles
+   • Outcome: Successful blend of form and function
+
+2. Historical Analysis
+   • Project: Classical Architectural Examples
+   • Period: Various historical eras
+   • Key Features: Traditional methods and materials
+   • Lessons Learned: Timeless principles and adaptations
+
+3. Future Directions
+   • Emerging trends
+   • Technological innovations
+   • Sustainable practices
+   • Integration with smart systems
       `,
     }
   ];
@@ -63,10 +101,10 @@ export default function StudyNotes({ open, onOpenChange, chapter }: StudyNotesPr
           <DialogTitle className="flex items-center justify-between">
             <span>{chapter.title} - Study Notes</span>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="h-8 w-8">
                 <Download className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="h-8 w-8">
                 <Printer className="h-4 w-4" />
               </Button>
             </div>
@@ -81,26 +119,15 @@ export default function StudyNotes({ open, onOpenChange, chapter }: StudyNotesPr
                   {pages[currentPage - 1].title}
                 </h2>
 
-                <div className="whitespace-pre-wrap">
+                <div className="whitespace-pre-wrap font-serif leading-relaxed">
                   {pages[currentPage - 1].content}
                 </div>
-
-                {currentPage === 1 && pages[currentPage - 1].keyPoints && (
-                  <div className="mt-6">
-                    <h3 className="text-lg font-medium mb-2">Key Points:</h3>
-                    <ul className="list-disc pl-6 space-y-1">
-                      {pages[currentPage - 1].keyPoints.map((point, idx) => (
-                        <li key={idx}>{point}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
             </div>
           </ScrollArea>
         </div>
 
-        <div className="border-t p-4 flex items-center justify-between">
+        <div className="border-t p-4 flex items-center justify-between bg-background">
           <div className="text-sm text-muted-foreground">
             Page {currentPage} of {pages.length}
           </div>
@@ -110,6 +137,7 @@ export default function StudyNotes({ open, onOpenChange, chapter }: StudyNotesPr
               size="icon"
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
+              className="h-8 w-8"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -118,6 +146,7 @@ export default function StudyNotes({ open, onOpenChange, chapter }: StudyNotesPr
               size="icon"
               onClick={() => setCurrentPage(prev => Math.min(pages.length, prev + 1))}
               disabled={currentPage === pages.length}
+              className="h-8 w-8"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
