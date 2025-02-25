@@ -2,7 +2,7 @@ export interface Theme {
   name: string;
   variant: 'professional' | 'tint' | 'vibrant';
   primary: string;
-  appearance: 'light' | 'dark' | 'system';
+  appearance: 'light' | 'dark';
   radius: number;
   colors: {
     background: string;
@@ -10,13 +10,6 @@ export interface Theme {
     muted: string;
     accent: string;
     gradient: string;
-    dark: {
-      background: string;
-      foreground: string;
-      muted: string;
-      accent: string;
-      gradient: string;
-    };
   };
 }
 

@@ -18,32 +18,30 @@ export default function ThemeSelect() {
     const theme = architecturalThemes[themeName];
     if (!theme) return;
 
-    // Update theme CSS variables
     const root = document.documentElement;
-    const isDark = root.classList.contains("dark");
     const { colors } = theme;
 
-    // Get the appropriate color set based on dark mode
-    const colorSet = isDark ? colors.dark : colors;
-
     // Apply colors
-    root.style.setProperty("--background", colorSet.background);
-    root.style.setProperty("--foreground", colorSet.foreground);
-    root.style.setProperty("--muted", colorSet.muted);
-    root.style.setProperty("--accent", colorSet.accent);
+    root.style.setProperty("--background", colors.background);
+    root.style.setProperty("--foreground", colors.foreground);
+    root.style.setProperty("--muted", colors.muted);
+    root.style.setProperty("--accent", colors.accent);
     root.style.setProperty("--primary", theme.primary);
     root.style.setProperty("--radius", `${theme.radius}rem`);
-    root.style.setProperty("--gradient", colorSet.gradient);
+    root.style.setProperty("--gradient", colors.gradient);
 
-    // Generate and apply texture with current theme
+    // Generate and apply texture
     const textureUrl = generateTexture(theme);
-    document.body.style.background = `${colorSet.gradient}, url(${textureUrl})`;
+    document.body.style.background = `${colors.gradient}, url(${textureUrl})`;
     document.body.style.backgroundSize = 'cover, 100px 100px';
     document.body.style.backgroundBlendMode = 'normal, overlay';
 
-    // Update theme.json values through data attributes
+    // Set theme variant and radius
     root.setAttribute('data-theme', theme.variant);
     root.setAttribute('data-radius', theme.radius.toString());
+
+    // Toggle dark mode class based on theme appearance
+    root.classList.toggle('dark', theme.appearance === 'dark');
 
     localStorage.setItem("theme", themeName);
     setCurrentTheme(themeName);
@@ -53,24 +51,6 @@ export default function ThemeSelect() {
       description: `Switched to ${theme.name} theme`,
     });
   };
-
-  // Listen for dark mode changes
-  useEffect(() => {
-    const darkModeObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === "attributes" && mutation.attributeName === "class") {
-          applyTheme(currentTheme); // Reapply current theme with new dark/light mode
-        }
-      });
-    });
-
-    darkModeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => darkModeObserver.disconnect();
-  }, [currentTheme]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
