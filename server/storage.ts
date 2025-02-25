@@ -11,6 +11,10 @@ export interface IStorage {
   getAllFormulas(): Promise<Formula[]>;
   createTerm(term: InsertTerm): Promise<Term>;
   createFormula(formula: InsertFormula): Promise<Formula>;
+  addQuizScore(score: number, total: number): Promise<void>;
+  getQuizScores(): Promise<any[]>;
+  addStudyTime(duration: number): Promise<void>;
+  getTotalStudyTime(): Promise<number>;
 }
 
 export class SQLiteStorage implements IStorage {
@@ -22,6 +26,7 @@ export class SQLiteStorage implements IStorage {
   }
 
   private initDatabase() {
+    // Create all tables if they don't exist
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS terms (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,27 +56,6 @@ export class SQLiteStorage implements IStorage {
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `);
-  }
-
-  async addQuizScore(score: number, total: number): Promise<void> {
-    this.db.prepare(
-      "INSERT INTO quiz_scores (score, total) VALUES (?, ?)"
-    ).run(score, total);
-  }
-
-  async getQuizScores(): Promise<any[]> {
-    return this.db.prepare("SELECT * FROM quiz_scores ORDER BY timestamp DESC LIMIT 10").all();
-  }
-
-  async addStudyTime(duration: number): Promise<void> {
-    this.db.prepare(
-      "INSERT INTO study_time (duration) VALUES (?)"
-    ).run(duration);
-  }
-
-  async getTotalStudyTime(): Promise<number> {
-    const result = this.db.prepare("SELECT SUM(duration) as total FROM study_time").get();
-    return result.total || 0;
   }
 
   async getAllTerms(): Promise<Term[]> {
@@ -105,6 +89,27 @@ export class SQLiteStorage implements IStorage {
       ) as Formula;
 
     return result;
+  }
+
+  async addQuizScore(score: number, total: number): Promise<void> {
+    this.db.prepare(
+      "INSERT INTO quiz_scores (score, total) VALUES (?, ?)"
+    ).run(score, total);
+  }
+
+  async getQuizScores(): Promise<any[]> {
+    return this.db.prepare("SELECT * FROM quiz_scores ORDER BY timestamp DESC LIMIT 10").all();
+  }
+
+  async addStudyTime(duration: number): Promise<void> {
+    this.db.prepare(
+      "INSERT INTO study_time (duration) VALUES (?)"
+    ).run(duration);
+  }
+
+  async getTotalStudyTime(): Promise<number> {
+    const result = this.db.prepare("SELECT SUM(duration) as total FROM study_time").get();
+    return result.total || 0;
   }
 }
 

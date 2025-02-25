@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" fill="white"/>
+  <path d="M40 152V56l56-32 56 32v96l-56 32z" fill="none" stroke="black" stroke-width="8"/>
+  <path d="M96 24v128M40 56l112 0M40 152l112 0" stroke="black" stroke-width="4"/>
+  <text x="96" y="104" font-family="Arial" font-size="24" text-anchor="middle" fill="black">ArchKit</text>
+</svg>
