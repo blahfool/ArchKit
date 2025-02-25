@@ -6,14 +6,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import BackButton from "@/components/BackButton";
-import {
   Timer,
   CheckCircle2,
   XCircle,
@@ -27,6 +19,8 @@ import { generateQuestions } from "@/lib/questionGenerator";
 import { fallbackTerms } from "@shared/schema";
 import type { Term } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import BackButton from "@/components/BackButton";
 
 interface BaseQuestion {
   id: number;
@@ -68,7 +62,6 @@ export default function Assessment() {
   const [timeLeft, setTimeLeft] = useState(3600);
   const [isActive, setIsActive] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [questionCount, setQuestionCount] = useState(10);
   const [selectedTypes, setSelectedTypes] = useState<string[]>(['multiple-choice']);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -77,20 +70,6 @@ export default function Assessment() {
   const { data: apiTerms } = useQuery<Term[]>({ 
     queryKey: ["/api/terms"]
   });
-
-  const categories = [
-    "all",
-    "Design Principles",
-    "Construction Technology",
-    "Environmental Design",
-    "Professional Practice",
-    "Building Systems",
-    "Urban Planning",
-    "Structural Design",
-    "Materials",
-    "Building Codes",
-    "Heritage Conservation"
-  ];
 
   const questionTypes = [
     { value: 'multiple-choice', label: 'Multiple Choice' },
@@ -111,7 +90,7 @@ export default function Assessment() {
         const typeQuestions = generateQuestions(
           terms,
           Math.floor(questionCount / selectedTypes.length),
-          selectedCategory,
+          "all", 
           type
         );
         generatedQuestions = [...generatedQuestions, ...typeQuestions];
@@ -324,27 +303,10 @@ export default function Assessment() {
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-medium mb-2">Select Category</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map(category => (
-                      <Button
-                        key={category}
-                        variant={selectedCategory === category ? "default" : "outline"}
-                        onClick={() => setSelectedCategory(category)}
-                        className="capitalize"
-                      >
-                        {category}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
                   <h2 className="text-lg font-medium mb-2">Exam Details</h2>
                   <p className="text-muted-foreground">
                     • Duration: 60 minutes<br />
-                    • Questions: {questions.length}<br />
-                    • Category: {selectedCategory === "all" ? "All Categories" : selectedCategory}<br />
+                    • Questions: {questionCount}<br />
                     • Types: {selectedTypes.map(t =>
                       questionTypes.find(qt => qt.value === t)?.label
                     ).join(', ')}
@@ -401,9 +363,7 @@ export default function Assessment() {
               <div className="space-y-6">
                 <div>
                   <div className="text-sm font-medium text-muted-foreground mb-2">
-                    {questions[currentQuestion].category} • {
-                      questionTypes.find(t => t.value === questions[currentQuestion].type)?.label
-                    }
+                    {questions[currentQuestion].type}
                   </div>
                   <p className="text-lg mb-4">{questions[currentQuestion].question}</p>
 
