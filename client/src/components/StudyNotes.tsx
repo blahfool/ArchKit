@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronLeft, ChevronRight, Download, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { saveAs } from 'file-saver';
 
 interface StudyNotesProps {
   open: boolean;
@@ -17,213 +18,253 @@ interface StudyNotesProps {
 export default function StudyNotes({ open, onOpenChange, chapter }: StudyNotesProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Generate detailed content for each page
-  const pages = [
-    {
-      title: "Introduction and Overview",
-      content: `
-${chapter.content}
+  const getChapterContent = () => {
+    // Based on the chapter title, return specific study content
+    switch (chapter.title.toLowerCase()) {
+      case "design principles":
+        return [
+          {
+            title: "Core Design Principles in Architecture",
+            content: `
+Understanding Architectural Design Principles
+------------------------------------------
 
-Detailed Overview:
-This comprehensive guide explores ${chapter.title.toLowerCase()}, a fundamental aspect of architectural practice. 
-We'll examine both theoretical foundations and practical applications, providing you with a thorough 
-understanding of this critical subject matter.
+1. Form and Function
+   • Analysis of how form emerges from functional requirements
+   • Integration of cultural and environmental contexts
+   • Balance between aesthetic appeal and practical utility
+   • Case studies of successful form-function relationships in Philippine architecture
 
-Historical Context:
-The evolution of ${chapter.title.toLowerCase()} can be traced back through various architectural periods,
-each contributing unique perspectives and methodologies. From classical interpretations to contemporary
-innovations, we'll explore how this field has shaped the built environment.
+2. Space and Order
+   • Principles of spatial organization in tropical architecture
+   • Hierarchy and sequence in architectural spaces
+   • Indoor-outdoor relationships in Philippine context
+   • Climate-responsive spatial planning strategies
 
-${chapter.keyPoints ? `
-Learning Objectives and Key Concepts:
-${chapter.keyPoints.map((point, index) => {
-  let concepts;
-  switch (point.toLowerCase()) {
-    case "form follows function":
-      concepts = `
-   • Spatial efficiency: Understanding how building form supports its intended use
-   • Structural integrity: Relationship between design aesthetics and structural requirements
-   • User experience: Impact of form on occupant comfort and functionality
-   • Environmental response: How building form adapts to climate and context`;
-      break;
-    case "unity in design":
-      concepts = `
-   • Visual harmony: Creating cohesive architectural compositions
-   • Material continuity: Consistent use of materials and finishes
-   • Rhythmic elements: Repetition and pattern in architectural design
-   • Contextual integration: Blending with surrounding environment`;
-      break;
-    case "balance and proportion":
-      concepts = `
-   • Golden ratio: Application of mathematical proportions in design
-   • Symmetrical balance: Traditional approaches to architectural harmony
-   • Asymmetrical balance: Modern interpretations of equilibrium
-   • Scale relationships: Human-centric design proportions`;
-      break;
-    case "spatial relationships":
-      concepts = `
-   • Circulation patterns: Movement flow through spaces
-   • Hierarchy: Organizing spaces by importance and function
-   • Transition zones: Connecting different functional areas
-   • Visual connections: Sight lines and spatial continuity`;
-      break;
-    case "site analysis":
-      concepts = `
-   • Topographical studies: Understanding terrain and elevation
-   • Environmental factors: Climate, sunlight, and wind patterns
-   • Infrastructure assessment: Existing utilities and services
-   • Regulatory constraints: Zoning and building codes`;
-      break;
-    case "programming":
-      concepts = `
-   • Space requirements: Determining functional needs
-   • User analysis: Understanding occupant behaviors
-   • Adjacency studies: Optimal arrangement of spaces
-   • Growth projections: Future expansion considerations`;
-      break;
-    default:
-      concepts = `
-   • Historical Development: Evolution through different periods
-   • Contemporary Applications: Modern interpretations and innovations
-   • Technical Considerations: Implementation guidelines
-   • Future Perspectives: Emerging trends and developments`;
-  }
-  return `
-${index + 1}. ${point}${concepts}`;
-}).join('\n\n')}
+3. Scale and Proportion
+   • Human scale in architectural design
+   • Traditional Filipino proportioning systems
+   • Modern interpretations of classical proportions
+   • Anthropometric considerations in tropical climates
 
-Practical Applications:
-Understanding how these concepts translate into real-world scenarios is crucial for architectural practice.
-We'll examine various implementation strategies and their impact on design outcomes.` : ''}
+4. Context and Site Integration
+   • Site analysis methodologies
+   • Environmental and cultural context considerations
+   • Local climate adaptation strategies
+   • Sustainable site development approaches
 
-Research and Development:
-Recent advancements in technology and methodology have significantly influenced how we approach
-${chapter.title.toLowerCase()}. We'll explore cutting-edge developments and their implications for
-future architectural practice.
-      `,
-    },
-    {
-      title: "Technical Principles and Methodology",
-      content: `
-Core Technical Concepts of ${chapter.title}
+5. Architectural Elements
+   • Traditional Filipino architectural elements
+   • Contemporary interpretations of vernacular features
+   • Climate-responsive building components
+   • Integration of modern and traditional elements
+            `
+          },
+          {
+            title: "Application in Philippine Context",
+            content: `
+Practical Applications in Local Architecture
+-----------------------------------------
 
-1. Fundamental Principles
-   A. Theoretical Framework
-      • Historical foundations and evolution
-      • Contemporary interpretations
-      • Integration with modern architectural practice
-      • Impact on design methodology
+1. Regional Adaptations
+   • Northern Luzon highland architecture
+   • Coastal design considerations
+   • Urban context adaptations
+   • Rural architectural responses
 
-   B. Technical Requirements
-      • Standards and specifications
-      • Performance criteria
-      • Regulatory compliance
-      • Quality assurance measures
+2. Climate Response Strategies
+   • Natural ventilation systems
+   • Solar shading techniques
+   • Rainfall management
+   • Thermal comfort solutions
 
-2. Implementation Methodology
-   A. Planning Phase
-      • Site analysis and context evaluation
-      • Resource assessment
-      • Feasibility studies
-      • Preliminary design considerations
+3. Material Applications
+   • Indigenous building materials
+   • Modern material innovations
+   • Sustainable material choices
+   • Local material availability and usage
 
-   B. Development Process
-      • Design development stages
-      • Technical documentation
-      • Coordination with other disciplines
-      • Quality control procedures
+4. Cultural Integration
+   • Community patterns and spatial arrangements
+   • Social spaces in Filipino architecture
+   • Cultural symbolism in design
+   • Contemporary cultural expressions
 
-3. Advanced Concepts
-   A. Innovation in Design
-      • Emerging technologies
-      • Sustainable solutions
-      • Smart integration
-      • Future-proofing strategies
+5. Professional Implementation
+   • Design documentation requirements
+   • Building code compliance
+   • Sustainable certification processes
+   • Project execution strategies
+            `
+          },
+          {
+            title: "Case Studies and Analysis",
+            content: `
+Philippine Architectural Case Studies
+----------------------------------
 
-   B. Performance Optimization
-      • Efficiency measures
-      • Cost-effectiveness
-      • Environmental impact
-      • Long-term sustainability
+1. Traditional Architecture
+   • Bahay Kubo analysis
+   • Bahay na Bato features
+   • Indigenous structural systems
+   • Vernacular space planning
 
-4. Integration with Other Systems
-   A. Interdisciplinary Coordination
-      • Structural considerations
-      • Environmental systems
-      • Material selection
-      • Construction methodology
+2. Contemporary Projects
+   • Modern tropical houses
+   • Mixed-use developments
+   • Institutional buildings
+   • Cultural facilities
 
-   B. Quality Management
-      • Performance monitoring
-      • Maintenance requirements
-      • Lifecycle assessment
-      • Continuous improvement strategies
-      `,
-    },
-    {
-      title: "Case Studies and Practical Applications",
-      content: `
-Real-World Applications and Analysis of ${chapter.title}
+3. Sustainable Developments
+   • Green building examples
+   • Energy-efficient designs
+   • Water conservation strategies
+   • Waste management integration
 
-1. Contemporary Case Study: Urban Innovation
-   Project: Metropolitan Design Center
-   Location: Singapore
-   • Project Overview:
-     - Scale: 50,000 square meters
-     - Budget: $100 million
-     - Timeline: 2020-2023
-   • Key Features:
-     - Innovative use of sustainable materials
-     - Integration of smart technologies
-     - Adaptive reuse strategies
-   • Outcomes and Lessons:
-     - 40% reduction in energy consumption
-     - Enhanced user experience
-     - Award-winning design solutions
+4. Urban Interventions
+   • City context solutions
+   • Public space design
+   • Transportation integration
+   • Community development
 
-2. Historical Case Study: Classical Implementation
-   Project: Heritage Restoration
-   Period: 19th Century Revival
-   • Original Features:
-     - Traditional construction methods
-     - Period-specific materials
-     - Historical significance
-   • Restoration Approach:
-     - Conservation principles
-     - Modern adaptations
-     - Preservation techniques
-   • Results and Impact:
-     - Successfully preserved historical elements
-     - Improved functionality
-     - Enhanced cultural value
+5. Future Directions
+   • Emerging design trends
+   • Technology integration
+   • Climate change adaptation
+   • Resilient architecture strategies
+            `
+          }
+        ];
 
-3. Future Trends and Innovations
-   A. Emerging Technologies
-      • Artificial Intelligence in design
-      • Virtual and Augmented Reality applications
-      • Advanced materials and systems
-      • Automated construction methods
+      case "construction methods":
+        return [
+          {
+            title: "Construction Technology Fundamentals",
+            content: `
+Building Systems and Methods
+--------------------------
 
-   B. Sustainable Practices
-      • Green building strategies
-      • Energy efficiency measures
-      • Waste reduction techniques
-      • Environmental impact assessment
+1. Foundation Systems
+   • Soil conditions in Philippine context
+   • Deep foundation applications
+   • Shallow foundation techniques
+   • Seismic considerations
 
-   C. Integration Strategies
-      • Smart building systems
-      • IoT implementation
-      • Data-driven design
-      • Adaptive technologies
+2. Structural Systems
+   • Concrete frame construction
+   • Steel structure applications
+   • Timber frame systems
+   • Hybrid structural solutions
 
-Conclusion and Future Perspectives:
-The evolution of ${chapter.title.toLowerCase()} continues to shape architectural practice,
-with emerging technologies and methodologies opening new possibilities for innovation
-and sustainability. Understanding these developments is crucial for staying at the
-forefront of architectural design and implementation.
-      `,
+3. Wall Systems
+   • Load-bearing walls
+   • Curtain wall applications
+   • Partition systems
+   • Thermal and acoustic considerations
+
+4. Roofing Technology
+   • Traditional roofing systems
+   • Modern roofing materials
+   • Weather protection strategies
+   • Ventilation integration
+
+5. Building Envelope
+   • Weather barrier systems
+   • Insulation methods
+   • Moisture control
+   • Energy efficiency measures
+            `
+          },
+          {
+            title: "Construction Management",
+            content: `
+Project Execution and Control
+---------------------------
+
+1. Planning and Scheduling
+   • Construction sequencing
+   • Resource allocation
+   • Timeline management
+   • Quality control procedures
+
+2. Site Management
+   • Layout and organization
+   • Safety protocols
+   • Material handling
+   • Equipment utilization
+
+3. Quality Assurance
+   • Inspection methods
+   • Testing procedures
+   • Documentation requirements
+   • Compliance verification
+
+4. Cost Control
+   • Budget management
+   • Cost tracking
+   • Value engineering
+   • Change order management
+
+5. Project Documentation
+   • Construction drawings
+   • Specifications writing
+   • Progress reporting
+   • As-built documentation
+            `
+          },
+          {
+            title: "Modern Construction Technologies",
+            content: `
+Advanced Building Technologies
+---------------------------
+
+1. Digital Construction
+   • BIM implementation
+   • Digital fabrication
+   • 3D printing applications
+   • Automated systems
+
+2. Sustainable Construction
+   • Green building methods
+   • Waste reduction strategies
+   • Recycled materials
+   • Energy-efficient systems
+
+3. Prefabrication
+   • Modular construction
+   • Component systems
+   • Assembly methods
+   • Quality control
+
+4. Smart Building Integration
+   • Building automation
+   • Security systems
+   • Energy management
+   • Maintenance monitoring
+
+5. Future Trends
+   • Emerging technologies
+   • Innovation integration
+   • Industry developments
+   • Research directions
+            `
+          }
+        ];
+
+      // Add more cases for other chapters...
+
+      default:
+        return [
+          {
+            title: "Overview",
+            content: chapter.content,
+            keyPoints: chapter.keyPoints || []
+          }
+        ];
     }
-  ];
+  };
+
+  const pages = getChapterContent();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -232,7 +273,18 @@ forefront of architectural design and implementation.
           <DialogTitle className="flex items-center justify-between">
             <span>{chapter.title} - Study Notes</span>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" className="h-8 w-8">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-8 w-8"
+                onClick={() => {
+                  const content = pages.map(page => 
+                    `${page.title}\n${page.content}`
+                  ).join('\n\n');
+                  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                  saveAs(blob, `${chapter.title.toLowerCase().replace(/\s+/g, '_')}_notes.txt`);
+                }}
+              >
                 <Download className="h-4 w-4" />
               </Button>
               <Button variant="outline" size="icon" className="h-8 w-8">
