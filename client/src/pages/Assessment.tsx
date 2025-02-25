@@ -378,67 +378,69 @@ export default function Assessment() {
       <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Architecture Assessment</h1>
 
       <div className="max-w-2xl mx-auto">
-        <Card className="mb-4">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Timer className="h-5 w-5" />
-                <span className="font-medium">{formatTime(timeLeft)}</span>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Question {currentQuestion + 1} of {questions.length}
-              </div>
-            </div>
-            <Progress value={(currentQuestion + 1) / questions.length * 100} className="mb-4" />
-          </CardContent>
-        </Card>
-
         {score === null ? (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-6">
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-2">
-                    {questions[currentQuestion].type}
+          <>
+            <Card className="mb-4">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Timer className="h-5 w-5" />
+                    <span className="font-medium">{formatTime(timeLeft)}</span>
                   </div>
-                  <p className="text-lg mb-4">{questions[currentQuestion].question}</p>
-
-                  {renderQuestion(questions[currentQuestion])}
+                  <div className="text-sm text-muted-foreground">
+                    Question {currentQuestion + 1} of {questions.length}
+                  </div>
                 </div>
+                <Progress value={(currentQuestion + 1) / questions.length * 100} className="mb-4" />
+              </CardContent>
+            </Card>
 
-                <div className="flex justify-between">
-                  <Button
-                    variant="outline"
-                    onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
-                    disabled={currentQuestion === 0}
-                    className="flex items-center"
-                  >
-                    <ChevronLeft className="h-4 w-4 mr-1" />
-                    Previous
-                  </Button>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-6">
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground mb-2">
+                      {questions[currentQuestion].type}
+                    </div>
+                    <p className="text-lg mb-4">{questions[currentQuestion].question}</p>
 
-                  {currentQuestion === questions.length - 1 ? (
+                    {renderQuestion(questions[currentQuestion])}
+                  </div>
+
+                  <div className="flex justify-between">
                     <Button
-                      onClick={handleSubmit}
-                      disabled={Object.keys(answers).length !== questions.length}
+                      variant="outline"
+                      onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
+                      disabled={currentQuestion === 0}
                       className="flex items-center"
                     >
-                      Submit
-                      <CheckCircle2 className="h-4 w-4 ml-1" />
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Previous
                     </Button>
-                  ) : (
-                    <Button
-                      onClick={() => setCurrentQuestion(prev => Math.min(questions.length - 1, prev + 1))}
-                      className="flex items-center"
-                    >
-                      Next
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  )}
+
+                    {currentQuestion === questions.length - 1 ? (
+                      <Button
+                        onClick={handleSubmit}
+                        disabled={Object.keys(answers).length !== questions.length}
+                        className="flex items-center"
+                      >
+                        Submit
+                        <CheckCircle2 className="h-4 w-4 ml-1" />
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => setCurrentQuestion(prev => Math.min(questions.length - 1, prev + 1))}
+                        className="flex items-center"
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </>
         ) : (
           <Card>
             <CardContent className="pt-6">
