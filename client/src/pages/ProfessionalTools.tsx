@@ -103,47 +103,6 @@ Date:              Date:
   return new Blob([template], { type: 'text/plain;charset=utf-8' });
 };
 
-const generateSpecificationTemplate = () => {
-  const template = `
-ARCHITECTURAL SPECIFICATIONS
-
-Project: [Project Name]
-Location: [Project Location]
-Architect: [Architect Name]
-Date: [Date]
-
-DIVISION 1 - GENERAL REQUIREMENTS
-
-1.1 WORK INCLUDED
-    A. Scope of Work
-    B. Project Requirements
-    C. Quality Assurance
-
-1.2 SUBMITTALS
-    A. Shop Drawings
-    B. Product Data
-    C. Samples
-
-DIVISION 2 - SITE WORK
-
-2.1 SITE PREPARATION
-    A. Clearing and Grubbing
-    B. Earthwork
-    C. Grading
-
-DIVISION 3 - CONCRETE
-
-3.1 CAST-IN-PLACE CONCRETE
-    A. Materials
-    B. Mix Design
-    C. Placement
-    D. Finishing
-
-[Continue with other divisions...]
-`;
-  return new Blob([template], { type: 'text/plain;charset=utf-8' });
-};
-
 const generateClientFormTemplate = () => {
   const template = `
 CLIENT REQUIREMENTS FORM
@@ -190,6 +149,47 @@ Project Information:
 
 Submitted by: _________________
 Date: _________________
+`;
+  return new Blob([template], { type: 'text/plain;charset=utf-8' });
+};
+
+const generateSpecificationTemplate = () => {
+  const template = `
+ARCHITECTURAL SPECIFICATIONS
+
+Project: [Project Name]
+Location: [Project Location]
+Architect: [Architect Name]
+Date: [Date]
+
+DIVISION 1 - GENERAL REQUIREMENTS
+
+1.1 WORK INCLUDED
+    A. Scope of Work
+    B. Project Requirements
+    C. Quality Assurance
+
+1.2 SUBMITTALS
+    A. Shop Drawings
+    B. Product Data
+    C. Samples
+
+DIVISION 2 - SITE WORK
+
+2.1 SITE PREPARATION
+    A. Clearing and Grubbing
+    B. Earthwork
+    C. Grading
+
+DIVISION 3 - CONCRETE
+
+3.1 CAST-IN-PLACE CONCRETE
+    A. Materials
+    B. Mix Design
+    C. Placement
+    D. Finishing
+
+[Continue with other divisions...]
 `;
   return new Blob([template], { type: 'text/plain;charset=utf-8' });
 };
@@ -288,6 +288,39 @@ export default function ProfessionalTools() {
     toast({
       title: "Task Deleted",
       description: "Task has been removed from the project."
+    });
+  };
+
+  const handleDownload = (templateType: string) => {
+    let blob: Blob;
+    let filename: string;
+
+    switch (templateType) {
+      case 'contract':
+        blob = generateContractTemplate();
+        filename = 'architectural-services-agreement.txt';
+        break;
+      case 'specifications':
+        blob = generateSpecificationTemplate();
+        filename = 'architectural-specifications.txt';
+        break;
+      case 'client-form':
+        blob = generateClientFormTemplate();
+        filename = 'client-requirements-form.txt';
+        break;
+      default:
+        toast({
+          title: "Error",
+          description: "Template not found",
+          variant: "destructive"
+        });
+        return;
+    }
+
+    saveAs(blob, filename);
+    toast({
+      title: "Download Started",
+      description: `${filename} is being downloaded to your device.`
     });
   };
 
@@ -477,42 +510,15 @@ export default function ProfessionalTools() {
                       Document Templates
                     </h2>
                     <div className="space-y-3">
-                      <Button variant="outline" className="w-full justify-start"
-                        onClick={() => {
-                          const blob = generateContractTemplate();
-                          saveAs(blob, 'contract_template.txt');
-                          toast({
-                            title: "Template Downloaded",
-                            description: "Contract template has been downloaded to your device."
-                          });
-                        }}
-                      >
+                      <Button variant="outline" className="w-full justify-start" onClick={() => handleDownload('contract')}>
                         <FileText className="h-4 w-4 mr-2" />
                         Contract Templates
                       </Button>
-                      <Button variant="outline" className="w-full justify-start"
-                        onClick={() => {
-                          const blob = generateSpecificationTemplate();
-                          saveAs(blob, 'specifications_template.txt');
-                          toast({
-                            title: "Template Downloaded",
-                            description: "Specification template has been downloaded to your device."
-                          });
-                        }}
-                      >
+                      <Button variant="outline" className="w-full justify-start" onClick={() => handleDownload('specifications')}>
                         <FileSpreadsheet className="h-4 w-4 mr-2" />
                         Specifications
                       </Button>
-                      <Button variant="outline" className="w-full justify-start"
-                        onClick={() => {
-                          const blob = generateClientFormTemplate();
-                          saveAs(blob, 'client_form_template.txt');
-                          toast({
-                            title: "Template Downloaded",
-                            description: "Client form template has been downloaded to your device."
-                          });
-                        }}
-                      >
+                      <Button variant="outline" className="w-full justify-start" onClick={() => handleDownload('client-form')}>
                         <MessageSquare className="h-4 w-4 mr-2" />
                         Client Forms
                       </Button>
