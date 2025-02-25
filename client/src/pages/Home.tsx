@@ -12,14 +12,14 @@ import {
   Briefcase, 
   FileCode, 
   PenSquare,
-  ClipboardList
+  ClipboardList,
+  ChevronRight
 } from "lucide-react";
 
 export default function Home() {
   const [showAnimation, setShowAnimation] = useState(true);
 
   useEffect(() => {
-    // Check if animation has already played in this session
     const hasAnimationPlayed = sessionStorage.getItem('animationPlayed');
     if (hasAnimationPlayed) {
       setShowAnimation(false);
@@ -29,20 +29,64 @@ export default function Home() {
   }, []);
 
   const menuItems = [
-    { icon: Calculator, label: "Calculator", href: "/calculator" },
-    { icon: BookOpen, label: "Terms Index", href: "/terms" },
-    { icon: Ruler, label: "AR Measure", href: "/ar" },
-    { icon: ClipboardList, label: "Assessment", href: "/exam" },
-    { icon: LineChart, label: "Progress", href: "/progress" },
-    { icon: Book, label: "E-Book", href: "/ebook" },
-    { icon: PenSquare, label: "Portfolio Builder", href: "/portfolio" },
-    { icon: FileCode, label: "Building Codes", href: "/codes" },
-    { icon: Briefcase, label: "Professional Tools", href: "/professional" },
-    { icon: Info, label: "About", href: "/about" },
+    { 
+      icon: Calculator, 
+      label: "Calculator", 
+      href: "/calculator",
+      description: "Essential architectural calculations and formulas"
+    },
+    { 
+      icon: BookOpen, 
+      label: "Terms Index", 
+      href: "/terms",
+      description: "Comprehensive architectural terminology guide"
+    },
+    { 
+      icon: Ruler, 
+      label: "AR Measure", 
+      href: "/ar",
+      description: "Augmented reality measurement tools"
+    },
+    { 
+      icon: ClipboardList, 
+      label: "Assessment", 
+      href: "/exam",
+      description: "Test your architectural knowledge"
+    },
+    { 
+      icon: LineChart, 
+      label: "Progress", 
+      href: "/progress",
+      description: "Track your learning journey"
+    },
+    { 
+      icon: Book, 
+      label: "E-Book", 
+      href: "/ebook",
+      description: "Digital architectural resources"
+    },
+    { 
+      icon: PenSquare, 
+      label: "Portfolio Builder", 
+      href: "/portfolio",
+      description: "Create and showcase your work"
+    },
+    { 
+      icon: FileCode, 
+      label: "Building Codes", 
+      href: "/codes",
+      description: "Access building regulations and standards"
+    },
+    { 
+      icon: Briefcase, 
+      label: "Professional Tools", 
+      href: "/professional",
+      description: "Resources for practicing architects"
+    }
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-start p-4 relative overflow-hidden">
       {/* Initial Logo Animation */}
       {showAnimation && (
         <div className="absolute inset-0 flex items-center justify-center logo-animation">
@@ -58,7 +102,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Animated background elements */}
+      {/* Background Elements */}
       <div 
         className={`absolute inset-0 pointer-events-none ${showAnimation ? 'opacity-0 animate-fade-in' : 'opacity-50'}`}
         style={{
@@ -75,7 +119,6 @@ export default function Home() {
         }}
       />
 
-      {/* Blueprint grid with animation */}
       <div 
         className={`absolute inset-0 ${showAnimation ? 'opacity-0 animate-grid-appear' : 'opacity-[0.03]'} pointer-events-none`}
         style={{
@@ -87,46 +130,52 @@ export default function Home() {
         }}
       />
 
-      {/* Geometric shapes */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className={`absolute top-10 left-10 w-40 h-40 border border-primary/20 rounded-full ${showAnimation ? 'opacity-0 animate-shape-appear' : 'opacity-100'}`} />
-        <div className={`absolute bottom-20 right-20 w-60 h-60 border border-primary/10 rotate-45 ${showAnimation ? 'opacity-0 animate-shape-appear' : 'opacity-100'}`}
-          style={{ animationDelay: '0.2s' }} />
-        <div className={`absolute top-1/2 left-1/4 w-20 h-20 border border-primary/30 ${showAnimation ? 'opacity-0 animate-shape-appear' : 'opacity-100'}`}
-          style={{ animationDelay: '0.4s' }} />
+      {/* Hero Section */}
+      <div className={`w-full max-w-4xl mx-auto text-center pt-12 pb-8 ${showAnimation ? 'opacity-0 animate-content-appear' : 'opacity-100'}`}>
+        <h1 className="text-5xl sm:text-6xl font-light mb-4 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+          Arch<span className="font-bold">Kit</span>
+        </h1>
+        <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-lg mx-auto">
+          Your complete toolkit for architecture studies and professional practice
+        </p>
       </div>
 
-      <Card className={`w-full max-w-lg bg-background/60 backdrop-blur border-primary/20 ${showAnimation ? 'opacity-0 animate-content-appear' : 'opacity-100'}`}>
-        <CardContent className="pt-8 pb-6">
-          <h1 className="text-5xl font-light text-center mb-2 tracking-tight">
-            Arch<span className="font-bold">Kit</span>
-          </h1>
-          <p className="text-center text-muted-foreground mb-8">
-            Architecture Student's Toolkit
-          </p>
+      {/* Features Grid */}
+      <div className={`w-full max-w-4xl mx-auto ${showAnimation ? 'opacity-0 animate-content-appear' : 'opacity-100'}`}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
+          {menuItems.map((item, index) => (
+            <Link 
+              key={item.href} 
+              href={item.href}
+              className="group"
+            >
+              <Card className="h-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]">
+                <CardContent className="p-6 flex flex-col items-center text-center gap-4">
+                  <div className="rounded-full bg-primary/5 p-3 transition-colors group-hover:bg-primary/10">
+                    <item.icon className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold mb-2 tracking-wide">{item.label}</h2>
+                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-primary/40 transition-transform group-hover:translate-x-1" />
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
 
-          <div className="grid grid-cols-2 gap-4 p-2">
-            {menuItems.map((item, index) => (
-              <Link 
-                key={item.href} 
-                href={item.href}
-                className={`${index === menuItems.length - 1 ? "col-span-2" : ""}`}
-              >
-                <Button
-                  variant="outline"
-                  className="w-full h-24 flex flex-col items-center justify-center gap-2 
-                            hover:bg-primary/5 hover:border-primary/30 transition-all
-                            hover:shadow-lg hover:-translate-y-0.5
-                            active:scale-95 touch-manipulation"
-                >
-                  <item.icon className="h-8 w-8" />
-                  <span className="font-medium text-lg tracking-wide">{item.label}</span>
-                </Button>
-              </Link>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+        {/* About Link */}
+        <Link href="/about" className="block mt-6">
+          <Button 
+            variant="ghost" 
+            className="w-full flex items-center justify-center gap-2 py-6"
+          >
+            <Info className="h-5 w-5" />
+            <span>About ArchKit</span>
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }
