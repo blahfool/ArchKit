@@ -13,6 +13,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="ArchKit" />
+    <meta name="application-name" content="ArchKit" />
 
     <!-- Icons -->
     <link rel="icon" type="image/png" href="./icons/icon-192x192.png" />
@@ -25,7 +26,7 @@
     <div id="root"></div>
     <script type="module" src="./src/main.tsx"></script>
     <script>
-      // Register Service Worker
+      // Register Service Worker with better error handling and offline support
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', async () => {
           try {
@@ -33,12 +34,6 @@
               scope: './',
               updateViaCache: 'none' // Never use cached service worker
             });
-
-            // Check for updates immediately and every 30 minutes
-            registration.update();
-            setInterval(() => {
-              registration.update();
-            }, 30 * 60 * 1000);
 
             // Handle updates
             registration.addEventListener('updatefound', () => {
@@ -48,22 +43,23 @@
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   // New content is available, prompt user to refresh
                   if (window.confirm('A new version of ArchKit is available! Click OK to update.')) {
-                    newWorker.postMessage({ type: 'skipWaiting' });
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
                     window.location.reload();
                   }
                 }
               });
             });
 
-            // Handle controller change
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-              if (!refreshing) {
-                refreshing = true;
-                window.location.reload();
-              }
+            // Add offline capability notification
+            window.addEventListener('online', () => {
+              console.log('Application is online');
             });
 
+            window.addEventListener('offline', () => {
+              console.log('Application is offline - continuing with cached content');
+            });
+
+            // Log successful registration
             console.log('ServiceWorker registration successful');
           } catch (err) {
             console.error('ServiceWorker registration failed: ', err);

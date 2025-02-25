@@ -5,8 +5,16 @@ const ASSETS_TO_CACHE = [
   './manifest.json',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
-  // Add all static assets and routes
-  './assets/'
+  './assets/*',
+  './calculator',
+  './terms',
+  './exam',
+  './ebook',
+  './portfolio',
+  './codes',
+  './professional',
+  './about',
+  './not-found'
 ];
 
 // Install event - cache static assets
@@ -36,7 +44,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - offline-first with network fallback
+// Fetch event - handle all routes offline-first
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
@@ -46,20 +54,19 @@ self.addEventListener('fetch', (event) => {
           return response;
         }
 
-        // Clone the request
-        const fetchRequest = event.request.clone();
+        // For navigation requests (HTML routes), return index.html
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
 
-        // Try network, then cache response
-        return fetch(fetchRequest)
+        // For other requests, try network then cache
+        return fetch(event.request)
           .then(response => {
             if (!response || response.status !== 200) {
               return response;
             }
 
-            // Clone the response
             const responseToCache = response.clone();
-
-            // Add successful responses to cache
             caches.open(CACHE_NAME)
               .then((cache) => {
                 if (event.request.url.startsWith(self.location.origin)) {
@@ -70,8 +77,11 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch(() => {
-            // If both cache and network fail, return offline page
-            return caches.match('./index.html');
+            // If both cache and network fail, return index.html for navigation
+            if (event.request.mode === 'navigate') {
+              return caches.match('./index.html');
+            }
+            return new Response('Offline content not available');
           });
       })
   );
