@@ -25,38 +25,42 @@
     <script>
       // Register Service Worker
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-              console.log('ServiceWorker registration successful');
-
-              // Check for updates
-              registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-
-                newWorker.addEventListener('statechange', () => {
-                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    // New content is available
-                    if (window.confirm('New version available! Click OK to update.')) {
-                      newWorker.postMessage({ type: 'skipWaiting' });
-                      window.location.reload();
-                    }
-                  }
-                });
-              });
-            })
-            .catch(err => {
-              console.log('ServiceWorker registration failed: ', err);
+        window.addEventListener('load', async () => {
+          try {
+            // Get the current origin to handle Replit's environment
+            const swPath = `${window.location.origin}/service-worker.js`;
+            const registration = await navigator.serviceWorker.register(swPath, {
+              scope: '/'
             });
 
-          // Handle updates when the service worker changes
-          let refreshing = false;
-          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (!refreshing) {
-              refreshing = true;
-              window.location.reload();
-            }
-          });
+            console.log('ServiceWorker registration successful');
+
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New content is available
+                  if (window.confirm('New version available! Click OK to update.')) {
+                    newWorker.postMessage({ type: 'skipWaiting' });
+                    window.location.reload();
+                  }
+                }
+              });
+            });
+
+            // Handle updates when the service worker changes
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              if (!refreshing) {
+                refreshing = true;
+                window.location.reload();
+              }
+            });
+          } catch (err) {
+            console.error('ServiceWorker registration failed: ', err);
+          }
         });
       }
     </script>

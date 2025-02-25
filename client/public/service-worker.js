@@ -13,11 +13,17 @@ const ASSETS_TO_CACHE = [
 const DATA_CACHE_NAME = 'archkit-data-v1';
 const API_URLS = ['/api/terms', '/api/formulas'];
 
+// Helper function to get full URL including Replit's environment
+function getFullUrl(path) {
+  return `${self.location.origin}${path}`;
+}
+
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      // Cache assets with full URLs
+      return cache.addAll(ASSETS_TO_CACHE.map(getFullUrl));
     })
   );
   // Activate new service worker immediately
